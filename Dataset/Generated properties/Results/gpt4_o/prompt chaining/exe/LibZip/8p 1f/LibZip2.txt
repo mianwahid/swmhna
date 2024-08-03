@@ -1,0 +1,142 @@
+To ensure the robustness and correctness of the `LibZip` library, we need to define test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for the `LibZip` contract:
+
+### FastLZ Operations
+
+1. **Invariant: Compression and Decompression Consistency**
+   - **Description**: Compressing and then decompressing any data should yield the original data.
+   - **Test Case**:
+     ```solidity
+     bytes memory originalData = ...; // some data
+     bytes memory compressedData = LibZip.flzCompress(originalData);
+     bytes memory decompressedData = LibZip.flzDecompress(compressedData);
+     assert(keccak256(originalData) == keccak256(decompressedData));
+     ```
+
+2. **Invariant: Empty Data Compression**
+   - **Description**: Compressing and decompressing an empty byte array should yield an empty byte array.
+   - **Test Case**:
+     ```solidity
+     bytes memory emptyData = "";
+     bytes memory compressedData = LibZip.flzCompress(emptyData);
+     bytes memory decompressedData = LibZip.flzDecompress(compressedData);
+     assert(decompressedData.length == 0);
+     ```
+
+3. **Invariant: Single Byte Data Compression**
+   - **Description**: Compressing and decompressing a single byte should yield the same single byte.
+   - **Test Case**:
+     ```solidity
+     bytes memory singleByteData = hex"01";
+     bytes memory compressedData = LibZip.flzCompress(singleByteData);
+     bytes memory decompressedData = LibZip.flzDecompress(compressedData);
+     assert(keccak256(singleByteData) == keccak256(decompressedData));
+     ```
+
+4. **Invariant: Large Data Compression**
+   - **Description**: Compressing and decompressing a large byte array should yield the original data.
+   - **Test Case**:
+     ```solidity
+     bytes memory largeData = new bytes(10000); // large data
+     for (uint i = 0; i < largeData.length; i++) {
+         largeData[i] = byte(uint8(i % 256));
+     }
+     bytes memory compressedData = LibZip.flzCompress(largeData);
+     bytes memory decompressedData = LibZip.flzDecompress(compressedData);
+     assert(keccak256(largeData) == keccak256(decompressedData));
+     ```
+
+### Calldata Operations
+
+1. **Invariant: Calldata Compression and Decompression Consistency**
+   - **Description**: Compressing and then decompressing any calldata should yield the original calldata.
+   - **Test Case**:
+     ```solidity
+     bytes memory originalData = ...; // some calldata
+     bytes memory compressedData = LibZip.cdCompress(originalData);
+     bytes memory decompressedData = LibZip.cdDecompress(compressedData);
+     assert(keccak256(originalData) == keccak256(decompressedData));
+     ```
+
+2. **Invariant: Empty Calldata Compression**
+   - **Description**: Compressing and decompressing an empty calldata should yield an empty calldata.
+   - **Test Case**:
+     ```solidity
+     bytes memory emptyData = "";
+     bytes memory compressedData = LibZip.cdCompress(emptyData);
+     bytes memory decompressedData = LibZip.cdDecompress(compressedData);
+     assert(decompressedData.length == 0);
+     ```
+
+3. **Invariant: Single Byte Calldata Compression**
+   - **Description**: Compressing and decompressing a single byte calldata should yield the same single byte.
+   - **Test Case**:
+     ```solidity
+     bytes memory singleByteData = hex"01";
+     bytes memory compressedData = LibZip.cdCompress(singleByteData);
+     bytes memory decompressedData = LibZip.cdDecompress(compressedData);
+     assert(keccak256(singleByteData) == keccak256(decompressedData));
+     ```
+
+4. **Invariant: Large Calldata Compression**
+   - **Description**: Compressing and decompressing a large calldata should yield the original calldata.
+   - **Test Case**:
+     ```solidity
+     bytes memory largeData = new bytes(10000); // large calldata
+     for (uint i = 0; i < largeData.length; i++) {
+         largeData[i] = byte(uint8(i % 256));
+     }
+     bytes memory compressedData = LibZip.cdCompress(largeData);
+     bytes memory decompressedData = LibZip.cdDecompress(compressedData);
+     assert(keccak256(largeData) == keccak256(decompressedData));
+     ```
+
+5. **Invariant: Calldata with Sequences of 0x00 and 0xff**
+   - **Description**: Compressing and decompressing calldata with sequences of 0x00 and 0xff should yield the original calldata.
+   - **Test Case**:
+     ```solidity
+     bytes memory sequenceData = new bytes(256);
+     for (uint i = 0; i < 128; i++) {
+         sequenceData[i] = 0x00;
+     }
+     for (uint i = 128; i < 256; i++) {
+         sequenceData[i] = 0xff;
+     }
+     bytes memory compressedData = LibZip.cdCompress(sequenceData);
+     bytes memory decompressedData = LibZip.cdDecompress(compressedData);
+     assert(keccak256(sequenceData) == keccak256(decompressedData));
+     ```
+
+### Fallback Function
+
+1. **Invariant: Fallback Function with Empty Calldata**
+   - **Description**: The fallback function should handle empty calldata without errors.
+   - **Test Case**:
+     ```solidity
+     contract TestContract {
+         fallback() external payable {
+             LibZip.cdFallback();
+         }
+     }
+     // Simulate calling the fallback function with empty calldata
+     (bool success, ) = address(testContract).call("");
+     assert(success);
+     ```
+
+2. **Invariant: Fallback Function with Compressed Calldata**
+   - **Description**: The fallback function should correctly decompress and handle compressed calldata.
+   - **Test Case**:
+     ```solidity
+     contract TestContract {
+         fallback() external payable {
+             LibZip.cdFallback();
+         }
+     }
+     bytes memory originalData = ...; // some calldata
+     bytes memory compressedData = LibZip.cdCompress(originalData);
+     // Simulate calling the fallback function with compressed calldata
+     (bool success, bytes memory returnedData) = address(testContract).call(compressedData);
+     assert(success);
+     assert(keccak256(returnedData) == keccak256(originalData));
+     ```
+
+By implementing these test invariants, we can ensure that the `LibZip` library functions correctly under various edge cases and scenarios.

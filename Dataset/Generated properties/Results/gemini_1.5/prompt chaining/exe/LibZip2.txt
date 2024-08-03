@@ -1,0 +1,57 @@
+## Test Invariants for LibZip Contract
+
+This document outlines test invariants for the `LibZip` contract, covering both FastLZ and calldata compression functionalities.
+
+**General Invariants (for both compression methods):**
+
+1. **Idempotency:**
+    - Compressing and then decompressing the same data should always result in the original data.
+    - `LibZip.flzDecompress(LibZip.flzCompress(data)) == data`
+    - `LibZip.cdDecompress(LibZip.cdCompress(data)) == data`
+2. **Empty Input:**
+    - Compressing an empty byte array should return an empty byte array.
+    - `LibZip.flzCompress("") == ""`
+    - `LibZip.cdCompress("") == ""`
+3. **Zero Length:**
+    - The length of the compressed data should never be greater than the length of the original data.
+    - `LibZip.flzCompress(data).length <= data.length`
+    - `LibZip.cdCompress(data).length <= data.length`
+
+**FastLZ Specific Invariants:**
+
+4. **Short Data:**
+    - For very short data (e.g., less than 10 bytes), compression might not yield significant size reduction. Test with various short inputs.
+5. **Repetitive Patterns:**
+    - FastLZ excels at compressing data with repeating patterns. Test with data containing various lengths of repeating sequences.
+6. **Random Data:**
+    - Test with randomly generated data to assess the average compression ratio.
+7. **Large Data:**
+    - Test with large datasets (e.g., several kilobytes) to evaluate performance and memory usage.
+
+**Calldata Specific Invariants:**
+
+8. **Zero Byte Runs:**
+    - Test with data containing long sequences of 0x00 bytes (up to 128) to ensure correct RLE compression.
+9. **0xFF Byte Runs:**
+    - Test with data containing long sequences of 0xff bytes (up to 32) to ensure correct RLE compression.
+10. **Mixed Data:**
+    - Test with data containing a mix of 0x00, 0xff, and other byte values to verify the selective RLE implementation.
+11. **First 4 Bytes Negation:**
+    - Ensure that the first 4 bytes of the compressed data are correctly bitwise negated.
+    - `LibZip.cdCompress(data)[0..3] == ~data[0..3]` (bitwise negation)
+12. **`cdFallback` Function:**
+    - **Calldata Size:** Test with various calldata sizes, including empty calldata.
+    - **Successful Delegation:** Ensure that `delegatecall` is executed successfully with the decompressed calldata.
+    - **Error Handling:** Test cases where `delegatecall` reverts and verify that `cdFallback` correctly propagates the revert.
+
+**Edge Cases:**
+
+13. **Max Values:** Test with input data containing the maximum allowed run lengths for both 0x00 and 0xff bytes.
+14. **Boundary Conditions:** Test with data lengths that are close to the boundaries where the compression algorithm switches between different encoding schemes.
+
+**Performance Considerations:**
+
+- While not strictly invariants, it's crucial to measure the gas cost of both compression and decompression functions for various input sizes and characteristics.
+- Compare the gas cost of using compressed calldata with uncompressed calldata to quantify the gas savings.
+
+These test invariants provide a comprehensive framework for testing the `LibZip` contract. By covering these cases, you can gain confidence in the correctness and efficiency of its compression and decompression functionalities. 

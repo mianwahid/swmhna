@@ -1,0 +1,102 @@
+To ensure the correctness and robustness of the `MerkleProofLib` smart contract, we need to define test invariants that cover various edge cases for each functionality. Here are the test invariants for the provided contract:
+
+### Invariants for `verify` Function
+
+1. **Valid Proof**:
+   - Given a valid proof, root, and leaf, the function should return `true`.
+   - Edge Case: Test with the smallest possible Merkle tree (single leaf).
+
+2. **Invalid Proof**:
+   - Given an invalid proof, the function should return `false`.
+   - Edge Case: Test with a proof that has an incorrect element.
+
+3. **Empty Proof**:
+   - Given an empty proof array, the function should return `false`.
+   - Edge Case: Test with an empty proof and a non-empty root and leaf.
+
+4. **Leaf Not in Tree**:
+   - Given a leaf that is not part of the tree, the function should return `false`.
+   - Edge Case: Test with a leaf that is not part of the tree but has a similar hash.
+
+### Invariants for `verifyCalldata` Function
+
+1. **Valid Proof**:
+   - Given a valid proof, root, and leaf in calldata, the function should return `true`.
+   - Edge Case: Test with the smallest possible Merkle tree (single leaf).
+
+2. **Invalid Proof**:
+   - Given an invalid proof in calldata, the function should return `false`.
+   - Edge Case: Test with a proof that has an incorrect element.
+
+3. **Empty Proof**:
+   - Given an empty proof array in calldata, the function should return `false`.
+   - Edge Case: Test with an empty proof and a non-empty root and leaf.
+
+4. **Leaf Not in Tree**:
+   - Given a leaf that is not part of the tree in calldata, the function should return `false`.
+   - Edge Case: Test with a leaf that is not part of the tree but has a similar hash.
+
+### Invariants for `verifyMultiProof` Function
+
+1. **Valid Multi-Proof**:
+   - Given a valid multi-proof, root, leaves, and flags, the function should return `true`.
+   - Edge Case: Test with the smallest possible Merkle tree (single leaf).
+
+2. **Invalid Multi-Proof**:
+   - Given an invalid multi-proof, the function should return `false`.
+   - Edge Case: Test with a proof that has an incorrect element.
+
+3. **Empty Proof and Leaves**:
+   - Given empty proof and leaves arrays, the function should return `false`.
+   - Edge Case: Test with empty proof and leaves but non-empty flags.
+
+4. **Incorrect Flags Length**:
+   - Given flags of incorrect length, the function should return `false`.
+   - Edge Case: Test with flags length not equal to `(leaves.length - 1) + proof.length`.
+
+5. **Leaves Not in Tree**:
+   - Given leaves that are not part of the tree, the function should return `false`.
+   - Edge Case: Test with leaves that are not part of the tree but have similar hashes.
+
+### Invariants for `verifyMultiProofCalldata` Function
+
+1. **Valid Multi-Proof**:
+   - Given a valid multi-proof, root, leaves, and flags in calldata, the function should return `true`.
+   - Edge Case: Test with the smallest possible Merkle tree (single leaf).
+
+2. **Invalid Multi-Proof**:
+   - Given an invalid multi-proof in calldata, the function should return `false`.
+   - Edge Case: Test with a proof that has an incorrect element.
+
+3. **Empty Proof and Leaves**:
+   - Given empty proof and leaves arrays in calldata, the function should return `false`.
+   - Edge Case: Test with empty proof and leaves but non-empty flags.
+
+4. **Incorrect Flags Length**:
+   - Given flags of incorrect length in calldata, the function should return `false`.
+   - Edge Case: Test with flags length not equal to `(leaves.length - 1) + proof.length`.
+
+5. **Leaves Not in Tree**:
+   - Given leaves that are not part of the tree in calldata, the function should return `false`.
+   - Edge Case: Test with leaves that are not part of the tree but have similar hashes.
+
+### Invariants for `emptyProof` Function
+
+1. **Empty Proof**:
+   - The function should always return an empty `bytes32` array.
+   - Edge Case: Ensure the returned array length is zero.
+
+### Invariants for `emptyLeaves` Function
+
+1. **Empty Leaves**:
+   - The function should always return an empty `bytes32` array.
+   - Edge Case: Ensure the returned array length is zero.
+
+### Invariants for `emptyFlags` Function
+
+1. **Empty Flags**:
+   - The function should always return an empty `bool` array.
+   - Edge Case: Ensure the returned array length is zero.
+
+### Summary
+These invariants ensure that the `MerkleProofLib` functions behave correctly under various conditions, including edge cases. By testing these invariants, we can verify the robustness and correctness of the library's implementation.

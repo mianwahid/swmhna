@@ -1,0 +1,29 @@
+This smart contract provides a library called `LibMap` for efficiently storing and retrieving packed unsigned integers within Solidity mappings. It leverages bitwise operations to store multiple smaller values within a single storage slot, optimizing gas costs. Here's a breakdown of its functionalities:
+
+**1. Data Structures:**
+
+- **`Uint8Map`, `Uint16Map`, `Uint32Map`, `Uint40Map`, `Uint64Map`, `Uint128Map`:** These structs represent maps for storing unsigned integers of different sizes (8, 16, 32, 40, 64, and 128 bits respectively). Each struct internally uses a `mapping(uint256 => uint256)` to store the data.
+
+**2. Getters and Setters:**
+
+- **`get(Uint*Map storage map, uint256 index)`:** These functions retrieve the value of the specified unsigned integer type (`uint8`, `uint16`, etc.) stored at the given `index` within the respective map. They use bitwise operations to extract the specific value from the packed storage slot.
+
+- **`set(Uint*Map storage map, uint256 index, uint* value)`:** These functions update the value of the specified unsigned integer type at the given `index` within the respective map. They use bitwise operations to modify the specific bits corresponding to the value within the packed storage slot.
+
+- **`get(mapping(uint256 => uint256) storage map, uint256 index, uint256 bitWidth)`:** This function allows retrieving a value of arbitrary `bitWidth` from a standard Solidity mapping. It calculates the appropriate storage slot and bit offset based on the `index` and `bitWidth`.
+
+- **`set(mapping(uint256 => uint256) storage map, uint256 index, uint256 value, uint256 bitWidth)`:** This function updates a value of arbitrary `bitWidth` within a standard Solidity mapping. It calculates the storage slot and bit offset and modifies the specific bits corresponding to the new `value`.
+
+**3. Binary Search:**
+
+- **`searchSorted(Uint*Map storage map, uint* needle, uint256 start, uint256 end)`:** These functions perform a binary search within the specified range (`start` to `end`) of the given map to find the `needle` value. They return a boolean indicating whether the value was found (`found`) and the `index` where it's located (or the closest index if not found).
+
+- **`searchSorted(mapping(uint256 => uint256) storage map, uint256 needle, uint256 start, uint256 end, uint256 bitWidth)`:** This function performs a binary search within a standard Solidity mapping, considering values of the specified `bitWidth`.
+
+**4. Private Helpers:**
+
+- **`_rawDiv(uint256 x, uint256 y)`:** This internal helper function performs integer division (`x / y`) while handling the case where `y` is zero (returning 0 in that case).
+
+- **`_rawMod(uint256 x, uint256 y)`:** This internal helper function calculates the modulo (`x % y`) while handling the case where `y` is zero (returning 0 in that case).
+
+**In essence, this `LibMap` library provides a set of tools for efficiently working with packed unsigned integers within Solidity mappings. This is particularly useful when you need to store a large number of small values, as it can significantly reduce storage costs and improve gas efficiency.**

@@ -1,0 +1,72 @@
+## Test Invariants for RedBlackTreeLib
+
+This list outlines test invariants for the `RedBlackTreeLib` contract, focusing on edge cases and ensuring the integrity of the Red-Black Tree data structure.
+
+**General Invariants (for all functions):**
+
+* **Non-Zero Values:** All functions should revert with `ValueIsEmpty` error when attempting to insert, find, or remove a zero value.
+* **Pointer Validity:** Functions accepting pointers should revert with `PointerOutOfBounds` error if the provided pointer is invalid (e.g., points to a non-existent node).
+* **Tree Full:** `tryInsert` should return `ERROR_TREE_IS_FULL` when attempting to insert into a full tree (containing 2^31 - 1 nodes).
+
+**`size(Tree storage tree)`:**
+
+* **Empty Tree:** `size` should return 0 for an empty tree.
+* **After Insertion:** `size` should increase by 1 after a successful `insert` operation.
+* **After Removal:** `size` should decrease by 1 after a successful `remove` operation.
+
+**`values(Tree storage tree)`:**
+
+* **Empty Tree:** `values` should return an empty array for an empty tree.
+* **Sorted Order:** The returned array from `values` should always be sorted in ascending order.
+* **Complete Values:** The returned array should contain all values present in the tree.
+
+**`find(Tree storage tree, uint256 x)`:**
+
+* **Non-Existing Value:** `find` should return an empty pointer (bytes32(0)) if the value `x` is not present in the tree.
+* **Existing Value:** `find` should return a non-empty pointer to the node containing `x` if it exists in the tree.
+
+**`nearest(Tree storage tree, uint256 x)`, `nearestBefore(Tree storage tree, uint256 x)`, `nearestAfter(Tree storage tree, uint256 x)`:**
+
+* **Empty Tree:** All three functions should return an empty pointer for an empty tree.
+* **Exact Match:** If `x` exists in the tree, all three functions should return a pointer to the node containing `x`.
+* **Nearest Value:** If `x` doesn't exist, the functions should return a pointer to the node containing the nearest value according to their respective logic (nearest, nearest before, nearest after).
+* **Tie Breaker:** In case of a tie (equal distance), `nearest` should prioritize the smaller value.
+
+**`exists(Tree storage tree, uint256 x)`:**
+
+* **Non-Existing Value:** `exists` should return `false` if `x` is not present in the tree.
+* **Existing Value:** `exists` should return `true` if `x` is present in the tree.
+
+**`insert(Tree storage tree, uint256 x)`, `tryInsert(Tree storage tree, uint256 x)`:**
+
+* **Duplicate Insertion:** Both functions should revert/return `ERROR_VALUE_ALREADY_EXISTS` when attempting to insert a value that already exists in the tree.
+* **Successful Insertion:** After a successful insertion, `exists(tree, x)` should return `true`.
+
+**`remove(Tree storage tree, uint256 x)`, `tryRemove(Tree storage tree, uint256 x)`, `remove(bytes32 ptr)`, `tryRemove(bytes32 ptr)`:**
+
+* **Removing Non-Existing Value:** All four functions should revert/return `ERROR_VALUE_DOES_NOT_EXISTS` when attempting to remove a value that doesn't exist in the tree.
+* **Successful Removal:** After a successful removal, `exists(tree, x)` should return `false`.
+* **Pointer Invalidation:** After `remove(bytes32 ptr)`, the pointer `ptr` might point to a different node or become invalid.
+
+**`value(bytes32 ptr)`:**
+
+* **Empty Pointer:** `value` should return 0 for an empty pointer (bytes32(0)).
+* **Valid Pointer:** `value` should return the correct value stored at the node pointed to by a valid pointer.
+
+**`first(Tree storage tree)`, `last(Tree storage tree)`:**
+
+* **Empty Tree:** Both functions should return an empty pointer for an empty tree.
+* **Smallest/Largest Value:** `first` should return a pointer to the node containing the smallest value, and `last` should return a pointer to the node containing the largest value in the tree.
+
+**`next(bytes32 ptr)`, `prev(bytes32 ptr)`:**
+
+* **Empty Pointer:** Both functions should return an empty pointer if provided with an empty pointer.
+* **Last/First Node:** `next` should return an empty pointer when called on the last node, and `prev` should return an empty pointer when called on the first node.
+* **Correct Navigation:** Both functions should correctly navigate to the next/previous node in the sorted order of values.
+
+**`isEmpty(bytes32 ptr)`:**
+
+* **Empty Pointer:** `isEmpty` should return `true` for an empty pointer (bytes32(0)).
+* **Non-Empty Pointer:** `isEmpty` should return `false` for a valid, non-empty pointer.
+
+These test invariants provide a comprehensive framework for testing the `RedBlackTreeLib` contract. By covering various edge cases and ensuring the data structure's integrity, these invariants contribute to the reliability and robustness of the library.

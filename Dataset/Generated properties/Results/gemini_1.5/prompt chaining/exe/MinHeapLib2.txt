@@ -1,0 +1,63 @@
+## Test Invariants for MinHeapLib Contract
+
+This list outlines test invariants for the `MinHeapLib` contract, covering edge cases and functionalities:
+
+**General Invariants:**
+
+- **Heap Property:** After every operation (push, pop, replace, enqueue), the heap property must hold: the value of each node is less than or equal to the values of its children.
+- **Empty Heap:**
+    - `root()`, `pop()`, and `replace()` should revert with `HeapIsEmpty` when called on an empty heap.
+    - `length()` should return 0 for an empty heap.
+- **Memory Allocation (MemHeap):**
+    - `reserve()` should allocate sufficient memory to avoid reallocations during subsequent pushes if the maximum heap size is known.
+    - Heap operations on `MemHeap` should not modify the storage heap and vice versa.
+
+**`root()` Function:**
+
+- **Single Element:** `root()` should return the only element when called on a heap with one element.
+- **Multiple Elements:** `root()` should always return the smallest element in the heap.
+
+**`push()` Function:**
+
+- **First Element:** Pushing an element into an empty heap should make that element the root.
+- **Subsequent Elements:** Pushing an element should maintain the heap property.
+- **Duplicate Elements:** Pushing duplicate elements should be allowed, and the heap property should still hold.
+
+**`pop()` Function:**
+
+- **Single Element:** Popping from a heap with one element should result in an empty heap.
+- **Multiple Elements:** Popping should always remove and return the smallest element while maintaining the heap property.
+
+**`pushPop()` Function:**
+
+- **Empty Heap:** `pushPop()` on an empty heap should be equivalent to `push()`.
+- **Smaller Value:** `pushPop()` with a value smaller than the root should return the original root.
+- **Larger Value:** `pushPop()` with a value larger than the root should return a value smaller than or equal to the pushed value, maintaining the heap property.
+
+**`replace()` Function:**
+
+- **Replacement Value:** The heap property should hold after replacing the root with a new value.
+- **Smaller Replacement:** Replacing the root with a smaller value should result in that value becoming the new root.
+- **Larger Replacement:** Replacing the root with a larger value should result in a heap where the new root is smaller than or equal to the replaced value.
+
+**`smallest()` Function:**
+
+- **Varying `k` Values:** Test with `k` values smaller than, equal to, and larger than the heap size.
+- **Sorted Output:** The returned array should always be sorted in ascending order.
+- **Non-Destructive:** `smallest()` should not modify the original heap.
+
+**`enqueue()` Function:**
+
+- **Empty Heap:** Enqueuing into an empty heap should always succeed (`success = true`, `hasPopped = false`).
+- **Non-Full Heap:** Enqueuing into a non-full heap should always succeed (`success = true`, `hasPopped = false`).
+- **Full Heap, Smaller Value:** Enqueuing a value smaller than the root into a full heap should succeed (`success = true`, `hasPopped = true`) and return the original root.
+- **Full Heap, Larger Value:** Enqueuing a value larger than the root into a full heap should fail (`success = false`, `hasPopped = false`).
+- **Boundary Conditions:** Test with `maxLength` values of 0, 1, and the maximum possible value.
+
+**Edge Cases:**
+
+- **Maximum/Minimum Values:** Test with `uint256` minimum and maximum values as heap elements.
+- **Duplicate Values:** Test with heaps containing multiple instances of the same value.
+- **Gas Usage:** While not strictly an invariant, consider testing the gas efficiency of different operations, especially for large heaps.
+
+These test invariants provide a comprehensive framework for testing the `MinHeapLib` contract. By covering these cases, you can ensure the correctness and robustness of your implementation. 

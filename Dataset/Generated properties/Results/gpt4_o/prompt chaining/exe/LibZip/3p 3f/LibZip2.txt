@@ -1,0 +1,99 @@
+To ensure the robustness and correctness of the `LibZip` library, we need to write test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for each function:
+
+### Invariants for `flzCompress` and `flzDecompress`
+
+1. **Compression and Decompression Consistency**:
+   - **Invariant**: `flzDecompress(flzCompress(data)) == data`
+   - **Edge Cases**:
+     - Empty data (`data = ""`)
+     - Single byte data (`data = "a"`)
+     - Repeated patterns (`data = "aaaaaa"`, `data = "abababab"`)
+     - Random data of various lengths (e.g., 1 byte, 32 bytes, 64 bytes, 256 bytes)
+     - Data with non-printable characters
+
+2. **Idempotency of Compression**:
+   - **Invariant**: `flzCompress(flzCompress(data)) == flzCompress(data)`
+   - **Edge Cases**:
+     - Same as above
+
+3. **Idempotency of Decompression**:
+   - **Invariant**: `flzDecompress(flzDecompress(data)) == flzDecompress(data)`
+   - **Edge Cases**:
+     - Same as above
+
+4. **Compression Reduces Size**:
+   - **Invariant**: `flzCompress(data).length <= data.length`
+   - **Edge Cases**:
+     - Data that is already compressed or cannot be compressed further
+
+### Invariants for `cdCompress` and `cdDecompress`
+
+1. **Compression and Decompression Consistency**:
+   - **Invariant**: `cdDecompress(cdCompress(data)) == data`
+   - **Edge Cases**:
+     - Empty data (`data = ""`)
+     - Single byte data (`data = "a"`)
+     - Sequences of `0x00` and `0xff` (e.g., `data = hex"000000"`, `data = hex"ffffff"`)
+     - Mixed sequences (e.g., `data = hex"00ff00ff"`)
+     - Random data of various lengths (e.g., 1 byte, 32 bytes, 64 bytes, 256 bytes)
+     - Data with non-printable characters
+
+2. **Idempotency of Compression**:
+   - **Invariant**: `cdCompress(cdCompress(data)) == cdCompress(data)`
+   - **Edge Cases**:
+     - Same as above
+
+3. **Idempotency of Decompression**:
+   - **Invariant**: `cdDecompress(cdDecompress(data)) == cdDecompress(data)`
+   - **Edge Cases**:
+     - Same as above
+
+4. **Compression Reduces Size**:
+   - **Invariant**: `cdCompress(data).length <= data.length`
+   - **Edge Cases**:
+     - Data that is already compressed or cannot be compressed further
+
+### Invariants for `cdFallback`
+
+1. **Fallback Handles Empty Calldata**:
+   - **Invariant**: `cdFallback()` should not revert when `calldatasize() == 0`
+   - **Edge Cases**:
+     - No calldata
+
+2. **Fallback Handles Compressed Calldata**:
+   - **Invariant**: `cdFallback()` should correctly decompress and delegate call with the decompressed data
+   - **Edge Cases**:
+     - Compressed calldata with sequences of `0x00` and `0xff`
+     - Mixed sequences
+     - Random compressed calldata
+
+3. **Fallback Reverts on Failure**:
+   - **Invariant**: `cdFallback()` should revert if the delegate call fails
+   - **Edge Cases**:
+     - Invalid compressed calldata
+     - Calldata that leads to a failing delegate call
+
+### Summary of Test Cases
+
+For each invariant, we need to create test cases that cover the edge cases mentioned. Here is a summary of the test cases:
+
+1. **Compression and Decompression Consistency**:
+   - Test with empty data
+   - Test with single byte data
+   - Test with repeated patterns
+   - Test with random data of various lengths
+   - Test with non-printable characters
+
+2. **Idempotency of Compression and Decompression**:
+   - Test with the same edge cases as above
+
+3. **Compression Reduces Size**:
+   - Test with data that is already compressed or cannot be compressed further
+
+4. **Fallback Functionality**:
+   - Test with empty calldata
+   - Test with valid compressed calldata
+   - Test with invalid compressed calldata
+   - Test with calldata that leads to a failing delegate call
+
+By covering these invariants and edge cases, we can ensure that the `LibZip` library functions correctly and handles various scenarios robustly.

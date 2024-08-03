@@ -1,0 +1,225 @@
+The provided smart contract is a Solidity library named `DateTimeLib` that offers various date and time operations. Below is a detailed explanation of each functionality provided by the library:
+
+### Constants
+- **Weekdays Constants**: Constants representing days of the week, adhering to ISO 8601 (1-indexed).
+  - `MON = 1`
+  - `TUE = 2`
+  - `WED = 3`
+  - `THU = 4`
+  - `FRI = 5`
+  - `SAT = 6`
+  - `SUN = 7`
+
+- **Months Constants**: Constants representing months of the year, adhering to ISO 8601 (1-indexed).
+  - `JAN = 1`
+  - `FEB = 2`
+  - `MAR = 3`
+  - `APR = 4`
+  - `MAY = 5`
+  - `JUN = 6`
+  - `JUL = 7`
+  - `AUG = 8`
+  - `SEP = 9`
+  - `OCT = 10`
+  - `NOV = 11`
+  - `DEC = 12`
+
+- **Supported Limits**: Constants defining the maximum supported values for years, epoch days, and timestamps.
+  - `MAX_SUPPORTED_YEAR = 0xffffffff`
+  - `MAX_SUPPORTED_EPOCH_DAY = 0x16d3e098039`
+  - `MAX_SUPPORTED_TIMESTAMP = 0x1e18549868c76ff`
+
+### Date Time Operations
+1. **dateToEpochDay**: Converts a given date (`year`, `month`, `day`) to the number of days since 1970-01-01.
+   ```solidity
+   function dateToEpochDay(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 epochDay)
+   ```
+
+2. **epochDayToDate**: Converts the number of days since 1970-01-01 to a date (`year`, `month`, `day`).
+   ```solidity
+   function epochDayToDate(uint256 epochDay) internal pure returns (uint256 year, uint256 month, uint256 day)
+   ```
+
+3. **dateToTimestamp**: Converts a given date (`year`, `month`, `day`) to a Unix timestamp.
+   ```solidity
+   function dateToTimestamp(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 result)
+   ```
+
+4. **timestampToDate**: Converts a Unix timestamp to a date (`year`, `month`, `day`).
+   ```solidity
+   function timestampToDate(uint256 timestamp) internal pure returns (uint256 year, uint256 month, uint256 day)
+   ```
+
+5. **dateTimeToTimestamp**: Converts a given date and time (`year`, `month`, `day`, `hour`, `minute`, `second`) to a Unix timestamp.
+   ```solidity
+   function dateTimeToTimestamp(uint256 year, uint256 month, uint256 day, uint256 hour, uint256 minute, uint256 second) internal pure returns (uint256 result)
+   ```
+
+6. **timestampToDateTime**: Converts a Unix timestamp to a date and time (`year`, `month`, `day`, `hour`, `minute`, `second`).
+   ```solidity
+   function timestampToDateTime(uint256 timestamp) internal pure returns (uint256 year, uint256 month, uint256 day, uint256 hour, uint256 minute, uint256 second)
+   ```
+
+7. **isLeapYear**: Checks if a given year is a leap year.
+   ```solidity
+   function isLeapYear(uint256 year) internal pure returns (bool leap)
+   ```
+
+8. **daysInMonth**: Returns the number of days in a given month of a given year.
+   ```solidity
+   function daysInMonth(uint256 year, uint256 month) internal pure returns (uint256 result)
+   ```
+
+9. **weekday**: Returns the weekday for a given Unix timestamp (Monday: 1, Tuesday: 2, ..., Sunday: 7).
+   ```solidity
+   function weekday(uint256 timestamp) internal pure returns (uint256 result)
+   ```
+
+10. **isSupportedDate**: Checks if a given date (`year`, `month`, `day`) is within the supported range.
+    ```solidity
+    function isSupportedDate(uint256 year, uint256 month, uint256 day) internal pure returns (bool result)
+    ```
+
+11. **isSupportedDateTime**: Checks if a given date and time (`year`, `month`, `day`, `hour`, `minute`, `second`) is within the supported range.
+    ```solidity
+    function isSupportedDateTime(uint256 year, uint256 month, uint256 day, uint256 hour, uint256 minute, uint256 second) internal pure returns (bool result)
+    ```
+
+12. **isSupportedEpochDay**: Checks if a given epoch day is within the supported range.
+    ```solidity
+    function isSupportedEpochDay(uint256 epochDay) internal pure returns (bool result)
+    ```
+
+13. **isSupportedTimestamp**: Checks if a given Unix timestamp is within the supported range.
+    ```solidity
+    function isSupportedTimestamp(uint256 timestamp) internal pure returns (bool result)
+    ```
+
+14. **nthWeekdayInMonthOfYearTimestamp**: Returns the Unix timestamp of the `n`th weekday `wd` in `month` of `year`.
+    ```solidity
+    function nthWeekdayInMonthOfYearTimestamp(uint256 year, uint256 month, uint256 n, uint256 wd) internal pure returns (uint256 result)
+    ```
+
+15. **mondayTimestamp**: Returns the Unix timestamp of the most recent Monday.
+    ```solidity
+    function mondayTimestamp(uint256 timestamp) internal pure returns (uint256 result)
+    ```
+
+16. **isWeekEnd**: Checks if a given Unix timestamp falls on a Saturday or Sunday.
+    ```solidity
+    function isWeekEnd(uint256 timestamp) internal pure returns (bool result)
+    ```
+
+### Date Time Arithmetic Operations
+1. **addYears**: Adds a specified number of years to a Unix timestamp.
+   ```solidity
+   function addYears(uint256 timestamp, uint256 numYears) internal pure returns (uint256 result)
+   ```
+
+2. **addMonths**: Adds a specified number of months to a Unix timestamp.
+   ```solidity
+   function addMonths(uint256 timestamp, uint256 numMonths) internal pure returns (uint256 result)
+   ```
+
+3. **addDays**: Adds a specified number of days to a Unix timestamp.
+   ```solidity
+   function addDays(uint256 timestamp, uint256 numDays) internal pure returns (uint256 result)
+   ```
+
+4. **addHours**: Adds a specified number of hours to a Unix timestamp.
+   ```solidity
+   function addHours(uint256 timestamp, uint256 numHours) internal pure returns (uint256 result)
+   ```
+
+5. **addMinutes**: Adds a specified number of minutes to a Unix timestamp.
+   ```solidity
+   function addMinutes(uint256 timestamp, uint256 numMinutes) internal pure returns (uint256 result)
+   ```
+
+6. **addSeconds**: Adds a specified number of seconds to a Unix timestamp.
+   ```solidity
+   function addSeconds(uint256 timestamp, uint256 numSeconds) internal pure returns (uint256 result)
+   ```
+
+7. **subYears**: Subtracts a specified number of years from a Unix timestamp.
+   ```solidity
+   function subYears(uint256 timestamp, uint256 numYears) internal pure returns (uint256 result)
+   ```
+
+8. **subMonths**: Subtracts a specified number of months from a Unix timestamp.
+   ```solidity
+   function subMonths(uint256 timestamp, uint256 numMonths) internal pure returns (uint256 result)
+   ```
+
+9. **subDays**: Subtracts a specified number of days from a Unix timestamp.
+   ```solidity
+   function subDays(uint256 timestamp, uint256 numDays) internal pure returns (uint256 result)
+   ```
+
+10. **subHours**: Subtracts a specified number of hours from a Unix timestamp.
+    ```solidity
+    function subHours(uint256 timestamp, uint256 numHours) internal pure returns (uint256 result)
+    ```
+
+11. **subMinutes**: Subtracts a specified number of minutes from a Unix timestamp.
+    ```solidity
+    function subMinutes(uint256 timestamp, uint256 numMinutes) internal pure returns (uint256 result)
+    ```
+
+12. **subSeconds**: Subtracts a specified number of seconds from a Unix timestamp.
+    ```solidity
+    function subSeconds(uint256 timestamp, uint256 numSeconds) internal pure returns (uint256 result)
+    ```
+
+13. **diffYears**: Returns the difference in Gregorian calendar years between two Unix timestamps.
+    ```solidity
+    function diffYears(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+14. **diffMonths**: Returns the difference in Gregorian calendar months between two Unix timestamps.
+    ```solidity
+    function diffMonths(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+15. **diffDays**: Returns the difference in days between two Unix timestamps.
+    ```solidity
+    function diffDays(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+16. **diffHours**: Returns the difference in hours between two Unix timestamps.
+    ```solidity
+    function diffHours(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+17. **diffMinutes**: Returns the difference in minutes between two Unix timestamps.
+    ```solidity
+    function diffMinutes(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+18. **diffSeconds**: Returns the difference in seconds between two Unix timestamps.
+    ```solidity
+    function diffSeconds(uint256 fromTimestamp, uint256 toTimestamp) internal pure returns (uint256 result)
+    ```
+
+### Private Helpers
+1. **_totalMonths**: Computes the total number of months given years and months.
+   ```solidity
+   function _totalMonths(uint256 numYears, uint256 numMonths) private pure returns (uint256 total)
+   ```
+
+2. **_add**: Unchecked arithmetic for adding two numbers.
+   ```solidity
+   function _add(uint256 a, uint256 b) private pure returns (uint256 c)
+   ```
+
+3. **_sub**: Unchecked arithmetic for subtracting two numbers.
+   ```solidity
+   function _sub(uint256 a, uint256 b) private pure returns (uint256 c)
+   ```
+
+4. **_offsetted**: Returns the offsetted timestamp.
+   ```solidity
+   function _offsetted(uint256 year, uint256 month, uint256 day, uint256 timestamp) private pure returns (uint256 result)
+   ```
+
+This library provides a comprehensive set of functions for date and time manipulation, making it a valuable tool for any Solidity developer needing to work with dates and times.

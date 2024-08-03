@@ -1,0 +1,83 @@
+## Test Invariants for Base64 Library
+
+Here are some test invariants for the provided `Base64` library, covering various edge cases:
+
+**`encode` Function:**
+
+**1. Empty Input:**
+
+   - **Invariant:** Encoding an empty bytes array should always return an empty string.
+   - **Test Cases:**
+     - `Base64.encode("") == ""`
+     - `Base64.encode("", true, false) == ""`
+     - `Base64.encode("", false, true) == ""`
+     - `Base64.encode("", true, true) == ""`
+
+**2. Standard Encoding:**
+
+   - **Invariant:** Encoding data with standard Base64 (not file-safe, with padding) should produce the expected output according to RFC 4648.
+   - **Test Cases:**
+     - Use a set of known input bytes and their corresponding Base64 encoded strings (refer to RFC 4648 test vectors).
+     - Example: `Base64.encode("Hello") == "SGVsbG8="`
+
+**3. File-Safe Encoding:**
+
+   - **Invariant:** Encoding data with file-safe Base64 should replace '+' with '-' and '/' with '_'.
+   - **Test Cases:**
+     - Encode data containing '+' and '/' characters and verify the output has '-' and '_' respectively.
+     - Example: `Base64.encode("+/=", true, false) == "-_8"`
+
+**4. Padding Handling:**
+
+   - **Invariant:** 
+     - Encoding with `noPadding = false` should include padding characters ('=') to make the encoded length a multiple of 4.
+     - Encoding with `noPadding = true` should omit padding characters.
+   - **Test Cases:**
+     - Encode data with varying lengths (including those not divisible by 3) and verify padding is added/omitted correctly.
+
+**5. Input Size Variations:**
+
+   - **Invariant:** The function should correctly handle input data of various sizes, including very small and very large inputs.
+   - **Test Cases:**
+     - Encode data with sizes ranging from 1 byte to the maximum bytes size supported by Solidity.
+
+**`decode` Function:**
+
+**1. Empty Input:**
+
+   - **Invariant:** Decoding an empty string should always return an empty bytes array.
+   - **Test Case:** `Base64.decode("") == ""`
+
+**2. Standard Decoding:**
+
+   - **Invariant:** Decoding a valid Base64 encoded string (standard, with padding) should produce the original bytes data.
+   - **Test Cases:**
+     - Use the same set of known Base64 encoded strings and their corresponding bytes data from the encoding tests.
+     - Example: `Base64.decode("SGVsbG8=") == "Hello"`
+
+**3. File-Safe Decoding:**
+
+   - **Invariant:** Decoding a file-safe Base64 encoded string should correctly handle '-' and '_' characters.
+   - **Test Cases:**
+     - Decode strings containing '-' and '_' and verify the output matches the original data.
+
+**4. Padding Handling:**
+
+   - **Invariant:** The function should correctly decode both padded and non-padded Base64 encoded strings.
+   - **Test Cases:**
+     - Decode strings with and without padding characters and verify the output is correct.
+
+**5. Invalid Input:**
+
+   - **Invariant:** While the function doesn't explicitly revert on invalid input, it's crucial to test edge cases and document the expected behavior.
+   - **Test Cases:**
+     - Decode strings with invalid characters (outside the Base64 alphabet).
+     - Decode strings with incorrect padding.
+     - Observe and document the output in these cases (it might be undefined behavior).
+
+**General Considerations:**
+
+- **Gas Usage:** While not strictly an invariant, it's important to monitor the gas consumption of both `encode` and `decode` functions, especially for large inputs.
+- **Fuzz Testing:** Consider using fuzz testing techniques to generate random inputs and uncover potential vulnerabilities.
+
+These test invariants and test cases provide a comprehensive starting point for testing the `Base64` library. Remember to adapt and expand these tests based on your specific use cases and requirements. 

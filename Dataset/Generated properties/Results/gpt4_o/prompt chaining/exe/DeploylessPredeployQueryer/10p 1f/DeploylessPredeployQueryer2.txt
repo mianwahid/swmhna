@@ -1,0 +1,63 @@
+To ensure the `DeploylessPredeployQueryer` contract functions correctly, we need to define a set of test invariants. These invariants will cover various edge cases and functionalities of the contract. Here are the test invariants:
+
+### 1. Target Contract Deployment
+- **Invariant 1.1: Target Contract Exists After Constructor Execution**
+  - Ensure that if the target contract does not exist before the constructor is called, it exists after the constructor execution.
+  - Edge Case: The factory contract fails to deploy the target contract.
+
+- **Invariant 1.2: Returned Address Matches Target Address**
+  - Ensure that the address returned by the factory matches the provided target address.
+  - Edge Case: The factory returns an incorrect address.
+
+### 2. Query Execution
+- **Invariant 2.1: Successful Query Execution**
+  - Ensure that each query in the `targetQueryCalldata` array is executed successfully.
+  - Edge Case: One of the queries fails, causing the constructor to revert.
+
+- **Invariant 2.2: Correct Data Returned**
+  - Ensure that the data returned from each query matches the expected format and values.
+  - Edge Case: The target contract returns unexpected data types or values.
+
+### 3. Memory Management
+- **Invariant 3.1: Proper Memory Allocation**
+  - Ensure that memory is allocated and managed correctly during the constructor execution.
+  - Edge Case: Memory overflow or underflow due to incorrect allocation.
+
+- **Invariant 3.2: Correct Data Aggregation**
+  - Ensure that the data from each query is aggregated correctly and returned in the expected format.
+  - Edge Case: Misalignment or incorrect padding in the aggregated data.
+
+### 4. Error Handling
+- **Invariant 4.1: Correct Error Thrown for Address Mismatch**
+  - Ensure that the `ReturnedAddressMismatch` error is thrown if the address returned by the factory does not match the provided target address.
+  - Edge Case: The factory returns an address that is off by one byte.
+
+- **Invariant 4.2: Revert on Query Failure**
+  - Ensure that the constructor reverts if any of the queries in the `targetQueryCalldata` array fail.
+  - Edge Case: One of the queries returns an error code or unexpected result.
+
+### 5. Gas and Balance Management
+- **Invariant 5.1: Sufficient Gas for Execution**
+  - Ensure that there is sufficient gas for the entire constructor execution, including target deployment and query execution.
+  - Edge Case: Gas limit is set too low, causing the constructor to run out of gas.
+
+- **Invariant 5.2: Correct Handling of Self-Balance**
+  - Ensure that the contract's balance is handled correctly during the constructor execution.
+  - Edge Case: The contract has insufficient balance to cover the deployment and query costs.
+
+### 6. Static Call Usage
+- **Invariant 6.1: Static Call Compatibility**
+  - Ensure that the contract can be used via a static `eth_call` as intended.
+  - Edge Case: The contract relies on state-changing operations that are not allowed in a static call.
+
+### 7. Edge Case Handling
+- **Invariant 7.1: Empty `targetQueryCalldata` Array**
+  - Ensure that the contract handles an empty `targetQueryCalldata` array correctly.
+  - Edge Case: No queries are provided, and the contract should return an empty result.
+
+- **Invariant 7.2: Large `targetQueryCalldata` Array**
+  - Ensure that the contract handles a large `targetQueryCalldata` array efficiently.
+  - Edge Case: The array is so large that it causes memory or gas issues.
+
+### Summary
+These test invariants cover the core functionalities and edge cases of the `DeploylessPredeployQueryer` contract. By ensuring these invariants hold, we can be confident that the contract behaves as expected under various conditions.

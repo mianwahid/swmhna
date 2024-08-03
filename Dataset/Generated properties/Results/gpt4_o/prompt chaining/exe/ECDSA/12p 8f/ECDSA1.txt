@@ -1,0 +1,69 @@
+The provided smart contract is a library named `ECDSA` that offers various functionalities for handling and recovering Ethereum signatures. Below is a detailed explanation of each functionality:
+
+### Custom Errors
+1. **`error InvalidSignature()`**:
+   - This custom error is used to indicate that a signature is invalid. It is thrown when the signature recovery process fails.
+
+### Recovery Operations
+These functions are used to recover the signer's address from a given message digest (`hash`) and signature.
+
+2. **`function recover(bytes32 hash, bytes memory signature) internal view returns (address result)`**:
+   - Recovers the signer's address from a message digest (`hash`) and a signature in `bytes` format.
+   - Supports both 65-byte `(r, s, v)` and 64-byte EIP-2098 `(r, vs)` short form signatures.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature()` if the recovery fails.
+
+3. **`function recoverCalldata(bytes32 hash, bytes calldata signature) internal view returns (address result)`**:
+   - Similar to the `recover` function but accepts the signature as `calldata` instead of `memory`.
+   - This is more gas-efficient when dealing with external calls.
+
+4. **`function recover(bytes32 hash, bytes32 r, bytes32 vs) internal view returns (address result)`**:
+   - Recovers the signer's address from a message digest (`hash`) and an EIP-2098 short form signature defined by `r` and `vs`.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature()` if the recovery fails.
+
+5. **`function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns (address result)`**:
+   - Recovers the signer's address from a message digest (`hash`) and a signature defined by `v`, `r`, and `s`.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature()` if the recovery fails.
+
+### Try-Recover Operations
+These functions are similar to the recovery operations but do not revert upon failure. Instead, they return the zero address (`address(0)`) if the recovery fails.
+
+6. **`function tryRecover(bytes32 hash, bytes memory signature) internal view returns (address result)`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and a signature in `bytes` format.
+   - Returns the zero address if the recovery fails.
+
+7. **`function tryRecoverCalldata(bytes32 hash, bytes calldata signature) internal view returns (address result)`**:
+   - Similar to the `tryRecover` function but accepts the signature as `calldata` instead of `memory`.
+   - Returns the zero address if the recovery fails.
+
+8. **`function tryRecover(bytes32 hash, bytes32 r, bytes32 vs) internal view returns (address result)`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and an EIP-2098 short form signature defined by `r` and `vs`.
+   - Returns the zero address if the recovery fails.
+
+9. **`function tryRecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns (address result)`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and a signature defined by `v`, `r`, and `s`.
+   - Returns the zero address if the recovery fails.
+
+### Hashing Operations
+These functions are used to create Ethereum Signed Messages from a given hash or byte array.
+
+10. **`function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 result)`**:
+    - Returns an Ethereum Signed Message hash created from a given `hash`.
+    - This is used to produce a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+
+11. **`function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32 result)`**:
+    - Returns an Ethereum Signed Message hash created from a given byte array `s`.
+    - Supports lengths of `s` up to 999999 bytes.
+    - This is used to produce a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+
+### Empty Calldata Helpers
+These functions provide utility for handling empty calldata.
+
+12. **`function emptySignature() internal pure returns (bytes calldata signature)`**:
+    - Returns an empty calldata `bytes`.
+    - Useful for functions that require a `bytes` parameter but need to handle cases where the signature is empty.
+
+### Summary
+The `ECDSA` library provides a set of optimized functions for recovering Ethereum addresses from signatures, both in `memory` and `calldata`. It supports both standard and EIP-2098 short form signatures. The library also includes functions for creating Ethereum Signed Message hashes and handling empty calldata. The recovery functions are designed to be gas-efficient and provide both reverting and non-reverting variants to suit different use cases.

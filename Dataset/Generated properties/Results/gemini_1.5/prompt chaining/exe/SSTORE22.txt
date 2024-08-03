@@ -1,0 +1,67 @@
+## SSTORE2 Test Invariants
+
+This list outlines test invariants for the SSTORE2 library, focusing on edge cases and ensuring robust functionality.
+
+**Write Logic:**
+
+**1. `write(bytes memory data)`**
+
+* **Invariant:** The returned `pointer` address should not be the zero address.
+    * **Edge Case:** Deployment failure due to gas limits or other unexpected errors.
+* **Invariant:** The bytecode size of the contract at `pointer` should be equal to the input `data` size + 1 (for the STOP opcode) + 10 (for the contract creation code).
+    * **Edge Case:** Incorrect data size calculation or incomplete bytecode deployment.
+* **Invariant:** Calling `read(pointer)` should return the original `data`.
+    * **Edge Case:** Data corruption during storage or retrieval.
+
+**2. `writeDeterministic(bytes memory data, bytes32 salt)`**
+
+* **Invariant:** The returned `pointer` address should match the address predicted by `predictDeterministicAddress(data, salt, msg.sender)`.
+    * **Edge Case:** Incorrect deterministic address calculation or deployment.
+* **Invariant:** Calling `writeDeterministic` with the same `data` and `salt` should return the same `pointer` address.
+    * **Edge Case:** Non-deterministic behavior in address generation or deployment.
+* **Invariant:** Calling `writeDeterministic` with different `salt` values should return different `pointer` addresses, even with the same `data`.
+    * **Edge Case:** Salt value not being used correctly in address generation.
+
+**3. `initCodeHash(bytes memory data)`**
+
+* **Invariant:** Calling `initCodeHash` with the same `data` should always return the same hash.
+    * **Edge Case:** Non-deterministic hash calculation.
+* **Invariant:** Calling `initCodeHash` with different `data` should return different hashes.
+    * **Edge Case:** Hash collision or incorrect data handling in hash calculation.
+
+**4. `predictDeterministicAddress(bytes memory data, bytes32 salt, address deployer)`**
+
+* **Invariant:** The predicted address should match the actual address returned by `writeDeterministic` when using the same `data`, `salt`, and `deployer`.
+    * **Edge Case:** Discrepancy between address prediction and actual deployment.
+* **Invariant:** Changing the `deployer` address should result in a different predicted address.
+    * **Edge Case:** Deployer address not being used correctly in address prediction.
+
+**Read Logic:**
+
+**5. `read(address pointer)`**
+
+* **Invariant:** Calling `read` with the zero address should revert with `InvalidPointer`.
+    * **Edge Case:** Attempting to read from an invalid storage contract address.
+* **Invariant:** Calling `read` with an address that doesn't contain a deployed contract should revert with `InvalidPointer`.
+    * **Edge Case:** Attempting to read from a non-existent contract.
+
+**6. `read(address pointer, uint256 start)`**
+
+* **Invariant:** Calling `read` with `start` greater than or equal to the size of the stored data should revert with `ReadOutOfBounds`.
+    * **Edge Case:** Attempting to read beyond the bounds of the stored data.
+
+**7. `read(address pointer, uint256 start, uint256 end)`**
+
+* **Invariant:** Calling `read` with `start` greater than or equal to `end` should revert with `ReadOutOfBounds`.
+    * **Edge Case:** Invalid byte range specified for reading.
+* **Invariant:** Calling `read` with `end` greater than the size of the stored data should revert with `ReadOutOfBounds`.
+    * **Edge Case:** Attempting to read beyond the bounds of the stored data.
+
+**General Invariants:**
+
+* **Gas Efficiency:** The gas cost of using SSTORE2 functions should be consistently lower than directly using `sstore` for equivalent data storage and retrieval.
+    * **Edge Case:** Unexpected gas cost increases due to code inefficiencies.
+* **Data Integrity:** Data stored using SSTORE2 should remain persistent and unchanged over time.
+    * **Edge Case:** Data corruption due to unforeseen vulnerabilities or external factors.
+
+These test invariants provide a comprehensive framework for testing the SSTORE2 library, ensuring its reliability and efficiency in handling persistent data storage on the Ethereum blockchain. Remember to test with various data sizes and edge cases to guarantee robust functionality. 

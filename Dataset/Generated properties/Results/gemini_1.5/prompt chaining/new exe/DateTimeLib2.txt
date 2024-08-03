@@ -1,0 +1,76 @@
+## Test Invariants for `DateTimeLib`
+
+This list outlines test invariants for the `DateTimeLib` contract, focusing on edge cases and functionality coverage.
+
+**General Invariants**
+
+- **Input Validation:** For all functions, inputs exceeding `MAX_SUPPORTED_YEAR`, `MAX_SUPPORTED_EPOCH_DAY`, and `MAX_SUPPORTED_TIMESTAMP` should revert or be handled gracefully. Tests should cover these boundaries.
+- **Leap Year Handling:** Functions dealing with years and months should correctly account for leap years, both common years and leap years divisible by 100 and 400.
+- **Day Boundaries:** Functions calculating dates should handle month boundaries correctly, including leap years (e.g., February 29th).
+- **Timestamp Accuracy:** Timestamp calculations should be accurate to the second, considering leap seconds if applicable.
+
+**Specific Function Invariants**
+
+**1. Date & Time Conversions**
+
+- **`dateToEpochDay` & `epochDayToDate`:**
+    - **Zero Date:** Test with (1970, 1, 1) as input and output for epoch day 0.
+    - **Leap Year Dates:** Test with dates in February of leap years (e.g., 2020-02-29) and non-leap years.
+    - **Year Boundaries:** Test with dates around year boundaries (e.g., 1969-12-31, 1970-01-01, 2023-12-31, 2024-01-01).
+- **`dateToTimestamp` & `timestampToDate`:**
+    - **Epoch Timestamp:** Test with (1970, 1, 1) and timestamp 0.
+    - **Daylight Saving Time:** If applicable, test with timestamps around DST transitions to ensure consistency.
+    - **Leap Seconds:** If applicable, test with timestamps around leap seconds.
+- **`dateTimeToTimestamp` & `timestampToDateTime`:**
+    - **Zero Time:** Test with (1970, 1, 1, 0, 0, 0) and timestamp 0.
+    - **Hour, Minute, Second Boundaries:** Test with values at the boundaries of hours, minutes, and seconds (e.g., 23:59:59).
+
+**2. Date & Time Information**
+
+- **`isLeapYear`:**
+    - **Century Years:** Test with years divisible by 100 (e.g., 1900, 2000) to ensure correct leap year identification.
+- **`daysInMonth`:**
+    - **February:** Test with February for both leap years and non-leap years.
+- **`weekday`:**
+    - **Week Boundaries:** Test with timestamps around the start and end of weeks to ensure correct weekday calculation.
+
+**3. Input Validation**
+
+- **All `isSupported...` functions:**
+    - **Lower Bound:** Test with values just below the minimum supported values.
+    - **Upper Bound:** Test with values just above the maximum supported values.
+
+**4. Specific Timestamp Calculations**
+
+- **`nthWeekdayInMonthOfYearTimestamp`:**
+    - **First and Last Weekday:** Test with `n` as 1 and the maximum occurrence of the weekday in the given month.
+    - **Non-Existing Weekday:** Test with `n` larger than the maximum occurrence of the weekday in the given month (should revert or return 0).
+- **`mondayTimestamp`:**
+    - **Start of Week:** Test with timestamps that already fall on a Monday.
+    - **End of Week:** Test with timestamps on Sunday just before a new week starts.
+
+**5. Weekend Check**
+
+- **`isWeekEnd`:**
+    - **Friday/Saturday Transition:** Test with timestamps around the Friday/Saturday transition.
+    - **Sunday/Monday Transition:** Test with timestamps around the Sunday/Monday transition.
+
+**6. Date & Time Arithmetic**
+
+- **`addYears`, `subYears`, `addMonths`, `subMonths`:**
+    - **Leap Year Transitions:** Test adding/subtracting years/months around leap year boundaries (e.g., from February 29th).
+    - **Month Length Differences:** Test adding/subtracting months that result in transitions to months with different lengths (e.g., from January 31st to February).
+- **All `add...` and `sub...` functions:**
+    - **Zero Addition/Subtraction:** Test adding/subtracting 0 units.
+    - **Day, Hour, Minute, Second Boundaries:** Test adding/subtracting values that cross day, hour, minute, and second boundaries.
+- **All `diff...` functions:**
+    - **Zero Difference:** Test with identical timestamps.
+    - **One Unit Difference:** Test with timestamps differing by exactly one year, month, day, hour, minute, or second.
+    - **Large Differences:** Test with timestamps that are significantly far apart.
+
+**Additional Considerations**
+
+- **Gas Usage:** While not strictly invariants, it's beneficial to track the gas usage of these functions, especially for complex calculations, to ensure efficiency.
+- **Code Coverage:** Aim for high code coverage in tests to ensure all branches and edge cases are thoroughly examined.
+
+By systematically testing these invariants, you can gain confidence in the correctness and reliability of the `DateTimeLib` library for handling date and time operations in your Solidity contracts. 

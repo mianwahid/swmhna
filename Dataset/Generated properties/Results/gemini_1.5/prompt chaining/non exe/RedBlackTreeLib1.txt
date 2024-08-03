@@ -1,0 +1,148 @@
+## RedBlackTreeLib Smart Contract Functionalities Explained
+
+This smart contract implements a Red-Black Tree data structure in Solidity using a library named `RedBlackTreeLib`. It allows efficient storage and retrieval of unique, non-zero uint256 values. 
+
+Here's a breakdown of each function:
+
+**1. `size(Tree storage tree) internal view returns (uint256 result)`**
+
+* **Functionality:** Returns the total number of values stored in the tree.
+* **Explanation:** It reads the root index slot of the tree, extracts the `totalNodes` value, and returns it.
+
+**2. `values(Tree storage tree) internal view returns (uint256[] memory result)`**
+
+* **Functionality:** Returns an array containing all values in the tree, sorted in ascending order.
+* **Explanation:** 
+    * It performs an in-order traversal of the tree.
+    * For each node visited, it appends the node's value to the `result` array.
+    * **WARNING:** This function can be expensive in terms of gas consumption for large trees. It's recommended for off-chain use.
+
+**3. `find(Tree storage tree, uint256 x) internal view returns (bytes32 result)`**
+
+* **Functionality:** Searches for the value `x` in the tree.
+* **Explanation:** 
+    * It uses the `_find` helper function to locate the node containing `x`.
+    * If found, it returns a pointer (`bytes32`) to the node.
+    * If not found, it returns an empty pointer.
+
+**4. `nearest(Tree storage tree, uint256 x) internal view returns (bytes32 result)`**
+
+* **Functionality:** Finds the value closest to `x` in the tree.
+* **Explanation:** 
+    * It uses `_find` to locate the closest node to `x`.
+    * If there's an exact match, it returns the pointer to that node.
+    * Otherwise, it compares the distances of the found node and its previous/next neighbors to `x`, returning the pointer to the closest one.
+
+**5. `nearestBefore(Tree storage tree, uint256 x) internal view returns (bytes32 result)`**
+
+* **Functionality:** Finds the closest value in the tree that is less than or equal to `x`.
+* **Explanation:** 
+    * Similar to `nearest`, but only considers values less than or equal to `x`.
+
+**6. `nearestAfter(Tree storage tree, uint256 x) internal view returns (bytes32 result)`**
+
+* **Functionality:** Finds the closest value in the tree that is greater than or equal to `x`.
+* **Explanation:** 
+    * Similar to `nearest`, but only considers values greater than or equal to `x`.
+
+**7. `exists(Tree storage tree, uint256 x) internal view returns (bool result)`**
+
+* **Functionality:** Checks if the value `x` exists in the tree.
+* **Explanation:** 
+    * Uses `_find` to search for `x`.
+    * Returns `true` if found, `false` otherwise.
+
+**8. `insert(Tree storage tree, uint256 x) internal`**
+
+* **Functionality:** Inserts the value `x` into the tree.
+* **Explanation:** 
+    * Calls `tryInsert` to attempt the insertion.
+    * Reverts if `tryInsert` returns an error code.
+
+**9. `tryInsert(Tree storage tree, uint256 x) internal returns (uint256 err)`**
+
+* **Functionality:** Attempts to insert `x` into the tree, returning an error code upon failure.
+* **Explanation:** 
+    * Uses `_find` to determine the insertion point.
+    * Calls `_update` to perform the insertion and maintain the Red-Black Tree properties.
+    * Returns 0 on success, a specific error code on failure.
+
+**10. `remove(Tree storage tree, uint256 x) internal`**
+
+* **Functionality:** Removes the value `x` from the tree.
+* **Explanation:** 
+    * Calls `tryRemove` to attempt the removal.
+    * Reverts if `tryRemove` returns an error code.
+
+**11. `tryRemove(Tree storage tree, uint256 x) internal returns (uint256 err)`**
+
+* **Functionality:** Attempts to remove `x` from the tree, returning an error code upon failure.
+* **Explanation:** 
+    * Uses `_find` to locate the node containing `x`.
+    * Calls `_update` to perform the removal and maintain the Red-Black Tree properties.
+    * Returns 0 on success, a specific error code on failure.
+
+**12. `remove(bytes32 ptr) internal`**
+
+* **Functionality:** Removes the value pointed to by `ptr` from the tree.
+* **Explanation:** 
+    * Calls `tryRemove(bytes32 ptr)` to attempt the removal.
+    * Reverts if `tryRemove` returns an error code.
+
+**13. `tryRemove(bytes32 ptr) internal returns (uint256 err)`**
+
+* **Functionality:** Attempts to remove the value pointed to by `ptr` from the tree, returning an error code upon failure.
+* **Explanation:** 
+    * Extracts the node index from `ptr`.
+    * Calls `_update` to perform the removal and maintain the Red-Black Tree properties.
+    * Returns 0 on success, a specific error code on failure.
+
+**14. `value(bytes32 ptr) internal view returns (uint256 result)`**
+
+* **Functionality:** Returns the value stored at the node pointed to by `ptr`.
+* **Explanation:** 
+    * Extracts the node index from `ptr`.
+    * Reads the node's data and returns the stored value.
+
+**15. `first(Tree storage tree) internal view returns (bytes32 result)`**
+
+* **Functionality:** Returns a pointer to the node containing the smallest value in the tree.
+* **Explanation:** 
+    * Uses `_end` helper function to find the leftmost node.
+
+**16. `last(Tree storage tree) internal view returns (bytes32 result)`**
+
+* **Functionality:** Returns a pointer to the node containing the largest value in the tree.
+* **Explanation:** 
+    * Uses `_end` helper function to find the rightmost node.
+
+**17. `next(bytes32 ptr) internal view returns (bytes32 result)`**
+
+* **Functionality:** Returns a pointer to the node containing the next larger value after the node pointed to by `ptr`.
+* **Explanation:** 
+    * Uses `_step` helper function to navigate the tree and find the next larger node.
+
+**18. `prev(bytes32 ptr) internal view returns (bytes32 result)`**
+
+* **Functionality:** Returns a pointer to the node containing the next smaller value before the node pointed to by `ptr`.
+* **Explanation:** 
+    * Uses `_step` helper function to navigate the tree and find the next smaller node.
+
+**19. `isEmpty(bytes32 ptr) internal pure returns (bool result)`**
+
+* **Functionality:** Checks if the pointer `ptr` is empty.
+* **Explanation:** 
+    * Returns `true` if `ptr` is equal to `bytes32(0)`, `false` otherwise.
+
+**Private Helper Functions:**
+
+* **`_unpack(bytes32 ptr)`:** Extracts the `nodes` address and `key` from a pointer.
+* **`_pack(uint256 nodes, uint256 key)`:** Combines the `nodes` address and `key` into a pointer.
+* **`_end(Tree storage tree, uint256 L)`:** Finds the leftmost or rightmost node depending on the value of `L`.
+* **`_step(bytes32 ptr, uint256 L, uint256 R)`:** Navigates the tree to find the next or previous node based on `L` and `R`.
+* **`_update(uint256 nodes, uint256 cursor, uint256 key, uint256 x, uint256 mode)`:** Performs insertion or deletion of a node and maintains the Red-Black Tree properties.
+* **`_nodes(Tree storage tree)`:** Calculates the storage slot address for the tree's nodes.
+* **`_find(Tree storage tree, uint256 x)`:** Searches for the value `x` in the tree.
+* **`_revert(uint256 err)`:** Reverts the transaction with a specific error code.
+
+This Red-Black Tree implementation provides an efficient way to store and retrieve sorted data on-chain. However, it's important to be mindful of gas costs, especially for functions like `values` and when dealing with large trees.

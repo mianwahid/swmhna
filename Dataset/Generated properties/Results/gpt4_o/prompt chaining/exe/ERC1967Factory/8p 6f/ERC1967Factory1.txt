@@ -1,0 +1,65 @@
+The provided smart contract, `ERC1967Factory`, is a factory contract for deploying and managing ERC1967 proxy contracts. Below is a detailed explanation of its functionalities:
+
+### Custom Errors
+1. **Unauthorized**: Thrown when the caller is not authorized to call a function.
+2. **DeploymentFailed**: Thrown when the proxy deployment fails.
+3. **UpgradeFailed**: Thrown when the upgrade of the proxy fails.
+4. **SaltDoesNotStartWithCaller**: Thrown when the provided salt does not start with the caller's address.
+
+### Events
+1. **AdminChanged**: Emitted when the admin of a proxy contract is changed.
+   - Parameters: `proxy` (address of the proxy), `admin` (new admin address).
+2. **Upgraded**: Emitted when the implementation of a proxy is upgraded.
+   - Parameters: `proxy` (address of the proxy), `implementation` (new implementation address).
+3. **Deployed**: Emitted when a new proxy is deployed.
+   - Parameters: `proxy` (address of the proxy), `implementation` (implementation address), `admin` (admin address).
+
+### Storage Constants
+1. **_IMPLEMENTATION_SLOT**: The storage slot for the implementation in the proxy, calculated as `uint256(keccak256("eip1967.proxy.implementation")) - 1`.
+
+### Admin Functions
+1. **adminOf(address proxy)**: Returns the admin of the specified proxy.
+   - Uses inline assembly to read the admin from storage.
+2. **changeAdmin(address proxy, address admin)**: Sets the admin of the specified proxy.
+   - Checks if the caller is the current admin.
+   - Updates the admin in storage and emits the `AdminChanged` event.
+
+### Upgrade Functions
+1. **upgrade(address proxy, address implementation)**: Upgrades the proxy to point to a new implementation.
+   - Calls `upgradeAndCall` with empty data.
+2. **upgradeAndCall(address proxy, address implementation, bytes calldata data)**: Upgrades the proxy to a new implementation and calls the proxy with the provided data.
+   - Checks if the caller is the current admin.
+   - Sets up the calldata to upgrade the proxy.
+   - Calls the proxy and reverts if the call fails.
+   - Emits the `Upgraded` event.
+
+### Deploy Functions
+1. **deploy(address implementation, address admin)**: Deploys a new proxy with the specified implementation and admin.
+   - Calls `deployAndCall` with empty data.
+2. **deployAndCall(address implementation, address admin, bytes calldata data)**: Deploys a new proxy with the specified implementation and admin, and calls the proxy with the provided data.
+   - Calls `_deploy` with the provided parameters.
+3. **deployDeterministic(address implementation, address admin, bytes32 salt)**: Deploys a new proxy with the specified implementation, admin, and salt, and returns its deterministic address.
+   - Calls `deployDeterministicAndCall` with empty data.
+4. **deployDeterministicAndCall(address implementation, address admin, bytes32 salt, bytes calldata data)**: Deploys a new proxy with the specified implementation, admin, and salt, and calls the proxy with the provided data.
+   - Checks if the salt starts with the zero address or the caller's address.
+   - Calls `_deploy` with the provided parameters.
+
+### Internal Functions
+1. **_deploy(address implementation, address admin, bytes32 salt, bool useSalt, bytes calldata data)**: Deploys the proxy, with optionality to deploy deterministically with a salt.
+   - Uses `create` or `create2` to deploy the proxy.
+   - Sets the implementation and admin of the proxy.
+   - Emits the `Deployed` event.
+2. **_initCode()**: Returns a pointer to the initialization code of a proxy created via this factory.
+   - Contains the creation and runtime code for the proxy.
+
+### View Functions
+1. **predictDeterministicAddress(bytes32 salt)**: Returns the address of the proxy deployed with the specified salt.
+   - Computes the address using `keccak256`.
+2. **initCodeHash()**: Returns the initialization code hash of the proxy.
+   - Used for mining vanity addresses with `create2crunch`.
+
+### Helper Functions
+1. **_emptyData()**: Helper function to return an empty bytes calldata.
+   - Uses inline assembly to set the length of the data to 0.
+
+This contract provides a comprehensive set of functionalities for deploying, managing, and upgrading ERC1967 proxy contracts, with robust error handling and event logging to facilitate tracking and debugging.

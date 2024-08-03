@@ -1,0 +1,110 @@
+## LibClone Smart Contract Functionalities Explained
+
+This smart contract, `LibClone`, provides a comprehensive set of functionalities for deploying and interacting with minimal proxy contracts in Solidity. It leverages different proxy patterns and optimizations to minimize gas costs and bytecode size.
+
+Here's a breakdown of its functionalities:
+
+**I. Minimal Proxy Operations:**
+
+* **`clone(address implementation)` & `clone(uint256 value, address implementation)`:**
+    - These functions deploy a minimal proxy contract that delegates all calls to the specified `implementation` address.
+    - The second variant allows depositing `value` amount of ETH during deployment.
+    - They utilize the 0age proxy pattern for its gas efficiency and minimal bytecode size.
+
+* **`cloneDeterministic(address implementation, bytes32 salt)` & `cloneDeterministic(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions deploy a deterministic minimal proxy contract using the `create2` opcode.
+    - The `salt` value ensures a unique deployment address for a given `implementation` and `salt` combination.
+    - The second variant allows depositing `value` amount of ETH during deployment.
+
+* **`initCode(address implementation)`:**
+    - Returns the bytecode used for deploying a minimal proxy of the given `implementation`.
+    - Useful for understanding the deployed code and for off-chain calculations.
+
+* **`initCodeHash(address implementation)`:**
+    - Returns the keccak256 hash of the initialization code for a minimal proxy.
+    - Primarily used for mining vanity addresses with tools like create2crunch.
+
+* **`predictDeterministicAddress(address implementation, bytes32 salt, address deployer)`:**
+    - Calculates the deterministic address of a minimal proxy contract before deployment.
+    - Takes the `implementation`, `salt`, and `deployer` address as input.
+    - Useful for pre-calculating deployment addresses and verifying deployments.
+
+**II. Minimal Proxy Operations (PUSH0 Variant):**
+
+* **`clone_PUSH0(address implementation)` & `clone_PUSH0(uint256 value, address implementation)`:**
+    - These functions are similar to their non-PUSH0 counterparts but utilize the PUSH0 opcode introduced in the Shanghai upgrade.
+    - They offer further gas optimizations at runtime but might not be compatible with all EVM chains initially.
+
+* **`cloneDeterministic_PUSH0(address implementation, bytes32 salt)` & `cloneDeterministic_PUSH0(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions are deterministic versions of the PUSH0 clone functions, deploying the proxy contract to a predictable address using `create2`.
+
+* **`initCode_PUSH0(address implementation)` & `initCodeHash_PUSH0(address implementation)`:**
+    - These functions are analogous to their non-PUSH0 counterparts, providing the initialization code and its hash for PUSH0-optimized minimal proxies.
+
+* **`predictDeterministicAddress_PUSH0(address implementation, bytes32 salt, address deployer)`:**
+    - Predicts the deterministic address of a PUSH0-optimized minimal proxy contract before deployment.
+
+**III. Clones with Immutable Args (CWIA) Operations:**
+
+* **`clone(address implementation, bytes memory data)` & `clone(uint256 value, address implementation, bytes memory data)`:**
+    - These functions deploy a CWIA proxy that includes immutable arguments (`data`) in its bytecode.
+    - This allows setting initial contract parameters during deployment, saving gas compared to setting them later.
+
+* **`cloneDeterministic(address implementation, bytes memory data, bytes32 salt)` & `cloneDeterministic(uint256 value, address implementation, bytes memory data, bytes32 salt)`:**
+    - These functions deploy deterministic CWIA proxies using `create2`, ensuring a predictable deployment address.
+
+* **`initCode(address implementation, bytes memory data)` & `initCodeHash(address implementation, bytes memory data)`:**
+    - These functions return the initialization code and its hash for CWIA proxies, respectively.
+
+* **`predictDeterministicAddress(address implementation, bytes memory data, bytes32 salt, address deployer)`:**
+    - Predicts the deterministic address of a CWIA proxy contract before deployment.
+
+**IV. Minimal ERC1967 Proxy Operations:**
+
+* **`deployERC1967(address implementation)` & `deployERC1967(uint256 value, address implementation)`:**
+    - These functions deploy a minimal ERC1967 proxy contract, which is specifically designed for upgrades using the UUPS pattern.
+
+* **`deployDeterministicERC1967(address implementation, bytes32 salt)` & `deployDeterministicERC1967(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions deploy deterministic minimal ERC1967 proxy contracts using `create2`.
+
+* **`createDeterministicERC1967(address implementation, bytes32 salt)` & `createDeterministicERC1967(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions are specifically designed for ERC4337 factories and do not revert if the proxy is already deployed.
+
+* **`initCodeERC1967(address implementation)` & `initCodeHashERC1967(address implementation)`:**
+    - These functions return the initialization code and its hash for minimal ERC1967 proxies.
+
+* **`predictDeterministicAddressERC1967(address implementation, bytes32 salt, address deployer)`:**
+    - Predicts the deterministic address of a minimal ERC1967 proxy contract before deployment.
+
+**V. ERC1967I Proxy Operations:**
+
+* **`deployERC1967I(address implementation)` & `deployERC1967I(uint256 value, address implementation)`:**
+    - These functions deploy a minimal ERC1967I proxy contract, which includes a special code path for returning the implementation address directly when `calldatasize() == 1`.
+
+* **`deployDeterministicERC1967I(address implementation, bytes32 salt)` & `deployDeterministicERC1967I(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions deploy deterministic minimal ERC1967I proxy contracts using `create2`.
+
+* **`createDeterministicERC1967I(address implementation, bytes32 salt)` & `createDeterministicERC1967I(uint256 value, address implementation, bytes32 salt)`:**
+    - These functions are specifically designed for ERC4337 factories and do not revert if the proxy is already deployed.
+
+* **`initCodeERC1967I(address implementation)` & `initCodeHashERC1967I(address implementation)`:**
+    - These functions return the initialization code and its hash for minimal ERC1967I proxies.
+
+* **`predictDeterministicAddressERC1967I(address implementation, bytes32 salt, address deployer)`:**
+    - Predicts the deterministic address of a minimal ERC1967I proxy contract before deployment.
+
+**VI. Constant ERC1967 Bootstrap Operations:**
+
+* **`constantERC1967Bootstrap()` & `constantERC1967BootstrapAddress()`:**
+    - These functions manage the deployment and address retrieval of a constant ERC1967 bootstrap contract.
+    - This bootstrap contract allows deploying an ERC1967 proxy at a deterministic address independent of the implementation.
+
+* **`bootstrapERC1967(address instance, address implementation)`:**
+    - This function sets the implementation address of an already deployed constant ERC1967 bootstrap contract.
+
+**VII. Other Operations:**
+
+* **`checkStartsWith(bytes32 salt, address by)`:**
+    - This function enforces a specific format for the `salt` value used in deterministic deployments, requiring it to start with either the zero address or the specified `by` address.
+
+In summary, the `LibClone` smart contract provides a comprehensive toolkit for deploying and managing various types of minimal proxy contracts in Solidity. It offers flexibility, gas efficiency, and deterministic deployment options, making it a valuable resource for developers working with proxy patterns in their smart contracts.

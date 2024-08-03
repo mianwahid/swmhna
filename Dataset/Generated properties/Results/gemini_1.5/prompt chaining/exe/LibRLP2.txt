@@ -1,0 +1,47 @@
+## Test Invariants for `LibRLP.computeAddress`
+
+Here are the test invariants for the `LibRLP.computeAddress` function, covering various edge cases:
+
+**1. Basic Functionality and Determinism**
+
+* **Invariant:** For the same `deployer` address and `nonce`, `computeAddress` MUST always return the same contract address.
+    * **Test Cases:**
+        * Call `computeAddress` multiple times with identical inputs and assert the returned address is the same.
+        * Compare the output of `computeAddress` with a reference implementation (e.g., from a trusted library or the Ethereum Yellow Paper specification) using the same inputs.
+
+**2. Nonce Handling**
+
+* **Invariant:** `computeAddress` MUST generate a different contract address for each incrementing `nonce` value, given the same `deployer` address.
+    * **Test Cases:**
+        * Call `computeAddress` with a fixed `deployer` address and incrementing `nonce` values (e.g., 0, 1, 2, ...). Assert that each call returns a unique address.
+
+**3. Deployer Address Variation**
+
+* **Invariant:** `computeAddress` MUST generate a different contract address for different `deployer` addresses, even with the same `nonce`.
+    * **Test Cases:**
+        * Call `computeAddress` with different `deployer` addresses and the same `nonce`. Assert that each call returns a unique address.
+
+**4. Edge Case: Zero Nonce**
+
+* **Invariant:** `computeAddress` MUST correctly handle a `nonce` value of 0.
+    * **Test Cases:**
+        * Call `computeAddress` with a valid `deployer` address and a `nonce` of 0. Assert that the returned address is valid and corresponds to the expected address for the first contract deployed by that address.
+
+**5. Edge Case: Large Nonce Values**
+
+* **Invariant:** While not explicitly checked in the code, test for reasonable large nonce values to ensure no unexpected behavior occurs.
+    * **Test Cases:**
+        * Call `computeAddress` with a valid `deployer` address and large `nonce` values (e.g., 2**32 - 1, 2**64 - 2). While exceeding 2**64-2 is impractical, testing large values within reason ensures the function handles boundaries gracefully.
+
+**6. Gas Usage Considerations**
+
+* **Invariant (Indirect):** While not a strict invariant, it's beneficial to track the gas usage of `computeAddress` across different inputs. Significant deviations might indicate inefficiencies.
+    * **Test Approach:**
+        * Measure and compare the gas used by `computeAddress` for different input sizes (e.g., small and large nonce values). 
+
+**Additional Notes:**
+
+* **Property-Based Testing:** Consider using property-based testing frameworks to generate a wider range of random and edge-case inputs for more comprehensive testing.
+* **Security Audit:** While these invariants cover functional correctness, a thorough security audit is crucial to identify potential vulnerabilities related to RLP encoding, hash collisions, or other unexpected behaviors. 
+
+By thoroughly testing these invariants, you can gain confidence in the correctness and reliability of the `LibRLP.computeAddress` function for various input scenarios. 

@@ -1,0 +1,97 @@
+To ensure the robustness and correctness of the `LibZip` library, we need to define test invariants for each of its functionalities. These invariants will help us verify that the library behaves as expected under various edge cases. Below are the test invariants for each function in the `LibZip` library:
+
+### Invariants for `flzCompress` and `flzDecompress`
+
+1. **Compression and Decompression Consistency**:
+   - **Invariant**: `flzDecompress(flzCompress(data)) == data`
+   - **Edge Cases**:
+     - Empty data (`data = ""`)
+     - Small data (`data = "a"`)
+     - Large data (e.g., `data = "a".repeat(1000)`)
+     - Data with repeated patterns (`data = "abcabcabc"`)
+     - Data with no repeated patterns (`data = "abcdefghij"`)
+
+2. **Idempotent Compression**:
+   - **Invariant**: `flzCompress(flzCompress(data)) == flzCompress(data)`
+   - **Edge Cases**:
+     - Empty data
+     - Small data
+     - Large data
+     - Data with repeated patterns
+     - Data with no repeated patterns
+
+3. **Idempotent Decompression**:
+   - **Invariant**: `flzDecompress(flzDecompress(data)) == flzDecompress(data)`
+   - **Edge Cases**:
+     - Empty data
+     - Small data
+     - Large data
+     - Data with repeated patterns
+     - Data with no repeated patterns
+
+### Invariants for `cdCompress` and `cdDecompress`
+
+1. **Compression and Decompression Consistency**:
+   - **Invariant**: `cdDecompress(cdCompress(data)) == data`
+   - **Edge Cases**:
+     - Empty data
+     - Small data
+     - Large data
+     - Data with sequences of `0x00` (e.g., `data = "\x00\x00\x00"`)
+     - Data with sequences of `0xff` (e.g., `data = "\xff\xff\xff"`)
+     - Data with mixed sequences (`data = "\x00\xff\x00\xff"`)
+
+2. **Idempotent Compression**:
+   - **Invariant**: `cdCompress(cdCompress(data)) == cdCompress(data)`
+   - **Edge Cases**:
+     - Empty data
+     - Small data
+     - Large data
+     - Data with sequences of `0x00`
+     - Data with sequences of `0xff`
+     - Data with mixed sequences
+
+3. **Idempotent Decompression**:
+   - **Invariant**: `cdDecompress(cdDecompress(data)) == cdDecompress(data)`
+   - **Edge Cases**:
+     - Empty data
+     - Small data
+     - Large data
+     - Data with sequences of `0x00`
+     - Data with sequences of `0xff`
+     - Data with mixed sequences
+
+### Invariants for `cdFallback`
+
+1. **Fallback Handling**:
+   - **Invariant**: When `cdFallback` is called with compressed calldata, it should correctly decompress and delegate the call.
+   - **Edge Cases**:
+     - Empty calldata
+     - Small calldata
+     - Large calldata
+     - Calldata with sequences of `0x00`
+     - Calldata with sequences of `0xff`
+     - Calldata with mixed sequences
+
+2. **Delegatecall Success**:
+   - **Invariant**: If the decompressed data results in a successful delegatecall, the fallback should return the correct data.
+   - **Edge Cases**:
+     - Valid compressed calldata that results in a successful delegatecall
+     - Invalid compressed calldata that results in a failed delegatecall
+
+3. **Delegatecall Reversion**:
+   - **Invariant**: If the decompressed data results in a failed delegatecall, the fallback should revert with the correct data.
+   - **Edge Cases**:
+     - Valid compressed calldata that results in a failed delegatecall
+     - Invalid compressed calldata that results in a failed delegatecall
+
+### Summary of Test Invariants
+
+- **Compression and Decompression Consistency**: Ensure that compressing and then decompressing data returns the original data.
+- **Idempotent Compression**: Ensure that compressing already compressed data does not change the result.
+- **Idempotent Decompression**: Ensure that decompressing already decompressed data does not change the result.
+- **Fallback Handling**: Ensure that the `cdFallback` function correctly handles compressed calldata.
+- **Delegatecall Success**: Ensure that successful delegatecalls return the correct data.
+- **Delegatecall Reversion**: Ensure that failed delegatecalls revert with the correct data.
+
+By testing these invariants, we can verify that the `LibZip` library functions correctly under various edge cases and scenarios.

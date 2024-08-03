@@ -1,0 +1,53 @@
+To ensure the correctness and robustness of the `MerkleProofLib` library, we need to write test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for each function:
+
+### 1. `verify` Function
+#### Invariants:
+1. **Correct Proof**: Given a valid proof, root, and leaf, the function should return `true`.
+2. **Incorrect Proof**: Given an invalid proof, the function should return `false`.
+3. **Empty Proof**: Given an empty proof array, the function should return `false`.
+4. **Single Element Proof**: If the proof contains only one element, it should correctly verify or reject based on the root and leaf.
+5. **Boundary Values**: Test with the smallest and largest possible values for `leaf` and `root`.
+
+### 2. `verifyCalldata` Function
+#### Invariants:
+1. **Correct Proof**: Given a valid proof, root, and leaf in calldata, the function should return `true`.
+2. **Incorrect Proof**: Given an invalid proof in calldata, the function should return `false`.
+3. **Empty Proof**: Given an empty proof array in calldata, the function should return `false`.
+4. **Single Element Proof**: If the proof contains only one element in calldata, it should correctly verify or reject based on the root and leaf.
+5. **Boundary Values**: Test with the smallest and largest possible values for `leaf` and `root` in calldata.
+
+### 3. `verifyMultiProof` Function
+#### Invariants:
+1. **Correct Proof**: Given a valid proof, root, leaves, and flags, the function should return `true`.
+2. **Incorrect Proof**: Given an invalid proof, the function should return `false`.
+3. **Empty Proof and Leaves**: Given empty proof and leaves arrays, the function should return `false`.
+4. **Single Leaf and Proof**: If the proof and leaves contain only one element, it should correctly verify or reject based on the root and flags.
+5. **Flags Length Mismatch**: If the length of flags does not match `(leaves.length - 1) + proof.length`, the function should return `false`.
+6. **Boundary Values**: Test with the smallest and largest possible values for `leaves` and `root`.
+
+### 4. `verifyMultiProofCalldata` Function
+#### Invariants:
+1. **Correct Proof**: Given a valid proof, root, leaves, and flags in calldata, the function should return `true`.
+2. **Incorrect Proof**: Given an invalid proof in calldata, the function should return `false`.
+3. **Empty Proof and Leaves**: Given empty proof and leaves arrays in calldata, the function should return `false`.
+4. **Single Leaf and Proof**: If the proof and leaves contain only one element in calldata, it should correctly verify or reject based on the root and flags.
+5. **Flags Length Mismatch**: If the length of flags does not match `(leaves.length - 1) + proof.length` in calldata, the function should return `false`.
+6. **Boundary Values**: Test with the smallest and largest possible values for `leaves` and `root` in calldata.
+
+### 5. `emptyProof` Function
+#### Invariants:
+1. **Empty Array**: The function should always return an empty array.
+2. **Length Zero**: The length of the returned array should be zero.
+
+### 6. `emptyLeaves` Function
+#### Invariants:
+1. **Empty Array**: The function should always return an empty array.
+2. **Length Zero**: The length of the returned array should be zero.
+
+### 7. `emptyFlags` Function
+#### Invariants:
+1. **Empty Array**: The function should always return an empty array.
+2. **Length Zero**: The length of the returned array should be zero.
+
+### Summary
+These test invariants ensure that the `MerkleProofLib` library functions correctly under various conditions, including edge cases. By covering these invariants, we can be confident in the reliability and robustness of the library.

@@ -1,0 +1,92 @@
+To ensure the robustness and correctness of the `LibPRNG` library, we need to write test invariants that cover all functionalities and edge cases. Here are the test invariants for each functionality:
+
+### Custom Errors
+1. **InvalidInitialLazyShufflerLength**
+   - Ensure that initializing a `LazyShuffler` with `n == 0` reverts with `InvalidInitialLazyShufflerLength`.
+   - Ensure that initializing a `LazyShuffler` with `n >= 2**32 - 1` reverts with `InvalidInitialLazyShufflerLength`.
+
+2. **InvalidNewLazyShufflerLength**
+   - Ensure that growing a `LazyShuffler` with a new length less than the current length reverts with `InvalidNewLazyShufflerLength`.
+
+3. **LazyShufflerNotInitialized**
+   - Ensure that calling `grow`, `restart`, `numShuffled`, `length`, `initialized`, `finished`, `get`, or `next` on an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+4. **LazyShufflerAlreadyInitialized**
+   - Ensure that initializing an already initialized `LazyShuffler` reverts with `LazyShufflerAlreadyInitialized`.
+
+5. **LazyShuffleFinished**
+   - Ensure that calling `next` on a `LazyShuffler` that has finished shuffling reverts with `LazyShuffleFinished`.
+
+6. **LazyShufflerGetOutOfBounds**
+   - Ensure that calling `get` with an index greater than or equal to the length of the `LazyShuffler` reverts with `LazyShufflerGetOutOfBounds`.
+
+### PRNG Operations
+1. **seed**
+   - Ensure that seeding a `PRNG` updates its state correctly.
+
+2. **next**
+   - Ensure that calling `next` on a `PRNG` updates its state and returns a new pseudorandom value.
+
+3. **uniform**
+   - Ensure that calling `uniform` on a `PRNG` with `upper == 0` always returns `0`.
+   - Ensure that calling `uniform` on a `PRNG` with `upper > 0` returns a value in the range `[0, upper)`.
+
+4. **shuffle (uint256[])**
+   - Ensure that calling `shuffle` on an array of length `0` or `1` does not change the array.
+   - Ensure that calling `shuffle` on an array of length `n` results in a permutation of the array.
+
+5. **shuffle (bytes)**
+   - Ensure that calling `shuffle` on a byte array of length `0` or `1` does not change the array.
+   - Ensure that calling `shuffle` on a byte array of length `n` results in a permutation of the array.
+
+6. **standardNormalWad**
+   - Ensure that calling `standardNormalWad` on a `PRNG` returns a value that follows the standard normal distribution.
+
+7. **exponentialWad**
+   - Ensure that calling `exponentialWad` on a `PRNG` returns a value that follows the unit exponential distribution.
+
+### Lazy Shuffling Operations
+1. **initialize**
+   - Ensure that initializing a `LazyShuffler` with a valid length sets the length correctly.
+   - Ensure that initializing a `LazyShuffler` with an invalid length reverts with `InvalidInitialLazyShufflerLength`.
+   - Ensure that initializing an already initialized `LazyShuffler` reverts with `LazyShufflerAlreadyInitialized`.
+
+2. **grow**
+   - Ensure that growing a `LazyShuffler` with a valid new length updates the length correctly.
+   - Ensure that growing a `LazyShuffler` with an invalid new length reverts with `InvalidNewLazyShufflerLength`.
+   - Ensure that growing an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+3. **restart**
+   - Ensure that restarting a `LazyShuffler` sets `numShuffled` to `0`.
+   - Ensure that restarting an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+4. **numShuffled**
+   - Ensure that `numShuffled` returns the correct number of shuffled elements.
+   - Ensure that calling `numShuffled` on an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+5. **length**
+   - Ensure that `length` returns the correct length of the `LazyShuffler`.
+   - Ensure that calling `length` on an uninitialized `LazyShuffler` returns `0`.
+
+6. **initialized**
+   - Ensure that `initialized` returns `true` for an initialized `LazyShuffler`.
+   - Ensure that `initialized` returns `false` for an uninitialized `LazyShuffler`.
+
+7. **finished**
+   - Ensure that `finished` returns `true` if all elements have been shuffled.
+   - Ensure that `finished` returns `false` if there are elements left to shuffle.
+   - Ensure that calling `finished` on an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+8. **get**
+   - Ensure that `get` returns the correct value for a given index.
+   - Ensure that calling `get` with an out-of-bounds index reverts with `LazyShufflerGetOutOfBounds`.
+   - Ensure that calling `get` on an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+9. **next**
+   - Ensure that `next` returns the next value in the shuffled range.
+   - Ensure that `next` increments the `numShuffled` by `1`.
+   - Ensure that calling `next` on a `LazyShuffler` that has finished shuffling reverts with `LazyShuffleFinished`.
+   - Ensure that calling `next` on an uninitialized `LazyShuffler` reverts with `LazyShufflerNotInitialized`.
+
+### Summary
+These test invariants cover all functionalities and edge cases of the `LibPRNG` library, ensuring that the library behaves correctly under various conditions.

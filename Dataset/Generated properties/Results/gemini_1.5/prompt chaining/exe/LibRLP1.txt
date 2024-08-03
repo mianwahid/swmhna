@@ -1,0 +1,35 @@
+## LibRLP Contract Functionality Breakdown
+
+This contract, `LibRLP`, provides a single, crucial function for calculating Ethereum contract addresses before deployment. Let's break down its functionality:
+
+**Function: `computeAddress(address deployer, uint256 nonce)`**
+
+This function calculates the address where a new contract will reside after deployment. It takes two parameters:
+
+* **`deployer` (address):** The address of the account or contract that will deploy the new contract.
+* **`nonce` (uint256):** A unique, incrementing number associated with the deploying address. Each time an address deploys a contract, its nonce increases.
+
+**How it works:**
+
+1. **RLP Encoding:** The function utilizes the Recursive Length Prefix (RLP) encoding scheme, a serialization method used extensively in Ethereum. RLP encodes the `deployer` address and the `nonce` into a byte string.
+
+2. **Keccak-256 Hashing:** The encoded byte string is then hashed using the Keccak-256 cryptographic hash function.
+
+3. **Address Derivation:** The last 20 bytes (160 bits) of the resulting hash are extracted to form the new contract's address.
+
+**Key Points:**
+
+* **Deterministic Address Generation:** This process ensures that the contract address is deterministically generated based on the deployer's address and nonce. This predictability is crucial for interacting with contracts before their actual deployment.
+* **Nonce Importance:** The nonce prevents address collisions. Since each deployment from an address increments the nonce, every new contract deployed from the same address will have a unique address.
+* **Gas Efficiency:** The function is optimized for gas efficiency by using assembly code for specific operations, minimizing the computational cost of address calculation.
+
+**Example Usage:**
+
+Let's say you want to pre-calculate the address of a contract you plan to deploy from your account. You can use this function to determine the address before sending the deployment transaction. This allows you to perform actions like pre-funding the contract address or sharing it with others.
+
+**Important Considerations:**
+
+* **Nonce Management:** While the function doesn't enforce nonce validity, it's crucial to manage nonces carefully. Incorrect nonces can lead to failed transactions or unexpected contract deployments.
+* **Security Implications:** Understanding this address generation mechanism is vital for security audits and identifying potential vulnerabilities related to contract deployments.
+
+In essence, the `LibRLP` contract provides a fundamental utility for Ethereum development by enabling deterministic and efficient calculation of contract addresses before deployment. 

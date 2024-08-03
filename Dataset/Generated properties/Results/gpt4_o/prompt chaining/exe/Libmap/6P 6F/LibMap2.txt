@@ -1,0 +1,103 @@
+To ensure the correctness and robustness of the `LibMap` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for the `LibMap` library:
+
+### General Invariants
+
+1. **Initial State Invariant**:
+   - For any index in any map, the initial value should be zero.
+   - **Test**: For each map type, check that `get` returns `0` for a range of indices before any `set` operation is performed.
+
+2. **Set and Get Consistency**:
+   - After setting a value at a specific index, getting the value at the same index should return the set value.
+   - **Test**: For each map type, set a value at a specific index and then get the value at the same index to ensure they match.
+
+3. **Boundary Conditions**:
+   - Test the boundary conditions for each map type, such as the maximum index and the maximum value that can be stored.
+   - **Test**: For each map type, set and get values at the maximum index and with the maximum value that the map can store.
+
+### Specific Invariants for Each Map Type
+
+#### Uint8Map
+
+1. **Uint8 Overflow**:
+   - Setting a value greater than `255` should not be possible (since `uint8` can only store values from `0` to `255`).
+   - **Test**: Attempt to set a value greater than `255` and ensure it is either rejected or truncated correctly.
+
+2. **Uint8 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `31` and `32`).
+   - **Test**: Set and get values at indices `31` and `32` to ensure they are stored and retrieved correctly.
+
+#### Uint16Map
+
+1. **Uint16 Overflow**:
+   - Setting a value greater than `65535` should not be possible (since `uint16` can only store values from `0` to `65535`).
+   - **Test**: Attempt to set a value greater than `65535` and ensure it is either rejected or truncated correctly.
+
+2. **Uint16 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `15` and `16`).
+   - **Test**: Set and get values at indices `15` and `16` to ensure they are stored and retrieved correctly.
+
+#### Uint32Map
+
+1. **Uint32 Overflow**:
+   - Setting a value greater than `4294967295` should not be possible (since `uint32` can only store values from `0` to `4294967295`).
+   - **Test**: Attempt to set a value greater than `4294967295` and ensure it is either rejected or truncated correctly.
+
+2. **Uint32 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `7` and `8`).
+   - **Test**: Set and get values at indices `7` and `8` to ensure they are stored and retrieved correctly.
+
+#### Uint40Map
+
+1. **Uint40 Overflow**:
+   - Setting a value greater than `1099511627775` should not be possible (since `uint40` can only store values from `0` to `1099511627775`).
+   - **Test**: Attempt to set a value greater than `1099511627775` and ensure it is either rejected or truncated correctly.
+
+2. **Uint40 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `5` and `6`).
+   - **Test**: Set and get values at indices `5` and `6` to ensure they are stored and retrieved correctly.
+
+#### Uint64Map
+
+1. **Uint64 Overflow**:
+   - Setting a value greater than `18446744073709551615` should not be possible (since `uint64` can only store values from `0` to `18446744073709551615`).
+   - **Test**: Attempt to set a value greater than `18446744073709551615` and ensure it is either rejected or truncated correctly.
+
+2. **Uint64 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `3` and `4`).
+   - **Test**: Set and get values at indices `3` and `4` to ensure they are stored and retrieved correctly.
+
+#### Uint128Map
+
+1. **Uint128 Overflow**:
+   - Setting a value greater than `340282366920938463463374607431768211455` should not be possible (since `uint128` can only store values from `0` to `340282366920938463463374607431768211455`).
+   - **Test**: Attempt to set a value greater than `340282366920938463463374607431768211455` and ensure it is either rejected or truncated correctly.
+
+2. **Uint128 Index Boundary**:
+   - Test the behavior at the boundary of storage slots (e.g., indices `1` and `2`).
+   - **Test**: Set and get values at indices `1` and `2` to ensure they are stored and retrieved correctly.
+
+### Binary Search Invariants
+
+1. **Sorted Search**:
+   - Ensure that the search function correctly identifies the presence or absence of a value in a sorted map.
+   - **Test**: Populate a map with sorted values and search for existing and non-existing values to verify the correctness of the search function.
+
+2. **Search Range**:
+   - Ensure that the search function respects the specified range.
+   - **Test**: Perform searches with different start and end ranges to ensure the function only searches within the specified range.
+
+3. **Empty Range**:
+   - Ensure that searching in an empty range returns `(false, start)`.
+   - **Test**: Perform a search with `start` equal to `end` and verify the result.
+
+### Generic Mapping Invariants
+
+1. **Generic Set and Get Consistency**:
+   - For any bit width, setting a value at a specific index and then getting the value at the same index should return the set value.
+   - **Test**: For various bit widths, set and get values at different indices to ensure consistency.
+
+2. **Generic Boundary Conditions**:
+   - Test the boundary conditions for various bit widths, such as the maximum index and the maximum value that can be stored.
+   - **Test**: For various bit widths, set and get values at the maximum index and with the maximum value that can be stored.
+
+By covering these invariants, we can ensure that the `LibMap` library functions correctly across a wide range of scenarios and edge cases.

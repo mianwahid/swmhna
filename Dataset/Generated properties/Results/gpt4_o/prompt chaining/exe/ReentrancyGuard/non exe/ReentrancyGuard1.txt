@@ -1,0 +1,60 @@
+The provided smart contract is a Reentrancy Guard, which is designed to prevent reentrant calls to functions. Reentrancy is a common vulnerability in smart contracts where an external contract can call back into the calling contract before the first invocation is complete, potentially leading to unexpected behavior or exploitation. Below is a detailed explanation of each functionality in the contract:
+
+### 1. Custom Error: `Reentrancy()`
+```solidity
+error Reentrancy();
+```
+- **Functionality**: This custom error is defined to signal unauthorized reentrant calls. It is used within the contract to revert transactions that attempt reentrancy.
+
+### 2. Storage: `_REENTRANCY_GUARD_SLOT`
+```solidity
+uint256 private constant _REENTRANCY_GUARD_SLOT = 0x929eee149b4bd21268;
+```
+- **Functionality**: This constant defines a specific storage slot used to store the reentrancy guard state. The value is derived from a hash to ensure it is unique and unlikely to collide with other storage slots. The use of 9 bytes helps avoid collisions with lower slots while minimizing bytecode size.
+
+### 3. Modifier: `nonReentrant`
+```solidity
+modifier nonReentrant() virtual {
+    assembly {
+        if eq(sload(_REENTRANCY_GUARD_SLOT), address()) {
+            mstore(0x00, 0xab143c06) // `Reentrancy()`.
+            revert(0x1c, 0x04)
+        }
+        sstore(_REENTRANCY_GUARD_SLOT, address())
+    }
+    _;
+    assembly {
+        sstore(_REENTRANCY_GUARD_SLOT, codesize())
+    }
+}
+```
+- **Functionality**: This modifier is used to guard functions against reentrancy. It works as follows:
+  - **Check**: It first checks if the `_REENTRANCY_GUARD_SLOT` is already set to the address of the contract. If it is, it means a reentrant call is being attempted, and the transaction is reverted with the `Reentrancy()` error.
+  - **Set Guard**: If the check passes, it sets the `_REENTRANCY_GUARD_SLOT` to the address of the contract to mark the function as entered.
+  - **Function Execution**: The function body is executed.
+  - **Reset Guard**: After the function execution, it resets the `_REENTRANCY_GUARD_SLOT` to the contract's code size, effectively marking the function as exited and allowing future calls.
+
+### 4. Modifier: `nonReadReentrant`
+```solidity
+modifier nonReadReentrant() virtual {
+    assembly {
+        if eq(sload(_REENTRANCY_GUARD_SLOT), address()) {
+            mstore(0x00, 0xab143c06) // `Reentrancy()`.
+            revert(0x1c, 0x04)
+        }
+    }
+    _;
+}
+```
+- **Functionality**: This modifier is used to guard view (read-only) functions against reentrancy. It works as follows:
+  - **Check**: It checks if the `_REENTRANCY_GUARD_SLOT` is already set to the address of the contract. If it is, it means a reentrant call is being attempted, and the transaction is reverted with the `Reentrancy()` error.
+  - **Function Execution**: If the check passes, the function body is executed.
+  - **Note**: Unlike `nonReentrant`, this modifier does not reset the `_REENTRANCY_GUARD_SLOT` after execution because view functions do not modify state.
+
+### Summary
+- **Custom Error**: `Reentrancy()` is used to signal unauthorized reentrant calls.
+- **Storage Slot**: `_REENTRANCY_GUARD_SLOT` is a unique storage slot used to track the reentrancy state.
+- **Modifier `nonReentrant`**: Prevents reentrant calls to state-modifying functions by setting and resetting a guard.
+- **Modifier `nonReadReentrant`**: Prevents reentrant calls to view functions by checking the guard without resetting it.
+
+These functionalities collectively ensure that functions protected by these modifiers cannot be reentered, thus mitigating the risk of reentrancy attacks.

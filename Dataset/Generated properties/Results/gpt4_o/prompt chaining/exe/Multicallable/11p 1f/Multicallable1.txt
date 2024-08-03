@@ -1,0 +1,66 @@
+The provided smart contract, `Multicallable`, is designed to enable a single call to execute multiple methods on itself. This is achieved through the `multicall` function, which uses `DELEGATECALL` to call each method specified in the input data. Below is a detailed explanation of the functionalities and the internal workings of this contract:
+
+### Contract Overview
+
+- **Purpose**: The `Multicallable` contract allows for multiple method calls to be executed in a single transaction. This can be useful for reducing gas costs and improving efficiency when multiple operations need to be performed sequentially.
+- **Author**: The contract is authored by Solady and is modified from Solmate.
+- **Warning**: The contract is not designed to be used with ERC2771 out-of-the-box due to potential vulnerabilities related to arbitrary address spoofing. The authors recommend using an alternative pattern for more flexibility and safety.
+
+### Functionality
+
+#### `multicall` Function
+
+```solidity
+function multicall(bytes[] calldata data) public virtual returns (bytes[] memory)
+```
+
+- **Purpose**: This function takes an array of calldata (`data`), each representing a method call, and executes them sequentially using `DELEGATECALL`. The results of each call are stored and returned as an array of bytes.
+- **Visibility**: `public` and `virtual`, allowing it to be overridden in derived contracts.
+- **Return Type**: Returns an array of bytes (`bytes[] memory`), where each element is the result of a corresponding method call.
+
+##### Detailed Steps
+
+1. **Initial Setup**:
+   - The function starts by setting up memory for storing the results.
+   - It checks if the `data` array is empty and returns early if it is.
+
+2. **Memory Allocation**:
+   - The function calculates the memory offsets for storing the results.
+   - It copies the offsets from the calldata into memory.
+
+3. **Loop Through Calls**:
+   - The function enters a loop to process each method call in the `data` array.
+   - For each call:
+     - It calculates the offset of the current bytes in the calldata.
+     - It copies the current bytes from calldata to memory.
+     - It performs a `DELEGATECALL` to the current contract with the copied calldata.
+     - If the `DELEGATECALL` reverts, the function bubbles up the error and reverts the entire transaction.
+     - It stores the result of the `DELEGATECALL` in memory, including the return data size and the actual return data.
+     - It advances the memory offset for the next result.
+
+4. **Return Results**:
+   - After processing all calls, the function returns the results as an array of bytes.
+
+##### Assembly Code Explanation
+
+- **Memory Management**:
+  - The function uses inline assembly for efficient memory management and to handle the `DELEGATECALL` operations.
+  - It sets up memory pointers and offsets to store the results of each call.
+
+- **DELEGATECALL Execution**:
+  - The `DELEGATECALL` is used to execute each method call within the context of the current contract.
+  - If any `DELEGATECALL` fails, the function captures the revert reason and reverts the entire transaction.
+
+- **Result Storage**:
+  - The results of each `DELEGATECALL` are stored in memory, including the size of the return data and the actual return data.
+  - The memory offsets are managed to ensure that the results are stored sequentially and can be returned as a single array.
+
+### Important Considerations
+
+- **Non-Payable**: The function is deliberately made non-payable to guard against double-spending vulnerabilities.
+- **Efficiency**: The function is designed to be efficient by directly returning the results and terminating the context.
+- **Security**: The contract includes a warning about potential vulnerabilities when used with certain ERC standards, and it recommends using alternative patterns for better security.
+
+### Conclusion
+
+The `Multicallable` contract provides a powerful mechanism for executing multiple method calls in a single transaction, leveraging `DELEGATECALL` for efficiency. However, it comes with important security considerations and is not suitable for use with certain ERC standards without additional safeguards.

@@ -1,0 +1,63 @@
+To ensure the `DeploylessPredeployQueryer` smart contract functions correctly, we need to define a set of test invariants that cover various edge cases. These invariants will help verify the contract's behavior under different scenarios. Below are the test invariants for the functionalities of the given contract:
+
+### 1. Custom Error: `ReturnedAddressMismatch`
+- **Invariant**: If the factory returns an address that does not match the provided target address, the contract should revert with the `ReturnedAddressMismatch` error.
+  - **Edge Case**: The factory returns an address that is off by one byte from the target address.
+
+### 2. Constructor Functionality
+#### 2.1. Target Contract Existence Check
+- **Invariant**: If the target contract already exists (i.e., `extcodesize(target) > 0`), the factory should not be called.
+  - **Edge Case**: The target contract exists but has minimal code (e.g., a single `return` statement).
+
+#### 2.2. Deploy Target if Not Exists
+- **Invariant**: If the target contract does not exist, the factory should be called with the provided `factoryCalldata`.
+  - **Edge Case**: The factory contract fails to deploy the target contract (e.g., due to insufficient gas or incorrect calldata).
+
+- **Invariant**: If the factory successfully deploys the target contract, the returned address must match the provided target address.
+  - **Edge Case**: The factory deploys the contract but returns an address that is different from the target address.
+
+#### 2.3. Query Target Contract
+- **Invariant**: The contract should correctly iterate over the `targetQueryCalldata` array and perform calls to the target contract with each calldata entry.
+  - **Edge Case**: The `targetQueryCalldata` array is empty.
+  - **Edge Case**: One of the calldata entries in `targetQueryCalldata` is invalid or causes the target contract to revert.
+
+- **Invariant**: The results of the calls to the target contract should be stored in memory and returned as an array of bytes.
+  - **Edge Case**: The target contract returns data of varying lengths for different calls.
+  - **Edge Case**: The target contract returns no data for some calls.
+
+#### 2.4. Revert on Failure
+- **Invariant**: If any call to the target contract fails, the contract should revert with the returned data.
+  - **Edge Case**: The target contract reverts with a custom error.
+  - **Edge Case**: The target contract runs out of gas during the call.
+
+### 3. General Invariants
+- **Invariant**: The contract should handle the case where the `factoryCalldata` is empty.
+  - **Edge Case**: The `factoryCalldata` is an empty byte array.
+
+- **Invariant**: The contract should handle the case where the `targetQueryCalldata` contains invalid calldata that does not conform to the expected format.
+  - **Edge Case**: The `targetQueryCalldata` contains non-ABI encoded data.
+
+### Summary of Test Invariants
+1. **ReturnedAddressMismatch Error**:
+   - Factory returns an address that does not match the target address.
+
+2. **Constructor Functionality**:
+   - **Target Contract Existence Check**:
+     - Target contract exists with minimal code.
+   - **Deploy Target if Not Exists**:
+     - Factory fails to deploy the target contract.
+     - Factory deploys the contract but returns a different address.
+   - **Query Target Contract**:
+     - `targetQueryCalldata` is empty.
+     - One of the calldata entries causes the target contract to revert.
+     - Target contract returns data of varying lengths.
+     - Target contract returns no data for some calls.
+   - **Revert on Failure**:
+     - Target contract reverts with a custom error.
+     - Target contract runs out of gas during the call.
+
+3. **General Invariants**:
+   - `factoryCalldata` is empty.
+   - `targetQueryCalldata` contains invalid calldata.
+
+By testing these invariants, we can ensure that the `DeploylessPredeployQueryer` contract behaves as expected under various edge cases and scenarios.

@@ -1,0 +1,47 @@
+## Test Invariants for LibMap Contract
+
+This document outlines test invariants for the provided `LibMap` contract. Each invariant targets specific functionalities and edge cases to ensure the library's robustness.
+
+**General Invariants:**
+
+- **Invariant 1: Zero Initialization:** All map structures should initialize with all values set to zero.
+- **Invariant 2: Out-of-Bounds Access:** Accessing any map structure with an index outside the intended range (based on bit width) should revert or return a predictable default value (e.g., zero).
+
+**Getters and Setters:**
+
+**Uint8Map:**
+
+- **Invariant 3: Single Value Set/Get:** Setting and getting a single value within the `Uint8Map` should work correctly for all possible values (0-255).
+- **Invariant 4: Multiple Value Set/Get:** Setting and getting multiple values within the same storage slot (up to 32 values) should not interfere with each other.
+- **Invariant 5: Overwriting Values:** Overwriting an existing value within the `Uint8Map` should update the value correctly.
+
+**Uint16Map, Uint32Map, Uint40Map, Uint64Map, Uint128Map:**
+
+- **Invariant 6: Value Range:** Setting and getting values within the respective map structures should work correctly for the full range of their data types (e.g., 0-65535 for `Uint16Map`).
+- **Invariant 7: Boundary Alignment:** Values should be stored and retrieved correctly even when they are not perfectly aligned with storage slot boundaries (e.g., setting a `uint16` value at index 1).
+
+**Generic Get/Set:**
+
+- **Invariant 8: Arbitrary Bit Width:** Setting and getting values with arbitrary bit widths (using the generic `get` and `set` functions) should work correctly for different bit widths and index combinations.
+- **Invariant 9: Value Masking:** The generic `get` function should correctly mask out irrelevant bits when retrieving a value with a specific bit width.
+
+**Binary Search:**
+
+- **Invariant 10: Empty Range:** Searching for any value within an empty range (`start` >= `end`) should return `found = false` and `index = start`.
+- **Invariant 11: Single Element Range:** Searching within a range containing a single element should return the correct result based on the needle's value.
+- **Invariant 12: Needle Found:** If the `needle` exists within the search range, the function should return `found = true` and the correct `index`.
+- **Invariant 13: Needle Not Found - Nearest Before:** If the `needle` doesn't exist but falls within the sorted range, the function should return `found = false` and the `index` of the nearest value before the `needle`.
+- **Invariant 14: Needle Not Found - Nearest After:** If the `needle` is greater than all values in the range, the function should return `found = false` and the `index` of the last element in the range.
+- **Invariant 15: Duplicate Values:** The search function should handle duplicate values correctly, returning the index based on the defined precedence (equal to > nearest before > nearest after).
+
+**Edge Cases:**
+
+- **Edge Case 1: Maximum Index:** Test setting and getting values at the maximum possible index for each map structure.
+- **Edge Case 2: Zero Bit Width:** Test the behavior of generic `get` and `set` functions when `bitWidth` is zero.
+- **Edge Case 3: Overflowing Values:** Attempt to set values that exceed the maximum limit of the respective data types and verify the behavior.
+
+**Testing Methodology:**
+
+These invariants can be tested using a Foundry test suite. Each invariant should be translated into one or more test cases that attempt to violate the invariant. The test cases should cover a wide range of inputs and scenarios to ensure comprehensive coverage.
+
+By thoroughly testing these invariants, you can gain confidence in the correctness and reliability of the `LibMap` library for handling packed unsigned integers in your Solidity contracts. 

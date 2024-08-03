@@ -1,0 +1,45 @@
+## LibBitmap Functionality Breakdown
+
+This smart contract library, `LibBitmap`, provides a space-efficient way to store and manipulate sets of boolean values (bits) using the concept of bitmaps. It leverages Solidity's bitwise operations for efficiency and offers a range of functionalities:
+
+**Data Structure:**
+
+- **`Bitmap` struct:** This struct represents a bitmap in storage. It uses a mapping where the key is a `uint256` representing a "bucket" and the value is another `uint256` holding 256 bits (booleans). This allows storing a large number of booleans in a compact manner.
+
+**Operations:**
+
+**Basic Bit Manipulation:**
+
+- **`get(Bitmap storage bitmap, uint256 index) internal view returns (bool isSet)`:**  Retrieves the boolean value (true/false) of the bit at a specific `index` within the `bitmap`. 
+- **`set(Bitmap storage bitmap, uint256 index) internal`:** Sets the bit at the given `index` in the `bitmap` to `true`.
+- **`unset(Bitmap storage bitmap, uint256 index) internal`:** Sets the bit at the given `index` in the `bitmap` to `false`.
+- **`toggle(Bitmap storage bitmap, uint256 index) internal returns (bool newIsSet)`:** Flips the bit at the given `index` in the `bitmap` (true becomes false, false becomes true) and returns the new state of the bit.
+- **`setTo(Bitmap storage bitmap, uint256 index, bool shouldSet) internal`:** Sets the bit at the given `index` in the `bitmap` to the value of `shouldSet` (true or false).
+
+**Batch Operations:**
+
+- **`setBatch(Bitmap storage bitmap, uint256 start, uint256 amount) internal`:** Efficiently sets a consecutive range of `amount` bits to `true`, starting from the `start` index within the `bitmap`.
+- **`unsetBatch(Bitmap storage bitmap, uint256 start, uint256 amount) internal`:** Efficiently sets a consecutive range of `amount` bits to `false`, starting from the `start` index within the `bitmap`.
+
+**Counting and Searching:**
+
+- **`popCount(Bitmap storage bitmap, uint256 start, uint256 amount) internal view returns (uint256 count)`:** Counts the number of bits set to `true` within a specified range. It scans `amount` of bits starting from the `start` index and returns the total count.
+- **`findLastSet(Bitmap storage bitmap, uint256 upTo) internal view returns (uint256 setBitIndex)`:**  Finds the index of the most significant (highest) bit set to `true` within the `bitmap` up to the given `upTo` index. Returns `NOT_FOUND` if no set bit is found.
+
+**Dependencies:**
+
+- **`LibBit` library:** This library provides low-level bit manipulation functions used within `LibBitmap`. For example, it includes functions like `fls` (find last set bit) and `popCount` (count set bits in a single word) which are essential for efficient bitmap operations.
+
+**Use Cases:**
+
+This library is particularly useful for managing sets or flags in a memory-efficient way. Some potential use cases include:
+
+- **Membership tracking:**  Keeping track of whether an element belongs to a set (e.g., users who have subscribed to a service).
+- **Role-based access control:** Representing user permissions as a set of flags.
+- **Resource allocation:** Tracking the availability of resources (e.g., free slots in a time schedule).
+
+**Advantages:**
+
+- **Space efficiency:** Bitmaps can significantly reduce storage costs compared to storing booleans individually, especially for large sets.
+- **Performance:** Bitwise operations are generally very efficient in Solidity, making bitmap manipulations fast.
+- **Readability:**  The library provides a clean and intuitive interface for working with bitmaps, abstracting away the low-level bit manipulation details. 

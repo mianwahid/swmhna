@@ -1,0 +1,175 @@
+To ensure the robustness and correctness of the `Initializable` contract, we need to define a set of test invariants that cover various edge cases and functionalities. Here are the test invariants for the `Initializable` contract:
+
+### Test Invariants
+
+1. **Single Initialization**
+   - **Invariant**: A function guarded by the `initializer` modifier can only be called once.
+   - **Edge Case**: Attempt to call the initializer function multiple times should revert with `InvalidInitialization()`.
+
+2. **Reinitialization with Versioning**
+   - **Invariant**: A function guarded by the `reinitializer` modifier can only be called once per version.
+   - **Edge Case**: Attempt to reinitialize with the same version should revert with `InvalidInitialization()`.
+   - **Edge Case**: Attempt to reinitialize with a lower version than the current should revert with `InvalidInitialization()`.
+
+3. **Only Initializing State**
+   - **Invariant**: A function guarded by the `onlyInitializing` modifier can only be called during the initialization process.
+   - **Edge Case**: Attempt to call a function with `onlyInitializing` outside of the initialization process should revert with `NotInitializing()`.
+
+4. **Disable Initializers**
+   - **Invariant**: The `_disableInitializers` function should lock the contract against any future initializations.
+   - **Edge Case**: After calling `_disableInitializers`, any attempt to initialize or reinitialize should revert with `InvalidInitialization()`.
+
+5. **Initialization Event Emission**
+   - **Invariant**: The `Initialized` event should be emitted with the correct version during initialization and reinitialization.
+   - **Edge Case**: Verify that the `Initialized` event is emitted with version `1` during the first initialization.
+   - **Edge Case**: Verify that the `Initialized` event is emitted with the correct version during reinitialization.
+
+6. **Initialization State Check**
+   - **Invariant**: The `_isInitializing` function should return `true` during the initialization process and `false` otherwise.
+   - **Edge Case**: Verify that `_isInitializing` returns `true` when a function with `initializer` or `reinitializer` is being executed.
+   - **Edge Case**: Verify that `_isInitializing` returns `false` outside of the initialization process.
+
+7. **Initialized Version Check**
+   - **Invariant**: The `_getInitializedVersion` function should return the highest version that has been initialized.
+   - **Edge Case**: Verify that `_getInitializedVersion` returns `1` after the first initialization.
+   - **Edge Case**: Verify that `_getInitializedVersion` returns the correct version after reinitialization.
+
+### Example Test Cases
+
+1. **Test Single Initialization**
+   ```solidity
+   function testSingleInitialization() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Attempt to call the initializer function again should revert
+       try contract.initialize() {
+           assert(false, "Expected InvalidInitialization error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+       }
+   }
+   ```
+
+2. **Test Reinitialization with Versioning**
+   ```solidity
+   function testReinitializationWithVersioning() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Call the reinitializer function with version 2
+       contract.reinitialize(2);
+       
+       // Attempt to reinitialize with the same version should revert
+       try contract.reinitialize(2) {
+           assert(false, "Expected InvalidInitialization error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+       }
+       
+       // Attempt to reinitialize with a lower version should revert
+       try contract.reinitialize(1) {
+           assert(false, "Expected InvalidInitialization error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+       }
+   }
+   ```
+
+3. **Test Only Initializing State**
+   ```solidity
+   function testOnlyInitializingState() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Attempt to call a function with onlyInitializing outside of initialization should revert
+       try contract.onlyInitializingFunction() {
+           assert(false, "Expected NotInitializing error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("NotInitializing()"));
+       }
+   }
+   ```
+
+4. **Test Disable Initializers**
+   ```solidity
+   function testDisableInitializers() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Call the disableInitializers function
+       contract.disableInitializers();
+       
+       // Attempt to initialize or reinitialize should revert
+       try contract.initialize() {
+           assert(false, "Expected InvalidInitialization error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+       }
+       
+       try contract.reinitialize(2) {
+           assert(false, "Expected InvalidInitialization error");
+       } catch Error(string memory reason) {
+           assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+       }
+   }
+   ```
+
+5. **Test Initialization Event Emission**
+   ```solidity
+   function testInitializationEventEmission() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Verify that the Initialized event is emitted with version 1
+       // (Assume we have a way to capture and verify events)
+       assertEventEmitted(contract, "Initialized", 1);
+       
+       // Call the reinitializer function with version 2
+       contract.reinitialize(2);
+       
+       // Verify that the Initialized event is emitted with version 2
+       assertEventEmitted(contract, "Initialized", 2);
+   }
+   ```
+
+6. **Test Initialization State Check**
+   ```solidity
+   function testInitializationStateCheck() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Verify that _isInitializing returns false outside of initialization
+       assert(!contract.isInitializing());
+       
+       // Call a function with initializer and verify _isInitializing returns true
+       contract.callInitializerFunction();
+       assert(contract.isInitializing());
+   }
+   ```
+
+7. **Test Initialized Version Check**
+   ```solidity
+   function testInitializedVersionCheck() public {
+       // Deploy the contract and call the initializer function
+       MyContract contract = new MyContract();
+       contract.initialize();
+       
+       // Verify that _getInitializedVersion returns 1
+       assert(contract.getInitializedVersion() == 1);
+       
+       // Call the reinitializer function with version 2
+       contract.reinitialize(2);
+       
+       // Verify that _getInitializedVersion returns 2
+       assert(contract.getInitializedVersion() == 2);
+   }
+   ```
+
+These test invariants and example test cases ensure that the `Initializable` contract behaves as expected under various conditions and edge cases.

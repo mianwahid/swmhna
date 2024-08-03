@@ -1,0 +1,67 @@
+To ensure the robustness and correctness of the `SSTORE2` library, we need to define test invariants that cover various edge cases for each functionality provided by the contract. Below are the test invariants for the `SSTORE2` library:
+
+### Write Logic
+
+1. **Invariant for `write` Function**
+   - **Edge Case: Empty Data**
+     - Ensure that writing an empty byte array returns a valid contract address.
+     - Ensure that the deployed contract contains only the STOP opcode.
+   - **Edge Case: Maximum Data Size**
+     - Ensure that writing the maximum allowed byte array (24,575 bytes) returns a valid contract address.
+     - Ensure that the deployed contract contains the correct data prefixed with the STOP opcode.
+   - **Edge Case: Deployment Failure**
+     - Ensure that attempting to write data larger than the maximum allowed size reverts with `DeploymentFailed`.
+
+2. **Invariant for `writeDeterministic` Function**
+   - **Edge Case: Empty Data with Salt**
+     - Ensure that writing an empty byte array with a given salt returns a valid deterministic contract address.
+     - Ensure that the deployed contract contains only the STOP opcode.
+   - **Edge Case: Maximum Data Size with Salt**
+     - Ensure that writing the maximum allowed byte array (24,575 bytes) with a given salt returns a valid deterministic contract address.
+     - Ensure that the deployed contract contains the correct data prefixed with the STOP opcode.
+   - **Edge Case: Deployment Failure with Salt**
+     - Ensure that attempting to write data larger than the maximum allowed size with a given salt reverts with `DeploymentFailed`.
+
+### Utility Functions
+
+3. **Invariant for `initCodeHash` Function**
+   - **Edge Case: Empty Data**
+     - Ensure that the initialization code hash for an empty byte array is computed correctly.
+   - **Edge Case: Maximum Data Size**
+     - Ensure that the initialization code hash for the maximum allowed byte array (24,575 bytes) is computed correctly.
+
+4. **Invariant for `predictDeterministicAddress` Function**
+   - **Edge Case: Empty Data with Salt and Deployer**
+     - Ensure that the predicted deterministic address for an empty byte array with a given salt and deployer address is computed correctly.
+   - **Edge Case: Maximum Data Size with Salt and Deployer**
+     - Ensure that the predicted deterministic address for the maximum allowed byte array (24,575 bytes) with a given salt and deployer address is computed correctly.
+
+### Read Logic
+
+5. **Invariant for `read` Function**
+   - **Edge Case: Valid Pointer**
+     - Ensure that reading from a valid storage contract address returns the correct data.
+   - **Edge Case: Invalid Pointer**
+     - Ensure that reading from an invalid storage contract address reverts with `InvalidPointer`.
+
+6. **Invariant for `read` Function with Start**
+   - **Edge Case: Valid Pointer with Start**
+     - Ensure that reading from a valid storage contract address starting from a valid index returns the correct data.
+   - **Edge Case: Invalid Pointer**
+     - Ensure that reading from an invalid storage contract address reverts with `InvalidPointer`.
+   - **Edge Case: Start Out of Bounds**
+     - Ensure that reading from a valid storage contract address with a start index out of bounds reverts with `ReadOutOfBounds`.
+
+7. **Invariant for `read` Function with Start and End**
+   - **Edge Case: Valid Pointer with Start and End**
+     - Ensure that reading from a valid storage contract address from a valid start index to a valid end index returns the correct data.
+   - **Edge Case: Invalid Pointer**
+     - Ensure that reading from an invalid storage contract address reverts with `InvalidPointer`.
+   - **Edge Case: Start or End Out of Bounds**
+     - Ensure that reading from a valid storage contract address with a start or end index out of bounds reverts with `ReadOutOfBounds`.
+   - **Edge Case: Start Greater than End**
+     - Ensure that reading from a valid storage contract address with a start index greater than the end index reverts with `ReadOutOfBounds`.
+
+### Summary
+
+These test invariants cover various edge cases for each functionality provided by the `SSTORE2` library. By testing these invariants, we can ensure that the library behaves correctly and robustly under different scenarios.

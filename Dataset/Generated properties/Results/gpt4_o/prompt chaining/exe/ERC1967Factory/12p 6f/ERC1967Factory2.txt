@@ -1,0 +1,102 @@
+To ensure the robustness and correctness of the `ERC1967Factory` smart contract, we need to define test invariants that cover various edge cases for all its functionalities. Below are the test invariants for each function and feature of the contract:
+
+### Custom Errors
+1. **Unauthorized Error**:
+   - Ensure that only the admin can call `changeAdmin`, `upgrade`, and `upgradeAndCall` functions.
+   - Verify that unauthorized calls revert with the `Unauthorized` error.
+
+2. **DeploymentFailed Error**:
+   - Ensure that proxy deployment reverts with `DeploymentFailed` if the deployment fails.
+   - Test scenarios where the `create` or `create2` opcode fails.
+
+3. **UpgradeFailed Error**:
+   - Ensure that proxy upgrade reverts with `UpgradeFailed` if the upgrade fails.
+   - Test scenarios where the call to set the implementation fails.
+
+4. **SaltDoesNotStartWithCaller Error**:
+   - Ensure that `deployDeterministic` and `deployDeterministicAndCall` revert with `SaltDoesNotStartWithCaller` if the salt does not start with the caller's address or zero address.
+
+### Events
+1. **AdminChanged Event**:
+   - Verify that the `AdminChanged` event is emitted with correct parameters when the admin is changed.
+
+2. **Upgraded Event**:
+   - Verify that the `Upgraded` event is emitted with correct parameters when the proxy is upgraded.
+
+3. **Deployed Event**:
+   - Verify that the `Deployed` event is emitted with correct parameters when a new proxy is deployed.
+
+### Admin Functions
+1. **adminOf Function**:
+   - Ensure that `adminOf` returns the correct admin address for a given proxy.
+   - Test with various proxy addresses, including those that have not been deployed.
+
+2. **changeAdmin Function**:
+   - Ensure that only the current admin can change the admin of a proxy.
+   - Verify that the admin is correctly updated in storage.
+   - Check that the `AdminChanged` event is emitted with correct parameters.
+
+### Upgrade Functions
+1. **upgrade Function**:
+   - Ensure that only the current admin can upgrade the proxy.
+   - Verify that the implementation is correctly updated.
+   - Check that the `Upgraded` event is emitted with correct parameters.
+
+2. **upgradeAndCall Function**:
+   - Ensure that only the current admin can upgrade the proxy and call it with data.
+   - Verify that the implementation is correctly updated and the call is executed.
+   - Check that the `Upgraded` event is emitted with correct parameters.
+   - Test with various data payloads, including empty data.
+
+### Deploy Functions
+1. **deploy Function**:
+   - Ensure that a new proxy is deployed with the specified implementation and admin.
+   - Verify that the proxy address is returned correctly.
+   - Check that the `Deployed` event is emitted with correct parameters.
+
+2. **deployAndCall Function**:
+   - Ensure that a new proxy is deployed with the specified implementation and admin, and the proxy is called with data.
+   - Verify that the proxy address is returned correctly.
+   - Check that the `Deployed` event is emitted with correct parameters.
+   - Test with various data payloads, including empty data.
+
+3. **deployDeterministic Function**:
+   - Ensure that a new proxy is deployed with the specified implementation, admin, and salt.
+   - Verify that the deterministic address is returned correctly.
+   - Check that the `Deployed` event is emitted with correct parameters.
+   - Test with various salts, including those that start with the caller's address and zero address.
+
+4. **deployDeterministicAndCall Function**:
+   - Ensure that a new proxy is deployed with the specified implementation, admin, salt, and the proxy is called with data.
+   - Verify that the deterministic address is returned correctly.
+   - Check that the `Deployed` event is emitted with correct parameters.
+   - Test with various data payloads, including empty data.
+   - Test with various salts, including those that start with the caller's address and zero address.
+
+### Internal Deploy Function
+1. **_deploy Function**:
+   - Ensure that the proxy is created using `create` or `create2` based on the `useSalt` flag.
+   - Verify that the implementation is correctly set.
+   - Check that the admin is correctly stored in storage.
+   - Ensure that the `Deployed` event is emitted with correct parameters.
+   - Test with various combinations of `implementation`, `admin`, `salt`, and `data`.
+
+### Helper Functions
+1. **predictDeterministicAddress Function**:
+   - Ensure that the predicted address matches the actual address of the proxy deployed with the specified salt.
+   - Test with various salts, including those that start with the caller's address and zero address.
+
+2. **initCodeHash Function**:
+   - Ensure that the initialization code hash is correctly computed.
+   - Verify that the hash matches the expected value for the proxy's initialization code.
+
+3. **_initCode Function**:
+   - Ensure that the initialization code is correctly returned.
+   - Verify that the code matches the expected creation and runtime bytecode for the proxy.
+
+4. **_emptyData Function**:
+   - Ensure that the function returns an empty bytes calldata.
+   - Verify that the length of the returned data is zero.
+
+### Summary
+The test invariants cover various edge cases and ensure the correctness of the `ERC1967Factory` smart contract's functionalities, including admin management, proxy deployment, proxy upgrade, and event emission. These invariants help in identifying potential issues and ensuring the robustness of the contract.

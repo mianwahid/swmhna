@@ -1,0 +1,77 @@
+To ensure the correctness and robustness of the `Base64` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for the `Base64` library:
+
+### Invariants for `encode(bytes memory data, bool fileSafe, bool noPadding)`
+
+1. **Empty Input:**
+   - **Invariant:** Encoding an empty byte array should return an empty string.
+   - **Test Case:** `encode("", false, false) == ""`
+
+2. **Single Byte Input:**
+   - **Invariant:** Encoding a single byte should produce a 2-character Base64 string with padding if `noPadding` is false.
+   - **Test Case:** `encode("f", false, false) == "Zg=="`
+
+3. **Two Bytes Input:**
+   - **Invariant:** Encoding two bytes should produce a 3-character Base64 string with padding if `noPadding` is false.
+   - **Test Case:** `encode("fo", false, false) == "Zm8="`
+
+4. **Three Bytes Input:**
+   - **Invariant:** Encoding three bytes should produce a 4-character Base64 string without padding.
+   - **Test Case:** `encode("foo", false, false) == "Zm9v"`
+
+5. **File Safe Encoding:**
+   - **Invariant:** When `fileSafe` is true, '+' should be replaced with '-' and '/' with '_'.
+   - **Test Case:** `encode("foo", true, false) == "Zm9v"`
+
+6. **No Padding:**
+   - **Invariant:** When `noPadding` is true, the result should not contain any '=' characters.
+   - **Test Case:** `encode("fo", false, true) == "Zm8"`
+
+7. **Combination of File Safe and No Padding:**
+   - **Invariant:** When both `fileSafe` and `noPadding` are true, the result should be file-safe and without padding.
+   - **Test Case:** `encode("fo", true, true) == "Zm8"`
+
+### Invariants for `encode(bytes memory data)`
+
+1. **Default Encoding:**
+   - **Invariant:** The default encoding should be equivalent to calling `encode(data, false, false)`.
+   - **Test Case:** `encode("foo") == encode("foo", false, false)`
+
+### Invariants for `encode(bytes memory data, bool fileSafe)`
+
+1. **File Safe Encoding with Padding:**
+   - **Invariant:** The encoding should be equivalent to calling `encode(data, fileSafe, false)`.
+   - **Test Case:** `encode("foo", true) == encode("foo", true, false)`
+
+### Invariants for `decode(string memory data)`
+
+1. **Empty Input:**
+   - **Invariant:** Decoding an empty string should return an empty byte array.
+   - **Test Case:** `decode("") == ""`
+
+2. **Single Byte Output:**
+   - **Invariant:** Decoding a 2-character Base64 string with padding should return a single byte.
+   - **Test Case:** `decode("Zg==") == "f"`
+
+3. **Two Bytes Output:**
+   - **Invariant:** Decoding a 3-character Base64 string with padding should return two bytes.
+   - **Test Case:** `decode("Zm8=") == "fo"`
+
+4. **Three Bytes Output:**
+   - **Invariant:** Decoding a 4-character Base64 string should return three bytes.
+   - **Test Case:** `decode("Zm9v") == "foo"`
+
+5. **File Safe Decoding:**
+   - **Invariant:** Decoding a file-safe Base64 string should return the correct byte array.
+   - **Test Case:** `decode("Zm9v") == decode("Zm9v")`
+
+6. **Non-Padded Decoding:**
+   - **Invariant:** Decoding a non-padded Base64 string should return the correct byte array.
+   - **Test Case:** `decode("Zm8") == "fo"`
+
+7. **Invalid Input Handling:**
+   - **Invariant:** Decoding an invalid Base64 string should not revert but produce undefined behavior.
+   - **Test Case:** `decode("invalid_base64")` should not revert but the output is undefined.
+
+### Summary
+
+These invariants ensure that the `Base64` library handles various edge cases correctly, including empty inputs, single and multiple byte inputs, file-safe encoding, and padding options. Additionally, they verify that the decoding function handles both valid and invalid inputs appropriately.

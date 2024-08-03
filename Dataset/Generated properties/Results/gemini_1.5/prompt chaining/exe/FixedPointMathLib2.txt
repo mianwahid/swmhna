@@ -1,0 +1,121 @@
+## Test Invariants for FixedPointMathLib
+
+This document outlines test invariants for the `FixedPointMathLib` contract, focusing on edge cases and ensuring comprehensive coverage of functionalities.
+
+**General Considerations:**
+
+* **Zero Handling:** Pay close attention to how functions handle zero values for inputs and outputs.
+* **Overflow/Underflow:** Test edge cases that could lead to overflow or underflow, especially for raw operations.
+* **Rounding:** Verify rounding behavior for functions like `mulWad`, `divWad`, and their up-rounding counterparts.
+* **Domain Specific:** Consider the specific mathematical domains and limitations of functions like `lnWad`, `expWad`, and `lambertW0Wad`.
+
+**Test Invariants:**
+
+**1. Simplified Fixed Point Operations:**
+
+* **`mulWad(x, y)` & `sMulWad(x, y)`:**
+    * `x = 0` or `y = 0` => `z = 0`
+    * `x = 1e18`, `y = 1e18` => `z = 1e18`
+    * Test with large values of `x` and `y` close to `uint256.max` to check for overflow.
+    * For `sMulWad`, test with different sign combinations of `x` and `y`.
+* **`rawMulWad(x, y)` & `rawSMulWad(x, y)`:**
+    * Same as above, but specifically test for potential overflows without checks.
+* **`mulWadUp(x, y)`:**
+    * Same test cases as `mulWad`, but verify rounding up behavior.
+    * Example: `x = 3e18`, `y = 2e18` => `z = 7e18` (rounding up from 6e18)
+* **`divWad(x, y)` & `sDivWad(x, y)`:**
+    * `x = 0` => `z = 0`
+    * `y = 0` => Reverts with `DivWadFailed` or `SDivWadFailed`.
+    * `x = 1e18`, `y = 2e18` => `z = 5e17`
+    * Test with large values of `x` and small values of `y` to check for overflow.
+    * For `sDivWad`, test with different sign combinations of `x` and `y`.
+* **`rawDivWad(x, y)` & `rawSDivWad(x, y)`:**
+    * Same as above, but specifically test for potential overflows and division by zero without checks.
+* **`divWadUp(x, y)`:**
+    * Same test cases as `divWad`, but verify rounding up behavior.
+    * Example: `x = 5e18`, `y = 2e18` => `z = 3e18` (rounding up from 2.5e18)
+* **`powWad(x, y)`:**
+    * `x = 0`, `y > 0` => `z = 0`
+    * `x > 0`, `y = 0` => `z = 1e18`
+    * `x = 1e18`, `y = 2` => `z = 1e36`
+    * Test with different combinations of positive and negative `x` and `y`.
+    * Test edge cases for potential overflow, especially with large exponents.
+* **`expWad(x)`:**
+    * `x = 0` => `z = 1e18`
+    * Test with large positive and negative values of `x` to verify accuracy and overflow behavior.
+* **`lnWad(x)`:**
+    * `x <= 0` => Reverts with `LnWadUndefined`.
+    * `x = 1e18` => `z = 0`
+    * Test with values of `x` close to 0 and very large values to verify accuracy.
+* **`lambertW0Wad(x)`:**
+    * `x < -0.367879441171442322e18` => Reverts with `OutOfDomain`.
+    * Test with values of `x` close to the domain boundary and other values to verify accuracy.
+
+**2. General Number Utilities:**
+
+* **`fullMulDiv(x, y, d)` & `fullMulDivUp(x, y)`:**
+    * `d = 0` => Reverts with `FullMulDivFailed`.
+    * Test with large values of `x`, `y`, and `d` to verify accuracy and absence of overflow.
+    * For `fullMulDivUp`, verify rounding up behavior.
+* **`mulDiv(x, y, d)` & `mulDivUp(x, y, d)`:**
+    * `d = 0` => Reverts with `MulDivFailed`.
+    * Test with edge cases that could lead to overflow in `x * y`.
+    * For `mulDivUp`, verify rounding up behavior.
+* **`divUp(x, d)`:**
+    * `d = 0` => Reverts with `DivFailed`.
+    * Verify rounding up behavior.
+* **`zeroFloorSub(x, y)`:**
+    * `x >= y` => `z = x - y`
+    * `x < y` => `z = 0`
+* **`rpow(x, y, b)`:**
+    * `x = 0`, `y > 0` => `z = 0`
+    * `x > 0`, `y = 0` => `z = b`
+    * Test with different combinations of `x`, `y`, and `b` to verify accuracy and overflow behavior.
+* **`sqrt(x)`:**
+    * Test with perfect squares and non-perfect squares to verify accuracy.
+* **`cbrt(x)`:**
+    * Test with perfect cubes and non-perfect cubes to verify accuracy.
+* **`sqrtWad(x)` & `cbrtWad(x)`:**
+    * Test with values that result in whole numbers and fractions after applying the root operation.
+* **`factorial(x)`:**
+    * `x > 58` => Reverts with `FactorialOverflow`.
+    * Test with different values of `x` within the valid range.
+* **`log2(x)`, `log2Up(x)`, `log10(x)`, `log10Up(x)`, `log256(x)`, `log256Up(x)`:**
+    * `x = 0` => `z = 0`
+    * Test with powers of 2, 10, and 256 to verify accuracy.
+    * For up-rounding functions, verify rounding up behavior.
+* **`sci(x)`, `packSci(x)`, `unpackSci(packed)`:**
+    * Test with a wide range of values for `x` to verify accurate conversion to and from scientific notation.
+    * For `packSci`, ensure the packed value fits within the desired unsigned integer type.
+* **`avg(x, y)`:**
+    * Test with both `uint256` and `int256` inputs.
+    * Verify accurate calculation of the average.
+* **`abs(x)`:**
+    * Test with positive and negative values of `x`.
+* **`dist(x, y)`:**
+    * Test with different combinations of positive and negative `x` and `y`.
+* **`min(x, y)` & `max(x, y)`:**
+    * Test with both `uint256` and `int256` inputs.
+    * Verify correct identification of minimum and maximum values.
+* **`clamp(x, minValue, maxValue)`:**
+    * Test with `x` less than, equal to, and greater than `minValue` and `maxValue`.
+* **`gcd(x, y)`:**
+    * Test with different combinations of `x` and `y` to verify accurate calculation of the greatest common divisor.
+
+**3. Raw Number Operations:**
+
+* **`rawAdd(x, y)` & `rawSub(x, y)`:**
+    * Test with edge cases that could lead to overflow or underflow.
+* **`rawMul(x, y)`:**
+    * Test with edge cases that could lead to overflow.
+* **`rawDiv(x, y)` & `rawSDiv(x, y)`:**
+    * `y = 0` => `z = 0`
+    * Test with edge cases that could lead to overflow.
+* **`rawMod(x, y)` & `rawSMod(x, y)`:**
+    * `y = 0` => `z = 0`
+    * Test with different combinations of `x` and `y`.
+* **`rawAddMod(x, y, d)` & `rawMulMod(x, y, d)`:**
+    * `d = 0` => `z = 0`
+    * Test with different combinations of `x`, `y`, and `d`.
+
+This list of test invariants provides a comprehensive starting point for testing the `FixedPointMathLib` contract. It's essential to prioritize edge cases and potential vulnerabilities related to overflow, underflow, rounding, and domain-specific limitations to ensure the library's reliability and security. 

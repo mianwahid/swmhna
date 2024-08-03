@@ -1,0 +1,78 @@
+The provided smart contract is a Solidity library named `FixedPointMathLib` that offers a variety of mathematical operations, particularly focused on fixed-point arithmetic. Below is a detailed explanation of each functionality provided by the library:
+
+### Custom Errors
+1. **ExpOverflow**: Thrown when an exponential operation results in a value that exceeds the maximum value of `uint256`.
+2. **FactorialOverflow**: Thrown when a factorial operation results in a value that exceeds the maximum value of `uint256`.
+3. **RPowOverflow**: Thrown when a repeated power operation results in an overflow.
+4. **MantissaOverflow**: Thrown when the mantissa is too large to fit.
+5. **MulWadFailed**: Thrown when a multiplication operation with WAD scaling fails due to overflow.
+6. **SMulWadFailed**: Thrown when a signed multiplication operation with WAD scaling fails due to overflow.
+7. **DivWadFailed**: Thrown when a division operation with WAD scaling fails due to overflow or division by zero.
+8. **SDivWadFailed**: Thrown when a signed division operation with WAD scaling fails due to overflow or division by zero.
+9. **MulDivFailed**: Thrown when a multiplication followed by division operation fails due to overflow or division by zero.
+10. **DivFailed**: Thrown when a division operation fails due to division by zero.
+11. **FullMulDivFailed**: Thrown when a full precision multiply-divide operation fails due to overflow or division by zero.
+12. **LnWadUndefined**: Thrown when the natural logarithm operation is undefined for the given input.
+13. **OutOfDomain**: Thrown when the input is outside the acceptable domain for a function.
+
+### Constants
+- **WAD**: A constant representing the scalar for ETH and most ERC20 tokens, set to `1e18`.
+
+### Simplified Fixed Point Operations
+1. **mulWad**: Multiplies two `uint256` numbers and divides by `WAD`, rounding down.
+2. **sMulWad**: Multiplies two `int256` numbers and divides by `WAD`, rounding down.
+3. **rawMulWad**: Multiplies two `uint256` numbers and divides by `WAD` without overflow checks.
+4. **rawSMulWad**: Multiplies two `int256` numbers and divides by `WAD` without overflow checks.
+5. **mulWadUp**: Multiplies two `uint256` numbers and divides by `WAD`, rounding up.
+6. **rawMulWadUp**: Multiplies two `uint256` numbers and divides by `WAD`, rounding up without overflow checks.
+7. **divWad**: Divides `x` by `y` after multiplying `x` by `WAD`, rounding down.
+8. **sDivWad**: Divides `x` by `y` after multiplying `x` by `WAD`, rounding down.
+9. **rawDivWad**: Divides `x` by `y` after multiplying `x` by `WAD` without overflow and divide by zero checks.
+10. **rawSDivWad**: Divides `x` by `y` after multiplying `x` by `WAD` without overflow and divide by zero checks.
+11. **divWadUp**: Divides `x` by `y` after multiplying `x` by `WAD`, rounding up.
+12. **rawDivWadUp**: Divides `x` by `y` after multiplying `x` by `WAD`, rounding up without overflow and divide by zero checks.
+13. **powWad**: Raises `x` to the power of `y` using fixed-point arithmetic.
+14. **expWad**: Computes the exponential function `e^x` using fixed-point arithmetic.
+15. **lnWad**: Computes the natural logarithm of `x` using fixed-point arithmetic.
+16. **lambertW0Wad**: Computes the Lambert W function of `x` using fixed-point arithmetic.
+
+### General Number Utilities
+1. **fullMulDiv**: Computes `floor(x * y / d)` with full precision, throwing on overflow or division by zero.
+2. **fullMulDivUp**: Computes `floor(x * y / d)` with full precision, rounding up, throwing on overflow or division by zero.
+3. **mulDiv**: Computes `floor(x * y / d)`, throwing on overflow or division by zero.
+4. **mulDivUp**: Computes `ceil(x * y / d)`, throwing on overflow or division by zero.
+5. **divUp**: Computes `ceil(x / d)`, throwing on division by zero.
+6. **zeroFloorSub**: Computes `max(0, x - y)`.
+7. **rpow**: Computes `x` raised to the power of `y` by squaring, denominated in base `b`.
+8. **sqrt**: Computes the square root of `x`.
+9. **cbrt**: Computes the cube root of `x`.
+10. **sqrtWad**: Computes the square root of `x`, denominated in `WAD`.
+11. **cbrtWad**: Computes the cube root of `x`, denominated in `WAD`.
+12. **factorial**: Computes the factorial of `x`.
+13. **log2**: Computes the base-2 logarithm of `x`.
+14. **log2Up**: Computes the base-2 logarithm of `x`, rounded up.
+15. **log10**: Computes the base-10 logarithm of `x`.
+16. **log10Up**: Computes the base-10 logarithm of `x`, rounded up.
+17. **log256**: Computes the base-256 logarithm of `x`.
+18. **log256Up**: Computes the base-256 logarithm of `x`, rounded up.
+19. **sci**: Converts `x` to scientific notation format `mantissa * 10 ** exponent`.
+20. **packSci**: Packs `x` into a smaller number using scientific notation.
+21. **unpackSci**: Unpacks a packed number from `packSci`.
+22. **avg**: Computes the average of `x` and `y`.
+23. **abs**: Computes the absolute value of `x`.
+24. **dist**: Computes the absolute distance between `x` and `y`.
+25. **min**: Computes the minimum of `x` and `y`.
+26. **max**: Computes the maximum of `x` and `y`.
+27. **clamp**: Clamps `x` to the range `[minValue, maxValue]`.
+28. **gcd**: Computes the greatest common divisor of `x` and `y`.
+
+### Raw Number Operations
+1. **rawAdd**: Adds `x` and `y` without checking for overflow.
+2. **rawSub**: Subtracts `y` from `x` without checking for underflow.
+3. **rawMul**: Multiplies `x` and `y` without checking for overflow.
+4. **rawDiv**: Divides `x` by `y`, returning 0 if `y` is zero.
+5. **rawMod**: Computes `x % y`, returning 0 if `y` is zero.
+6. **rawAddMod**: Computes `(x + y) % d`, returning 0 if `d` is zero.
+7. **rawMulMod**: Computes `(x * y) % d`, returning 0 if `d` is zero.
+
+This library provides a comprehensive set of mathematical functions that are useful for various applications, especially those involving fixed-point arithmetic in Ethereum smart contracts.

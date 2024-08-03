@@ -1,0 +1,74 @@
+To ensure the robustness and correctness of the `UUPSUpgradeable` contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for each functionality of the contract:
+
+### Custom Errors
+1. **UpgradeFailed Error**:
+   - Invariant: The `UpgradeFailed` error should be thrown if the new implementation does not correctly implement `proxiableUUID`.
+   - Edge Case: Attempt to upgrade to an implementation that does not return `_ERC1967_IMPLEMENTATION_SLOT` from `proxiableUUID`.
+
+2. **UnauthorizedCallContext Error**:
+   - Invariant: The `UnauthorizedCallContext` error should be thrown if a function with the `onlyProxy` or `notDelegated` modifier is called from an unauthorized context.
+   - Edge Case: Call a function with the `onlyProxy` modifier directly (not through a proxy).
+   - Edge Case: Call a function with the `notDelegated` modifier via delegatecall.
+
+### Immutables
+1. **__self Variable**:
+   - Invariant: The `__self` variable should always store the address of the contract itself.
+   - Edge Case: Verify that `__self` is correctly set during contract deployment.
+
+### Events
+1. **Upgraded Event**:
+   - Invariant: The `Upgraded` event should be emitted with the correct new implementation address when the proxy's implementation is upgraded.
+   - Edge Case: Upgrade the implementation and verify that the `Upgraded` event is emitted with the correct address.
+
+### Storage
+1. **_ERC1967_IMPLEMENTATION_SLOT**:
+   - Invariant: The `_ERC1967_IMPLEMENTATION_SLOT` should always be `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`.
+   - Edge Case: Verify that `_ERC1967_IMPLEMENTATION_SLOT` is correctly set and does not change.
+
+### UUPS Operations
+1. **_authorizeUpgrade Function**:
+   - Invariant: The `_authorizeUpgrade` function should only allow authorized addresses to upgrade the proxy.
+   - Edge Case: Attempt to upgrade the implementation from an unauthorized address and verify that it reverts.
+
+2. **proxiableUUID Function**:
+   - Invariant: The `proxiableUUID` function should always return `_ERC1967_IMPLEMENTATION_SLOT`.
+   - Edge Case: Call `proxiableUUID` and verify that it returns the correct value.
+
+3. **upgradeToAndCall Function**:
+   - Invariant: The `upgradeToAndCall` function should correctly upgrade the implementation and optionally call a function on the new implementation.
+   - Edge Case: Upgrade to a new implementation and verify that the implementation address is updated.
+   - Edge Case: Upgrade to a new implementation with non-empty `data` and verify that the delegatecall is performed correctly.
+   - Edge Case: Attempt to upgrade to an invalid implementation and verify that it reverts with `UpgradeFailed`.
+
+### Modifiers
+1. **onlyProxy Modifier**:
+   - Invariant: Functions with the `onlyProxy` modifier should only be callable through a proxy.
+   - Edge Case: Call a function with the `onlyProxy` modifier directly and verify that it reverts with `UnauthorizedCallContext`.
+
+2. **notDelegated Modifier**:
+   - Invariant: Functions with the `notDelegated` modifier should not be callable via delegatecall.
+   - Edge Case: Call a function with the `notDelegated` modifier via delegatecall and verify that it reverts with `UnauthorizedCallContext`.
+
+### Assembly Code in `upgradeToAndCall`
+1. **Clearing Upper 96 Bits**:
+   - Invariant: The upper 96 bits of `newImplementation` should be cleared to ensure it is a valid address.
+   - Edge Case: Verify that the upper 96 bits of `newImplementation` are cleared during the upgrade process.
+
+2. **Checking `proxiableUUID`**:
+   - Invariant: The `proxiableUUID` function of `newImplementation` should return `_ERC1967_IMPLEMENTATION_SLOT`.
+   - Edge Case: Attempt to upgrade to an implementation that does not return `_ERC1967_IMPLEMENTATION_SLOT` and verify that it reverts with `UpgradeFailed`.
+
+3. **Emitting `Upgraded` Event**:
+   - Invariant: The `Upgraded` event should be emitted with the correct new implementation address.
+   - Edge Case: Upgrade the implementation and verify that the `Upgraded` event is emitted with the correct address.
+
+4. **Updating Implementation**:
+   - Invariant: The implementation address in the storage slot should be updated to `newImplementation`.
+   - Edge Case: Upgrade the implementation and verify that the storage slot is updated with the new implementation address.
+
+5. **Optional Delegatecall**:
+   - Invariant: If `data` is non-empty, a delegatecall should be made to `newImplementation` with the provided `data`.
+   - Edge Case: Upgrade to a new implementation with non-empty `data` and verify that the delegatecall is performed correctly.
+   - Edge Case: Verify that the delegatecall reverts correctly if the called function in `newImplementation` reverts.
+
+By defining these test invariants, we can ensure that the `UUPSUpgradeable` contract behaves as expected under various conditions and edge cases.

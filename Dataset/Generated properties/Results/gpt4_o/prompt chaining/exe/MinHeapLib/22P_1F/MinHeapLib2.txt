@@ -1,0 +1,52 @@
+To ensure the correctness and robustness of the `MinHeapLib` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for each functionality provided by the contract:
+
+### Invariants for `root` Function
+1. **Heap is Empty**: Ensure that calling `root` on an empty heap reverts with `HeapIsEmpty()`.
+2. **Heap is Non-Empty**: Ensure that calling `root` on a non-empty heap returns the smallest element.
+
+### Invariants for `reserve` Function
+1. **Reserve Zero Slots**: Ensure that reserving zero slots does not alter the heap.
+2. **Reserve Less Than Current Capacity**: Ensure that reserving fewer slots than the current capacity does not alter the heap.
+3. **Reserve More Than Current Capacity**: Ensure that reserving more slots than the current capacity increases the capacity without altering the existing elements.
+
+### Invariants for `smallest` Function
+1. **Heap is Empty**: Ensure that calling `smallest` on an empty heap returns an empty array.
+2. **k Greater Than Heap Size**: Ensure that calling `smallest` with `k` greater than the heap size returns all elements in ascending order.
+3. **k Less Than or Equal to Heap Size**: Ensure that calling `smallest` with `k` less than or equal to the heap size returns the `k` smallest elements in ascending order.
+
+### Invariants for `length` Function
+1. **Initial Length**: Ensure that the length of a newly created heap is zero.
+2. **Length After Push**: Ensure that the length increases by one after each `push` operation.
+3. **Length After Pop**: Ensure that the length decreases by one after each `pop` operation.
+
+### Invariants for `push` Function
+1. **Push to Empty Heap**: Ensure that pushing an element to an empty heap sets the root to that element.
+2. **Push to Non-Empty Heap**: Ensure that pushing an element maintains the min-heap property.
+
+### Invariants for `pop` Function
+1. **Heap is Empty**: Ensure that calling `pop` on an empty heap reverts with `HeapIsEmpty()`.
+2. **Heap is Non-Empty**: Ensure that calling `pop` on a non-empty heap returns the smallest element and maintains the min-heap property.
+
+### Invariants for `pushPop` Function
+1. **Heap is Empty**: Ensure that calling `pushPop` on an empty heap behaves like a `push`.
+2. **Heap is Non-Empty**: Ensure that calling `pushPop` on a non-empty heap returns the smallest element and maintains the min-heap property.
+
+### Invariants for `replace` Function
+1. **Heap is Empty**: Ensure that calling `replace` on an empty heap reverts with `HeapIsEmpty()`.
+2. **Heap is Non-Empty**: Ensure that calling `replace` on a non-empty heap returns the smallest element and maintains the min-heap property.
+
+### Invariants for `enqueue` Function
+1. **Heap is Empty**: Ensure that calling `enqueue` on an empty heap with a non-zero `maxLength` behaves like a `push`.
+2. **Heap is Non-Empty and Not Full**: Ensure that calling `enqueue` on a non-full heap with a non-zero `maxLength` behaves like a `push`.
+3. **Heap is Full and Value is Less Than or Equal to Root**: Ensure that calling `enqueue` on a full heap with a value less than or equal to the root does not alter the heap.
+4. **Heap is Full and Value is Greater Than Root**: Ensure that calling `enqueue` on a full heap with a value greater than the root replaces the root and maintains the min-heap property.
+
+### Invariants for Private Helpers (`_set`)
+1. **General Operation**: Ensure that the `_set` function maintains the min-heap property for all modes of operation (enqueue, pop, replace, push, pushPop).
+
+### Edge Cases
+1. **Large Heap**: Ensure that the heap functions correctly with a large number of elements.
+2. **Duplicate Elements**: Ensure that the heap functions correctly with duplicate elements.
+3. **Boundary Values**: Ensure that the heap functions correctly with boundary values (e.g., `0`, `2^256-1`).
+
+By implementing these test invariants, we can thoroughly verify the correctness and robustness of the `MinHeapLib` smart contract.

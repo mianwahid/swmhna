@@ -1,0 +1,71 @@
+The provided smart contract is the `LibZip` library, designed for compressing and decompressing bytes data. It offers two distinct compression methods: FastLZ and calldata compression. Let's break down each functionality:
+
+**1. FastLZ Operations**
+
+   - **`flzCompress(bytes memory data) internal pure returns (bytes memory result)`**
+
+     - **Purpose:** Compresses the input byte data `data` using the FastLZ algorithm.
+     - **Algorithm:** This implementation is based on a specific commit of the FastLZ library (link provided in the code comments) and is equivalent to level 1 compression. It utilizes LZ77 techniques, identifying repeating patterns in the data and replacing them with references to previous occurrences.
+     - **Input:** `data` - The byte array to be compressed.
+     - **Output:** `result` - The compressed byte array.
+
+   - **`flzDecompress(bytes memory data) internal pure returns (bytes memory result)`**
+
+     - **Purpose:** Decompresses the input byte data `data` that was previously compressed using `flzCompress`.
+     - **Algorithm:**  This function reverses the compression process performed by `flzCompress`, reconstructing the original data from the references and literals stored in the compressed data.
+     - **Input:** `data` - The compressed byte array.
+     - **Output:** `result` - The decompressed byte array (the original data).
+
+**2. Calldata Operations**
+
+   - **`cdCompress(bytes memory data) internal pure returns (bytes memory result)`**
+
+     - **Purpose:** Compresses the input byte data `data` specifically for calldata usage.
+     - **Algorithm:** Employs a selective run-length encoding (RLE) scheme. It targets sequences of 0x00 (up to 128 consecutive bytes) and 0xff (up to 32 consecutive bytes), replacing them with shorter representations. The first 4 bytes are bitwise negated to ensure compatibility with `fallback` and `receive` functions.
+     - **Input:** `data` - The byte array to be compressed.
+     - **Output:** `result` - The calldata-compressed byte array.
+
+   - **`cdDecompress(bytes memory data) internal pure returns (bytes memory result)`**
+
+     - **Purpose:** Decompresses the input byte data `data` that was previously compressed using `cdCompress`.
+     - **Algorithm:** Reverses the selective RLE compression, expanding the encoded runs of 0x00 and 0xff back to their original form. It also handles the bitwise negation of the first 4 bytes.
+     - **Input:** `data` - The calldata-compressed byte array.
+     - **Output:** `result` - The decompressed byte array.
+
+   - **`cdFallback() internal`**
+
+     - **Purpose:** Designed to be used within the `fallback` function of a contract to handle calldata compressed using `cdCompress`.
+     - **Mechanism:** 
+       - It first checks if there's any calldata. If not, it returns.
+       - It decompresses the calldata directly from the calldata area in memory.
+       - It then uses `delegatecall` to execute the decompressed calldata in the context of the current contract.
+       - Finally, it returns the result of the `delegatecall`.
+     - **Usage:** This function allows contracts to receive and execute compressed calldata, improving gas efficiency.
+
+**Key Points:**
+
+- **Efficiency:** Both FastLZ and calldata compression aim to reduce the size of byte data, which is particularly beneficial in Ethereum where gas costs are directly tied to data size.
+- **Calldata Optimization:** The calldata compression and `cdFallback` functions are specifically designed to optimize gas consumption when interacting with contracts using compressed calldata.
+- **Internal Library:** `LibZip` is declared as an `internal library`, meaning its functions are only accessible from within the contract that imports it.
+
+**Example Usage:**
+
+```solidity
+pragma solidity ^0.8.4;
+
+import "./LibZip.sol";
+
+contract MyContract {
+
+    function compressAndStore(bytes memory data) public {
+        bytes memory compressedData = LibZip.flzCompress(data);
+        // ... store compressedData ...
+    }
+
+    function decompressAndRetrieve() public view returns (bytes memory) {
+        // ... retrieve compressedData ...
+        bytes memory originalData = LibZip.flzDecompress(compressedData);
+        return originalData;
+    }
+}
+```

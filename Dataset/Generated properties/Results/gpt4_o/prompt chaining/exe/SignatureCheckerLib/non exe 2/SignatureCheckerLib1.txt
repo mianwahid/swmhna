@@ -1,0 +1,86 @@
+The provided smart contract is a library named `SignatureCheckerLib` that offers various functionalities for verifying signatures. It supports both ECDSA signatures from Externally Owned Accounts (EOAs) and ERC1271 signatures from smart contract wallets like Argent and Gnosis Safe. Below is a detailed explanation of each functionality provided by the library:
+
+### 1. `isValidSignatureNow(address signer, bytes32 hash, bytes memory signature)`
+
+- **Purpose**: Verifies if a given `signature` is valid for a `signer` and a `hash`.
+- **Functionality**:
+  - If the `signer` is a smart contract, the signature is validated using ERC1271.
+  - If the `signer` is an EOA, the signature is validated using `ECDSA.recover`.
+  - Supports both 65-byte `(r, s, v)` and 64-byte EIP-2098 `(r, vs)` signatures.
+  - Uses inline assembly for efficient memory operations and calls the `ecrecover` precompile for ECDSA recovery.
+
+### 2. `isValidSignatureNowCalldata(address signer, bytes32 hash, bytes calldata signature)`
+
+- **Purpose**: Similar to the previous function but operates on `bytes calldata` instead of `bytes memory`.
+- **Functionality**:
+  - Verifies the signature using the same logic as `isValidSignatureNow`.
+  - Uses inline assembly to handle calldata efficiently.
+
+### 3. `isValidSignatureNow(address signer, bytes32 hash, bytes32 r, bytes32 vs)`
+
+- **Purpose**: Verifies if a given signature in the form of `(r, vs)` is valid for a `signer` and a `hash`.
+- **Functionality**:
+  - If the `signer` is a smart contract, the signature is validated using ERC1271.
+  - If the `signer` is an EOA, the signature is validated using `ECDSA.recover`.
+  - Uses inline assembly for efficient memory operations and calls the `ecrecover` precompile for ECDSA recovery.
+
+### 4. `isValidSignatureNow(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s)`
+
+- **Purpose**: Verifies if a given signature in the form of `(v, r, s)` is valid for a `signer` and a `hash`.
+- **Functionality**:
+  - If the `signer` is a smart contract, the signature is validated using ERC1271.
+  - If the `signer` is an EOA, the signature is validated using `ECDSA.recover`.
+  - Uses inline assembly for efficient memory operations and calls the `ecrecover` precompile for ECDSA recovery.
+
+### 5. `isValidERC1271SignatureNow(address signer, bytes32 hash, bytes memory signature)`
+
+- **Purpose**: Verifies if a given `signature` is valid for a `hash` for an ERC1271 `signer` contract.
+- **Functionality**:
+  - Uses inline assembly to call the `isValidSignature` function of the ERC1271 contract.
+  - Checks if the returned data matches the magic value `0x1626ba7e`.
+
+### 6. `isValidERC1271SignatureNowCalldata(address signer, bytes32 hash, bytes calldata signature)`
+
+- **Purpose**: Similar to the previous function but operates on `bytes calldata` instead of `bytes memory`.
+- **Functionality**:
+  - Verifies the signature using the same logic as `isValidERC1271SignatureNow`.
+  - Uses inline assembly to handle calldata efficiently.
+
+### 7. `isValidERC1271SignatureNow(address signer, bytes32 hash, bytes32 r, bytes32 vs)`
+
+- **Purpose**: Verifies if a given signature in the form of `(r, vs)` is valid for a `hash` for an ERC1271 `signer` contract.
+- **Functionality**:
+  - Uses inline assembly to call the `isValidSignature` function of the ERC1271 contract.
+  - Checks if the returned data matches the magic value `0x1626ba7e`.
+
+### 8. `isValidERC1271SignatureNow(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s)`
+
+- **Purpose**: Verifies if a given signature in the form of `(v, r, s)` is valid for a `hash` for an ERC1271 `signer` contract.
+- **Functionality**:
+  - Uses inline assembly to call the `isValidSignature` function of the ERC1271 contract.
+  - Checks if the returned data matches the magic value `0x1626ba7e`.
+
+### 9. `toEthSignedMessageHash(bytes32 hash)`
+
+- **Purpose**: Returns an Ethereum Signed Message hash created from a `hash`.
+- **Functionality**:
+  - Produces a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+  - Uses inline assembly to prepend the Ethereum Signed Message prefix and compute the keccak256 hash.
+
+### 10. `toEthSignedMessageHash(bytes memory s)`
+
+- **Purpose**: Returns an Ethereum Signed Message hash created from a `bytes` array.
+- **Functionality**:
+  - Produces a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+  - Supports lengths of `s` up to 999999 bytes.
+  - Uses inline assembly to convert the length of `s` to its ASCII decimal representation, prepend the Ethereum Signed Message prefix, and compute the keccak256 hash.
+
+### 11. `emptySignature()`
+
+- **Purpose**: Returns an empty calldata bytes.
+- **Functionality**:
+  - Uses inline assembly to create and return an empty `bytes` array.
+
+### Summary
+
+The `SignatureCheckerLib` library provides a comprehensive set of functions for verifying signatures, supporting both ECDSA and ERC1271 standards. It includes functions for different signature formats and uses inline assembly for efficient memory and calldata operations. The library also includes utility functions for creating Ethereum Signed Message hashes and handling empty signatures.

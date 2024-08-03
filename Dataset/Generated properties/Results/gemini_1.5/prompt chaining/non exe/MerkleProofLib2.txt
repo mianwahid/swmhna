@@ -1,0 +1,35 @@
+## Test Invariants for MerkleProofLib
+
+This list outlines test invariants for the `MerkleProofLib` contract, focusing on edge cases and ensuring comprehensive coverage of its functionalities.
+
+**General Invariants:**
+
+- **Invariant 1: Empty Proof/Leaves/Flags:** Calling `emptyProof()`, `emptyLeaves()`, and `emptyFlags()` should always return empty calldata arrays of the respective types.
+
+**`verify` and `verifyCalldata` Function Invariants:**
+
+- **Invariant 2: Valid Proof:** Given a valid Merkle proof, root, and leaf, both `verify` and `verifyCalldata` should return `true`.
+- **Invariant 3: Invalid Proof - Incorrect Root:** Given an otherwise valid proof but an incorrect root, both functions should return `false`.
+- **Invariant 4: Invalid Proof - Modified Proof Element:**  Given a proof with even a single modified element, both functions should return `false`.
+- **Invariant 5: Invalid Proof - Incorrect Leaf:** Given a valid proof and root but an incorrect leaf, both functions should return `false`.
+- **Invariant 6: Empty Proof:** Given an empty proof array, both functions should return `true` if and only if the leaf is equal to the root.
+- **Invariant 7: Single-Element Proof:** Given a proof array containing only one element, both functions should return `true` if and only if the hash of the leaf and the single proof element equals the root.
+
+**`verifyMultiProof` and `verifyMultiProofCalldata` Function Invariants:**
+
+- **Invariant 8: Valid Multi Proof:** Given valid inputs (proof, root, leaves, flags), both `verifyMultiProof` and `verifyMultiProofCalldata` should return `true`.
+- **Invariant 9: Invalid Multi Proof - Incorrect Root:** Given an otherwise valid input but an incorrect root, both functions should return `false`.
+- **Invariant 10: Invalid Multi Proof - Modified Proof/Leaves/Flags:** Given an input with even a single modified element in `proof`, `leaves`, or `flags`, both functions should return `false`.
+- **Invariant 11: Invalid Multi Proof - Incorrect Flags Length:** If `flags.length` does not equal `(leaves.length - 1) + proof.length`, both functions should return `false`.
+- **Invariant 12: Empty Proof/Leaves:** 
+    - If both `proof` and `leaves` are empty, both functions should return `true` if and only if `flags` is also empty.
+    - If `proof` is empty and `leaves` contains a single element, both functions should return `true` if and only if the single leaf equals the root and `flags` is empty.
+- **Invariant 13: Single Leaf, Multi Proof:** Given a single leaf and a corresponding multi-element proof, both functions should return `true` if and only if the proof correctly verifies the leaf against the root.
+- **Invariant 14: Multiple Leaves, Single Proof Element:** Given multiple leaves and a single proof element, both functions should return `true` if and only if the proof element, combined with appropriate leaves based on `flags`, results in the correct root.
+
+**Edge Case Invariants:**
+
+- **Invariant 15: Large Input Arrays:** Test with large `proof`, `leaves`, and `flags` arrays to ensure there are no overflow vulnerabilities.
+- **Invariant 16: Gas Usage:** Compare the gas usage of memory-based and calldata-based functions to confirm the expected gas optimizations.
+
+These invariants provide a starting point for testing the `MerkleProofLib` contract. It's crucial to implement tests that cover these invariants and any other potential edge cases specific to your application's use of this library. 

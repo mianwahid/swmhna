@@ -1,0 +1,82 @@
+## ECDSA Library Functionalities Explained
+
+This smart contract implements a gas-optimized ECDSA library for Solidity, offering various functionalities related to ECDSA signatures. Here's a breakdown of each function:
+
+**1. `recover(bytes32 hash, bytes memory signature)`:**
+
+- **Purpose:** Recovers the signer's address from a given message digest (`hash`) and its corresponding ECDSA signature (`signature`).
+- **Input:**
+    - `hash`: The message digest (keccak256 hash) of the signed message.
+    - `signature`: The ECDSA signature, either in the regular 65-byte `(r, s, v)` format or the EIP-2098 `(r, vs)` short form.
+- **Output:**
+    - `result`: The recovered signer's address. Reverts with `InvalidSignature` error if recovery fails.
+- **Details:**
+    - Uses the `ecrecover` precompile for efficient signature verification.
+    - Supports both regular and EIP-2098 short form signatures.
+    - Optimized for gas efficiency using assembly.
+
+**2. `recoverCalldata(bytes32 hash, bytes calldata signature)`:**
+
+- **Purpose:** Similar to `recover(bytes32, bytes)`, but optimized for signatures passed as calldata.
+- **Input:**
+    - `hash`: The message digest.
+    - `signature`: The ECDSA signature (calldata).
+- **Output:**
+    - `result`: The recovered signer's address. Reverts with `InvalidSignature` error if recovery fails.
+- **Details:**
+    - Uses `calldataload` and `calldatacopy` for efficient data access from calldata.
+
+**3. `recover(bytes32 hash, bytes32 r, bytes32 vs)`:**
+
+- **Purpose:** Recovers the signer's address from a message digest, `r` value, and combined `vs` value of an EIP-2098 short form signature.
+- **Input:**
+    - `hash`: The message digest.
+    - `r`: The `r` value of the signature.
+    - `vs`: The combined `v` and `s` values of the signature.
+- **Output:**
+    - `result`: The recovered signer's address. Reverts with `InvalidSignature` error if recovery fails.
+
+**4. `recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s)`:**
+
+- **Purpose:** Recovers the signer's address from a message digest and individual `v`, `r`, and `s` values of a signature.
+- **Input:**
+    - `hash`: The message digest.
+    - `v`: The `v` value of the signature.
+    - `r`: The `r` value of the signature.
+    - `s`: The `s` value of the signature.
+- **Output:**
+    - `result`: The recovered signer's address. Reverts with `InvalidSignature` error if recovery fails.
+
+**5. `tryRecover(bytes32 hash, bytes memory signature)`:**
+**6. `tryRecoverCalldata(bytes32 hash, bytes calldata signature)`:**
+**7. `tryRecover(bytes32 hash, bytes32 r, bytes32 vs)`:**
+**8. `tryRecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s)`:**
+
+- **Purpose:** These functions are similar to their respective `recover` counterparts but do not revert on recovery failure. Instead, they return the zero address.
+- **WARNING:** It's crucial to avoid comparing the returned address directly against a zero address, as it could lead to vulnerabilities.
+
+**9. `toEthSignedMessageHash(bytes32 hash)`:**
+
+- **Purpose:** Computes the Ethereum Signed Message hash of a given message digest according to EIP-191.
+- **Input:**
+    - `hash`: The message digest.
+- **Output:**
+    - `result`: The Ethereum Signed Message hash.
+
+**10. `toEthSignedMessageHash(bytes memory s)`:**
+
+- **Purpose:** Computes the Ethereum Signed Message hash of a given message (`s`) according to EIP-191.
+- **Input:**
+    - `s`: The message.
+- **Output:**
+    - `result`: The Ethereum Signed Message hash.
+- **Details:**
+    - Supports messages up to 999999 bytes long.
+
+**11. `emptySignature()`:**
+
+- **Purpose:** Returns an empty calldata bytes array representing an empty signature.
+- **Output:**
+    - `signature`: An empty calldata bytes array.
+
+**Overall, this ECDSA library provides a comprehensive set of functionalities for working with ECDSA signatures in Solidity, offering both gas-optimized and user-friendly options for various scenarios.** 

@@ -1,0 +1,41 @@
+The provided smart contract is a library named `SafeTransferLib` that provides safe methods for transferring ETH and ERC20 tokens. It includes various functions to handle transfers, approvals, and permits, ensuring that operations are executed safely and efficiently. Below is a detailed explanation of each functionality:
+
+### Custom Errors
+1. **ETHTransferFailed**: Thrown when an ETH transfer fails.
+2. **TransferFromFailed**: Thrown when an ERC20 `transferFrom` operation fails.
+3. **TransferFailed**: Thrown when an ERC20 `transfer` operation fails.
+4. **ApproveFailed**: Thrown when an ERC20 `approve` operation fails.
+5. **Permit2Failed**: Thrown when a Permit2 operation fails.
+6. **Permit2AmountOverflow**: Thrown when the Permit2 amount exceeds the maximum allowed value.
+
+### Constants
+1. **GAS_STIPEND_NO_STORAGE_WRITES**: Suggested gas stipend for ETH transfers to contracts that disallow storage writes (2300 gas).
+2. **GAS_STIPEND_NO_GRIEF**: Suggested gas stipend for ETH transfers to contracts that allow some storage reads and writes but prevent griefing (100000 gas).
+3. **DAI_DOMAIN_SEPARATOR**: The unique EIP-712 domain separator for the DAI token contract.
+4. **WETH9**: The address for the WETH9 contract on Ethereum mainnet.
+5. **PERMIT2**: The canonical Permit2 address.
+
+### ETH Operations
+1. **safeTransferETH**: Transfers a specified amount of ETH to a given address. Reverts if the transfer fails.
+2. **safeTransferAllETH**: Transfers all ETH in the current contract to a given address. Reverts if the transfer fails.
+3. **forceSafeTransferETH**: Forcefully transfers a specified amount of ETH to a given address with a specified gas stipend. Uses `SELFDESTRUCT` to ensure the transfer if the initial attempt fails.
+4. **forceSafeTransferAllETH**: Forcefully transfers all ETH in the current contract to a given address with a specified gas stipend. Uses `SELFDESTRUCT` to ensure the transfer if the initial attempt fails.
+5. **trySafeTransferETH**: Attempts to transfer a specified amount of ETH to a given address with a specified gas stipend. Returns a boolean indicating success or failure.
+6. **trySafeTransferAllETH**: Attempts to transfer all ETH in the current contract to a given address with a specified gas stipend. Returns a boolean indicating success or failure.
+
+### ERC20 Operations
+1. **safeTransferFrom**: Transfers a specified amount of ERC20 tokens from one address to another. Reverts if the transfer fails.
+2. **trySafeTransferFrom**: Attempts to transfer a specified amount of ERC20 tokens from one address to another. Returns a boolean indicating success or failure.
+3. **safeTransferAllFrom**: Transfers all ERC20 tokens from one address to another. Reverts if the transfer fails. Returns the amount transferred.
+4. **safeTransfer**: Transfers a specified amount of ERC20 tokens from the current contract to a given address. Reverts if the transfer fails.
+5. **safeTransferAll**: Transfers all ERC20 tokens from the current contract to a given address. Reverts if the transfer fails. Returns the amount transferred.
+6. **safeApprove**: Approves a specified amount of ERC20 tokens for a given address to manage on behalf of the current contract. Reverts if the approval fails.
+7. **safeApproveWithRetry**: Approves a specified amount of ERC20 tokens for a given address to manage on behalf of the current contract. If the initial attempt fails, it resets the approved amount to zero and retries the approval. Reverts if the approval fails.
+8. **balanceOf**: Returns the amount of ERC20 tokens owned by a given account. Returns zero if the token does not exist.
+9. **safeTransferFrom2**: Transfers a specified amount of ERC20 tokens from one address to another. If the initial attempt fails, it tries to use Permit2 to transfer the tokens. Reverts if the transfer fails.
+10. **permit2TransferFrom**: Transfers a specified amount of ERC20 tokens from one address to another via Permit2. Reverts if the transfer fails.
+11. **permit2**: Permits a user to spend a given amount of another user's tokens via native EIP-2612 permit if possible, falling back to Permit2 if native permit fails or is not implemented on the token.
+12. **simplePermit2**: Performs a simple permit on the Permit2 contract.
+
+### Summary
+The `SafeTransferLib` library provides a comprehensive set of functions to handle ETH and ERC20 token transfers safely. It includes mechanisms to handle failed transfers, force transfers using `SELFDESTRUCT`, and fallback methods using Permit2 for ERC20 tokens. The library ensures that operations are executed with appropriate gas stipends and provides custom error messages for better debugging and error handling.

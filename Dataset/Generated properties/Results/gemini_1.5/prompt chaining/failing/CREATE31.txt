@@ -1,0 +1,21 @@
+The provided smart contract is the `CREATE3` library by Solady, a modified version of similar libraries from Solmate and 0xSequence. This library provides a way to deploy contracts to deterministic addresses using CREATE2 opcode and also helps in retrieving those addresses. Let's break down its functionalities:
+
+**1. Custom Errors:**
+
+- **`DeploymentFailed()`:** This error is reverted when the deployment of the contract using CREATE2 fails. This could happen due to various reasons like insufficient gas, invalid bytecode, etc.
+- **`InitializationFailed()`:** This error is reverted when the initialization of the deployed contract fails. This usually happens when the deployed contract's constructor reverts for some reason.
+
+**2. Bytecode Constants:**
+
+- **`_PROXY_BYTECODE`:** This constant stores the bytecode of a minimal proxy contract. This proxy contract is deployed using CREATE2 and then used to deploy the actual contract. This approach ensures that the final deployed contract's address is solely dependent on the salt and not on the bytecode of the contract being deployed.
+- **`_PROXY_BYTECODE_HASH`:** This constant stores the keccak256 hash of the `_PROXY_BYTECODE`. Pre-calculating this hash saves gas during the deployment process.
+
+**3. CREATE3 Operations:**
+
+- **`deploy(bytes32 salt, bytes memory creationCode, uint256 value)`:** This function deploys the given `creationCode` to a deterministic address determined by the provided `salt`. It uses the `_PROXY_BYTECODE` to deploy a proxy contract first and then uses that proxy to deploy the actual contract with the given `creationCode`. The deployed contract is also funded with the specified `value` in wei. The function returns the deterministic address of the deployed contract.
+- **`getDeployed(bytes32 salt, address deployer)`:** This function calculates and returns the deterministic address for a contract deployed with the given `salt` and `deployer` address. This function doesn't actually deploy any contract, it just calculates the address where a contract would be deployed if `deploy` function was called with the same `salt` and `deployer`.
+- **`getDeployed(bytes32 salt)`:** This function is a simplified version of the previous `getDeployed` function. It calculates and returns the deterministic address for a contract deployed with the given `salt` using the current contract's address as the `deployer`.
+
+**In summary:**
+
+The CREATE3 library provides a secure and gas-efficient way to deploy contracts to deterministic addresses using CREATE2. This is particularly useful in scenarios where you need to know the address of a contract before it's deployed, like in proxy patterns or when interacting with other protocols that rely on deterministic deployments.

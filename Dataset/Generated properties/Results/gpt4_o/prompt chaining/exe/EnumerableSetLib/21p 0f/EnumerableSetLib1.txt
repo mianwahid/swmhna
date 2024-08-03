@@ -1,0 +1,72 @@
+The provided smart contract is a Solidity library named `EnumerableSetLib` that provides functionalities for managing enumerable sets in storage. This library supports sets of different types: `address`, `bytes32`, `uint256`, and `int256`. Below is a detailed explanation of each functionality provided by the library:
+
+### Custom Errors
+1. **IndexOutOfBounds**: Thrown when an index is out of the valid range.
+2. **ValueIsZeroSentinel**: Thrown when a value is equal to the zero sentinel value, which is not allowed.
+
+### Constants
+1. **_ZERO_SENTINEL**: A sentinel value used to denote the zero value in storage. No elements in the set can be equal to this value.
+2. **_ENUMERABLE_ADDRESS_SET_SLOT_SEED**: A constant used for calculating the storage slot for `AddressSet`.
+3. **_ENUMERABLE_WORD_SET_SLOT_SEED**: A constant used for calculating the storage slot for `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+### Structs
+1. **AddressSet**: Represents an enumerable set of `address` values.
+2. **Bytes32Set**: Represents an enumerable set of `bytes32` values.
+3. **Uint256Set**: Represents an enumerable set of `uint256` values.
+4. **Int256Set**: Represents an enumerable set of `int256` values.
+
+### Getters / Setters
+1. **length**: Returns the number of elements in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+2. **contains**: Checks if a value is in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+3. **add**: Adds a value to the set. Returns `true` if the value was not already in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+4. **remove**: Removes a value from the set. Returns `true` if the value was in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+5. **values**: Returns all the values in the set as an array.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+6. **at**: Returns the element at a specific index in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+### Private Helpers
+1. **_rootSlot**: Calculates the root storage slot for a given set.
+   - Overloaded for `AddressSet` and `Bytes32Set`.
+2. **_toBytes32Set**: Casts a `Uint256Set` or `Int256Set` to a `Bytes32Set`.
+3. **_toUints**: Casts a `bytes32` array to a `uint256` array.
+4. **_toInts**: Casts a `bytes32` array to an `int256` array.
+
+### Detailed Functionality
+
+#### length
+- **AddressSet**: Calculates the number of elements by checking the storage slots.
+- **Bytes32Set**: Similar to `AddressSet`, but uses a different storage layout.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for length calculation.
+
+#### contains
+- **AddressSet**: Checks if an `address` value is in the set.
+- **Bytes32Set**: Checks if a `bytes32` value is in the set.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for containment checks.
+
+#### add
+- **AddressSet**: Adds an `address` value to the set.
+- **Bytes32Set**: Adds a `bytes32` value to the set.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for adding values.
+
+#### remove
+- **AddressSet**: Removes an `address` value from the set.
+- **Bytes32Set**: Removes a `bytes32` value from the set.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for removing values.
+
+#### values
+- **AddressSet**: Returns all `address` values in the set.
+- **Bytes32Set**: Returns all `bytes32` values in the set.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for retrieving values and then cast them to `uint256` or `int256`.
+
+#### at
+- **AddressSet**: Returns the `address` value at a specific index.
+- **Bytes32Set**: Returns the `bytes32` value at a specific index.
+- **Uint256Set** and **Int256Set**: Use the `Bytes32Set` implementation for retrieving values and then cast them to `uint256` or `int256`.
+
+### Summary
+The `EnumerableSetLib` library provides a comprehensive set of functionalities for managing enumerable sets of different types in Solidity. It includes methods for adding, removing, checking containment, retrieving values, and accessing elements by index. The library is optimized to handle small sets efficiently and uses custom storage layouts to minimize gas costs.

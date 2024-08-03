@@ -1,0 +1,97 @@
+To ensure the `DeploylessPredeployQueryer` contract functions correctly, we need to define a set of test invariants that cover various edge cases. These invariants will help verify the contract's behavior under different scenarios. Below are the test invariants for the functionalities of the given contract:
+
+### 1. Custom Errors
+#### Invariant: Returned Address Mismatch
+- **Description**: Ensure that the contract reverts with the `ReturnedAddressMismatch` error if the address returned by the factory does not match the provided target address.
+- **Edge Cases**:
+  - The factory returns an address different from the target address.
+  - The factory returns an address with a different case (e.g., uppercase vs. lowercase).
+
+### 2. Constructor
+#### Invariant: Target Contract Deployment
+- **Description**: Ensure that the target contract is deployed if it does not already exist.
+- **Edge Cases**:
+  - The target contract does not exist initially.
+  - The target contract already exists (should not attempt to deploy again).
+
+#### Invariant: Factory Call Success
+- **Description**: Ensure that the factory call succeeds when deploying the target contract.
+- **Edge Cases**:
+  - The factory call fails due to insufficient gas.
+  - The factory call fails due to incorrect calldata.
+  - The factory call fails due to the factory contract being non-existent or non-functional.
+
+#### Invariant: Factory Call Return Data
+- **Description**: Ensure that the factory call returns the correct address of the deployed target contract.
+- **Edge Cases**:
+  - The factory call returns an address that is not the target address.
+  - The factory call returns an empty address or zero address.
+
+#### Invariant: Query Target Contract
+- **Description**: Ensure that the contract correctly queries the target contract using the provided `targetQueryCalldata`.
+- **Edge Cases**:
+  - The target contract does not respond to the query (e.g., reverts or runs out of gas).
+  - The target contract returns unexpected data types or formats.
+  - The target contract returns empty data.
+
+#### Invariant: Return Data Format
+- **Description**: Ensure that the return data from the constructor is correctly formatted as an array of bytes.
+- **Edge Cases**:
+  - The return data includes multiple entries with varying lengths.
+  - The return data includes entries with zero length.
+  - The return data includes entries with maximum possible length.
+
+### 3. General Invariants
+#### Invariant: Memory Safety
+- **Description**: Ensure that the contract does not cause memory corruption or out-of-bounds memory access.
+- **Edge Cases**:
+  - The `targetQueryCalldata` array is empty.
+  - The `targetQueryCalldata` array contains very large entries.
+  - The `factoryCalldata` is empty or very large.
+
+#### Invariant: Gas Usage
+- **Description**: Ensure that the contract handles gas usage efficiently and does not run out of gas during execution.
+- **Edge Cases**:
+  - The contract is called with minimal gas.
+  - The contract is called with excessive gas.
+  - The contract performs multiple queries with varying gas requirements.
+
+### Summary of Test Invariants
+1. **Returned Address Mismatch**:
+   - Factory returns an incorrect address.
+   - Factory returns an address with different casing.
+
+2. **Target Contract Deployment**:
+   - Target contract does not exist initially.
+   - Target contract already exists.
+
+3. **Factory Call Success**:
+   - Factory call fails due to insufficient gas.
+   - Factory call fails due to incorrect calldata.
+   - Factory call fails due to non-existent or non-functional factory contract.
+
+4. **Factory Call Return Data**:
+   - Factory call returns an incorrect address.
+   - Factory call returns an empty or zero address.
+
+5. **Query Target Contract**:
+   - Target contract does not respond.
+   - Target contract returns unexpected data types or formats.
+   - Target contract returns empty data.
+
+6. **Return Data Format**:
+   - Return data includes multiple entries with varying lengths.
+   - Return data includes zero-length entries.
+   - Return data includes maximum length entries.
+
+7. **Memory Safety**:
+   - `targetQueryCalldata` array is empty.
+   - `targetQueryCalldata` array contains very large entries.
+   - `factoryCalldata` is empty or very large.
+
+8. **Gas Usage**:
+   - Contract is called with minimal gas.
+   - Contract is called with excessive gas.
+   - Contract performs multiple queries with varying gas requirements.
+
+By testing these invariants, we can ensure that the `DeploylessPredeployQueryer` contract behaves as expected under various conditions and edge cases.

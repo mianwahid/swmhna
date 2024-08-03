@@ -1,0 +1,60 @@
+## Test Invariants for DynamicBufferLib
+
+Here are the test invariants for the `DynamicBufferLib` contract, covering edge cases and functionalities:
+
+**1. `reserve` Function:**
+
+* **Invariant:** After calling `reserve` with a `minimum` value greater than the current capacity, the buffer's capacity should be at least `minimum`.
+    * **Edge Case 1:** `minimum` is 0. The buffer's capacity should remain unchanged.
+    * **Edge Case 2:** `minimum` is equal to the current capacity. The buffer's capacity should remain unchanged.
+    * **Edge Case 3:** `minimum` is slightly larger than the current capacity. The buffer should be resized to accommodate `minimum`.
+    * **Edge Case 4:** `minimum` is significantly larger than the current capacity. The buffer should be resized to accommodate `minimum`.
+
+* **Invariant:** After calling `reserve`, the existing data in the buffer should remain unchanged.
+    * **Edge Case:** The buffer contains data before calling `reserve`. Verify that the data is preserved after resizing.
+
+**2. `clear` Function:**
+
+* **Invariant:** After calling `clear`, the buffer's length should be 0.
+    * **Edge Case 1:** The buffer is empty before calling `clear`.
+    * **Edge Case 2:** The buffer contains data before calling `clear`.
+
+* **Invariant:** After calling `clear`, the buffer's capacity should remain unchanged.
+    * **Edge Case:** The buffer has a non-zero capacity before calling `clear`.
+
+**3. `s` Function:**
+
+* **Invariant:** The returned string should be equal to the byte data stored in the buffer.
+    * **Edge Case 1:** The buffer is empty. The returned string should be empty.
+    * **Edge Case 2:** The buffer contains data. The returned string should match the data exactly.
+
+* **Invariant:** Modifying the buffer after calling `s` should change the content of the returned string.
+    * **Edge Case:** Append data to the buffer after calling `s` and verify that the string reflects the change.
+
+**4. `p` Function (Single `data` Argument):**
+
+* **Invariant:** After calling `p`, the buffer's length should be the sum of the original length and the length of the appended `data`.
+    * **Edge Case 1:** Appending an empty `data` byte array. The buffer's length should remain unchanged.
+    * **Edge Case 2:** Appending a non-empty `data` byte array to an empty buffer.
+    * **Edge Case 3:** Appending a non-empty `data` byte array to a non-empty buffer.
+
+* **Invariant:** After calling `p`, the buffer should contain the original data followed by the appended `data`.
+    * **Edge Case:** Appending data to a buffer that already contains data. Verify that the data is appended correctly without overwriting existing data.
+
+* **Invariant:** If the buffer needs to be resized during the append operation, the capacity should be increased appropriately.
+    * **Edge Case:** Appending data that exceeds the current capacity of the buffer.
+
+**5. `p` Function (Multiple `data` Arguments):**
+
+* **Invariant:** The invariants for the single `data` argument version of `p` should hold true for all overloaded versions with multiple `data` arguments.
+    * **Edge Case:** Test with different combinations of empty and non-empty `data` arguments.
+
+* **Invariant:** The order of appending multiple `data` arguments should be preserved in the final buffer.
+    * **Edge Case:** Append multiple `data` arguments with distinct content and verify their order in the resulting buffer.
+
+**General Invariants:**
+
+* **Memory Safety:** Ensure that no memory leaks or buffer overflows occur during any of the operations.
+* **Gas Efficiency:** The library should be implemented to minimize gas consumption, especially during resizing operations.
+
+These test invariants provide a comprehensive set of checks to ensure the correctness and robustness of the `DynamicBufferLib` contract. By covering various edge cases and functionalities, these invariants help guarantee that the library behaves as expected in different scenarios.

@@ -1,0 +1,78 @@
+The provided smart contract is a Solidity library named `MerkleProofLib` that offers functionalities for verifying Merkle proofs. Merkle proofs are used to verify the inclusion of a leaf node in a Merkle tree without needing to reveal the entire tree. This library is optimized for gas efficiency and includes both memory and calldata versions of the verification functions. Below is a detailed explanation of each functionality provided by the contract:
+
+### 1. `verify` Function
+```solidity
+function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) internal pure returns (bool isValid)
+```
+- **Purpose**: Verifies if a given `leaf` exists in a Merkle tree with a specified `root` using a provided `proof`.
+- **Parameters**:
+  - `proof`: An array of hashes that form the proof.
+  - `root`: The root hash of the Merkle tree.
+  - `leaf`: The leaf node whose inclusion is being verified.
+- **Returns**: A boolean `isValid` indicating whether the leaf is part of the Merkle tree.
+- **Implementation**: Uses inline assembly for gas optimization. It iterates over the proof elements, hashes them with the current leaf, and updates the leaf until the computed hash matches the root.
+
+### 2. `verifyCalldata` Function
+```solidity
+function verifyCalldata(bytes32[] calldata proof, bytes32 root, bytes32 leaf) internal pure returns (bool isValid)
+```
+- **Purpose**: Similar to the `verify` function but operates on calldata instead of memory.
+- **Parameters**:
+  - `proof`: An array of hashes in calldata.
+  - `root`: The root hash of the Merkle tree.
+  - `leaf`: The leaf node whose inclusion is being verified.
+- **Returns**: A boolean `isValid` indicating whether the leaf is part of the Merkle tree.
+- **Implementation**: Uses inline assembly for gas optimization, similar to the `verify` function but optimized for calldata.
+
+### 3. `verifyMultiProof` Function
+```solidity
+function verifyMultiProof(bytes32[] memory proof, bytes32 root, bytes32[] memory leaves, bool[] memory flags) internal pure returns (bool isValid)
+```
+- **Purpose**: Verifies if multiple `leaves` exist in a Merkle tree with a specified `root` using a provided `proof` and `flags`.
+- **Parameters**:
+  - `proof`: An array of hashes that form the proof.
+  - `root`: The root hash of the Merkle tree.
+  - `leaves`: An array of leaf nodes whose inclusion is being verified.
+  - `flags`: An array of boolean flags indicating whether to pop from the queue or the proof.
+- **Returns**: A boolean `isValid` indicating whether all leaves are part of the Merkle tree.
+- **Implementation**: Uses inline assembly to rebuild the root by consuming and producing values on a queue. The flags array determines whether to pop from the queue or the proof.
+
+### 4. `verifyMultiProofCalldata` Function
+```solidity
+function verifyMultiProofCalldata(bytes32[] calldata proof, bytes32 root, bytes32[] calldata leaves, bool[] calldata flags) internal pure returns (bool isValid)
+```
+- **Purpose**: Similar to the `verifyMultiProof` function but operates on calldata instead of memory.
+- **Parameters**:
+  - `proof`: An array of hashes in calldata.
+  - `root`: The root hash of the Merkle tree.
+  - `leaves`: An array of leaf nodes in calldata.
+  - `flags`: An array of boolean flags in calldata.
+- **Returns**: A boolean `isValid` indicating whether all leaves are part of the Merkle tree.
+- **Implementation**: Uses inline assembly to rebuild the root by consuming and producing values on a queue, similar to the `verifyMultiProof` function but optimized for calldata.
+
+### 5. `emptyProof` Function
+```solidity
+function emptyProof() internal pure returns (bytes32[] calldata proof)
+```
+- **Purpose**: Returns an empty calldata bytes32 array.
+- **Returns**: An empty `proof` array.
+- **Implementation**: Uses inline assembly to set the length of the array to zero.
+
+### 6. `emptyLeaves` Function
+```solidity
+function emptyLeaves() internal pure returns (bytes32[] calldata leaves)
+```
+- **Purpose**: Returns an empty calldata bytes32 array.
+- **Returns**: An empty `leaves` array.
+- **Implementation**: Uses inline assembly to set the length of the array to zero.
+
+### 7. `emptyFlags` Function
+```solidity
+function emptyFlags() internal pure returns (bool[] calldata flags)
+```
+- **Purpose**: Returns an empty calldata boolean array.
+- **Returns**: An empty `flags` array.
+- **Implementation**: Uses inline assembly to set the length of the array to zero.
+
+### Summary
+The `MerkleProofLib` library provides highly optimized functions for verifying Merkle proofs, both for single and multiple leaves, and includes utility functions to return empty arrays. The use of inline assembly ensures that these operations are gas-efficient, making the library suitable for use in performance-critical smart contracts.

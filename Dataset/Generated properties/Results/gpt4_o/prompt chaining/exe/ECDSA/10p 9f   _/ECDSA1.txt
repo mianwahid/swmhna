@@ -1,0 +1,68 @@
+The provided smart contract is a library named `ECDSA` that offers various functionalities for handling and verifying ECDSA (Elliptic Curve Digital Signature Algorithm) signatures. Below is a detailed explanation of each functionality provided by the contract:
+
+### Custom Errors
+- **`InvalidSignature`**: This error is thrown when a signature is invalid. It is used in the `recover` functions to indicate that the signature recovery process has failed.
+
+### Recovery Operations
+These functions are used to recover the signer's address from a given message digest (`hash`) and signature.
+
+1. **`recover(bytes32 hash, bytes memory signature) -> address`**:
+   - Recovers the signer's address from a message digest (`hash`) and a signature in `bytes` format.
+   - Supports both 65-byte `(r, s, v)` and 64-byte EIP-2098 `(r, vs)` short form signatures.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature` if the recovery fails.
+
+2. **`recoverCalldata(bytes32 hash, bytes calldata signature) -> address`**:
+   - Similar to the above `recover` function but accepts the signature as `calldata` instead of `memory`.
+   - This is more gas-efficient when dealing with external function calls.
+
+3. **`recover(bytes32 hash, bytes32 r, bytes32 vs) -> address`**:
+   - Recovers the signer's address from a message digest (`hash`) and an EIP-2098 short form signature defined by `r` and `vs`.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature` if the recovery fails.
+
+4. **`recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) -> address`**:
+   - Recovers the signer's address from a message digest (`hash`) and a signature defined by `v`, `r`, and `s`.
+   - Uses the `ecrecover` precompile to perform the recovery.
+   - Reverts with `InvalidSignature` if the recovery fails.
+
+### Try-Recover Operations
+These functions are similar to the recovery operations but do not revert upon failure. Instead, they return the zero address (`address(0)`) if the recovery fails.
+
+1. **`tryRecover(bytes32 hash, bytes memory signature) -> address`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and a signature in `bytes` format.
+   - Returns the zero address if the recovery fails.
+
+2. **`tryRecoverCalldata(bytes32 hash, bytes calldata signature) -> address`**:
+   - Similar to the above `tryRecover` function but accepts the signature as `calldata` instead of `memory`.
+   - Returns the zero address if the recovery fails.
+
+3. **`tryRecover(bytes32 hash, bytes32 r, bytes32 vs) -> address`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and an EIP-2098 short form signature defined by `r` and `vs`.
+   - Returns the zero address if the recovery fails.
+
+4. **`tryRecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) -> address`**:
+   - Attempts to recover the signer's address from a message digest (`hash`) and a signature defined by `v`, `r`, and `s`.
+   - Returns the zero address if the recovery fails.
+
+### Hashing Operations
+These functions are used to create Ethereum Signed Messages from a given hash or byte array.
+
+1. **`toEthSignedMessageHash(bytes32 hash) -> bytes32`**:
+   - Returns an Ethereum Signed Message hash created from a given `hash`.
+   - This is used to produce a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+
+2. **`toEthSignedMessageHash(bytes memory s) -> bytes32`**:
+   - Returns an Ethereum Signed Message hash created from a given byte array `s`.
+   - Supports lengths of `s` up to 999999 bytes.
+   - This is used to produce a hash corresponding to the one signed with the `eth_sign` JSON-RPC method as part of EIP-191.
+
+### Empty Calldata Helpers
+These functions provide utility for handling empty calldata.
+
+1. **`emptySignature() -> bytes calldata`**:
+   - Returns an empty calldata `bytes`.
+   - This can be useful in scenarios where an empty signature is required.
+
+### Summary
+The `ECDSA` library provides a comprehensive set of functions for handling ECDSA signatures, including recovery of signer's addresses, creation of Ethereum Signed Message hashes, and utility functions for empty calldata. The library is optimized for gas efficiency and supports both standard and EIP-2098 short form signatures. It also includes custom error handling to ensure safe and reliable operations.

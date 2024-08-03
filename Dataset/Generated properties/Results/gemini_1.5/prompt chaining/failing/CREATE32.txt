@@ -1,0 +1,58 @@
+## Test Invariants for CREATE3 Library
+
+This list outlines test invariants for the provided `CREATE3` library, focusing on edge cases and functionality:
+
+**1. `deploy` Function:**
+
+* **Invariant 1: Deterministic Deployment**
+    * **Description:**  Deploying the same bytecode with the same salt always results in the same deployed contract address.
+    * **Test Cases:**
+        * Deploy identical bytecode with the same salt multiple times and assert address equality.
+        * Deploy identical bytecode with different salts and assert address inequality.
+* **Invariant 2: Deployment Failure**
+    * **Description:**  `DeploymentFailed` error is thrown when deployment using CREATE2 fails.
+    * **Test Cases:**
+        * Attempt deployment with insufficient gas and assert `DeploymentFailed` error.
+        * Attempt deployment with invalid bytecode (e.g., missing terminating opcode) and assert `DeploymentFailed` error.
+* **Invariant 3: Initialization Failure**
+    * **Description:** `InitializationFailed` error is thrown when the deployed contract's constructor reverts.
+    * **Test Cases:**
+        * Deploy bytecode with a constructor that always reverts and assert `InitializationFailed` error.
+        * Deploy bytecode with a constructor that reverts under specific conditions (e.g., invalid input) and test those conditions.
+* **Invariant 4: Value Transfer**
+    * **Description:** The deployed contract receives the correct amount of ETH specified by the `value` parameter.
+    * **Test Cases:**
+        * Deploy a contract with a non-zero `value` and assert the deployed contract's balance.
+* **Invariant 5: Gas Usage Optimization**
+    * **Description:** The library utilizes gas-efficient techniques for deployment.
+    * **Test Cases:**
+        * Benchmark the gas usage of the `deploy` function and compare it to alternative implementations.
+        * Analyze the bytecode of the deployed proxy contract for gas optimization.
+
+**2. `getDeployed` Function:**
+
+* **Invariant 6: Address Calculation Accuracy**
+    * **Description:** The `getDeployed` function accurately calculates the deterministic address without deploying any contract.
+    * **Test Cases:**
+        * Calculate the address using `getDeployed` and compare it to the address obtained from an actual deployment using the same salt and deployer.
+* **Invariant 7: Salt Uniqueness**
+    * **Description:** Different salts always result in different deterministic addresses.
+    * **Test Cases:**
+        * Calculate addresses using `getDeployed` with different salts and assert address inequality.
+* **Invariant 8: Deployer Specificity**
+    * **Description:** The `getDeployed` function considers the deployer address in address calculation.
+    * **Test Cases:**
+        * Calculate addresses using `getDeployed` with the same salt but different deployer addresses and assert address inequality.
+* **Invariant 9: Consistency with `deploy` Function**
+    * **Description:** The address calculated by `getDeployed` is consistent with the address returned by the `deploy` function for the same salt and deployer.
+    * **Test Cases:**
+        * Calculate the address using `getDeployed` and then deploy a contract using the same salt and deployer. Assert that the addresses are identical.
+
+**3. Edge Cases:**
+
+* **Zero Salt:** Test the behavior of both `deploy` and `getDeployed` functions when using a zero salt.
+* **Empty Bytecode:** Test the behavior of the `deploy` function when attempting to deploy empty bytecode.
+* **Maximum Length Bytecode:** Test the behavior of the `deploy` function when deploying bytecode close to the maximum allowed size.
+* **Reverted Deployment:** Test the behavior of the library when a deployment is reverted due to external factors (e.g., out-of-gas in the deployed contract's constructor).
+
+These test invariants cover a wide range of scenarios and edge cases for the `CREATE3` library, ensuring its correctness, security, and efficiency. Remember to write comprehensive tests that cover all these invariants and any other potential vulnerabilities. 

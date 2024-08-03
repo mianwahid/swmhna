@@ -1,0 +1,51 @@
+The provided smart contract is a library named `JSONParserLib` designed for parsing JSON strings in Solidity. Below is a detailed explanation of its functionalities:
+
+### Custom Errors
+- **ParsingFailed()**: This error is thrown when the input JSON string is invalid.
+
+### Constants
+- **TYPE_UNDEFINED**: Represents an uninitialized item.
+- **TYPE_ARRAY**: Represents a JSON array (e.g., `[1,2,3]`).
+- **TYPE_OBJECT**: Represents a JSON object (e.g., `{"a":"A","b":"B"}`).
+- **TYPE_NUMBER**: Represents a JSON number (e.g., `-1.23e+21`).
+- **TYPE_STRING**: Represents a JSON string (e.g., `"hello"`).
+- **TYPE_BOOLEAN**: Represents a JSON boolean (`true` or `false`).
+- **TYPE_NULL**: Represents a JSON null (`null`).
+
+### Structs
+- **Item**: A struct representing a parsed JSON node. It contains a single field `_data` which is a packed representation of the node's data.
+
+### JSON Parsing Operation
+- **parse(string memory s)**: Parses the JSON string `s` and returns the root `Item`. It reverts if `s` is not a valid JSON as specified in RFC 8259.
+
+### JSON Item Operations
+- **value(Item memory item)**: Returns the string value of the item, preserving inner whitespace and trimming leading/trailing whitespace.
+- **index(Item memory item)**: Returns the index of the item in an array. Returns 0 if the item's parent is not an array.
+- **key(Item memory item)**: Returns the key of the item in an object. Returns an empty string if the item's parent is not an object.
+- **children(Item memory item)**: Returns the children of the item as an array of `Item`. Returns an empty array if the item is neither an array nor an object.
+- **size(Item memory item)**: Returns the number of children of the item. Returns zero if the item is neither an array nor an object.
+- **at(Item memory item, uint256 i)**: Returns the item at index `i` for an array. If the item is not an array or the index is out of bounds, the result's type will be undefined.
+- **at(Item memory item, string memory k)**: Returns the item at key `k` for an object. If the item is not an object or the key is not found, the result's type will be undefined.
+- **getType(Item memory item)**: Returns the type of the item as a uint8.
+- **isUndefined(Item memory item)**: Returns whether the item is of type undefined.
+- **isArray(Item memory item)**: Returns whether the item is of type array.
+- **isObject(Item memory item)**: Returns whether the item is of type object.
+- **isNumber(Item memory item)**: Returns whether the item is of type number.
+- **isString(Item memory item)**: Returns whether the item is of type string.
+- **isBoolean(Item memory item)**: Returns whether the item is of type boolean.
+- **isNull(Item memory item)**: Returns whether the item is of type null.
+- **parent(Item memory item)**: Returns the parent of the item. If the item does not have a parent, the result's type will be undefined.
+
+### Utility Functions
+- **parseUint(string memory s)**: Parses an unsigned integer from a string in decimal format. Reverts if the string is not a valid uint256 or if the number is too big.
+- **parseInt(string memory s)**: Parses a signed integer from a string in decimal format. Reverts if the string is not a valid int256 or if the number cannot fit within the int256 range.
+- **parseUintFromHex(string memory s)**: Parses an unsigned integer from a string in hexadecimal format. Reverts if the string is not a valid uint256 hex string or if the number is too big.
+- **decodeString(string memory s)**: Decodes a JSON encoded string. The string must be double-quoted and JSON encoded. Reverts if the string is invalid.
+
+### Private Helpers
+- **_query(bytes32 input, uint256 mode)**: Performs a query on the input with the given mode. This function is used internally for various parsing and querying operations.
+- **_toInput(string memory input)**: Casts the input string to a bytes32.
+- **_toInput(Item memory input)**: Casts the input `Item` to a bytes32.
+
+### Summary
+The `JSONParserLib` library provides a comprehensive set of functions for parsing and manipulating JSON strings in Solidity. It supports various JSON data types, including arrays, objects, numbers, strings, booleans, and null values. The library also includes utility functions for parsing integers and decoding JSON strings. The internal structure and operations are optimized for efficiency, making it a powerful tool for handling JSON data in smart contracts.

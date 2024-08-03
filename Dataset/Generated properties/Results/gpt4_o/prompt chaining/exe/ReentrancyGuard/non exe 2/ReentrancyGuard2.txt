@@ -1,0 +1,35 @@
+To ensure the robustness of the provided Reentrancy Guard smart contract, we need to define test invariants that cover various edge cases for each functionality. Here are the test invariants for the contract:
+
+### 1. Custom Error: `Reentrancy()`
+- **Invariant**: The `Reentrancy()` error should be thrown whenever a reentrant call is detected.
+  - **Edge Case**: Ensure that the error is thrown when a function protected by `nonReentrant` or `nonReadReentrant` is called reentrantly.
+
+### 2. Storage: `_REENTRANCY_GUARD_SLOT`
+- **Invariant**: The `_REENTRANCY_GUARD_SLOT` should be correctly set and reset during function execution.
+  - **Edge Case**: Verify that `_REENTRANCY_GUARD_SLOT` is set to the contract's address during the execution of a `nonReentrant` function and reset to the contract's code size after execution.
+  - **Edge Case**: Ensure that `_REENTRANCY_GUARD_SLOT` remains unchanged during the execution of a `nonReadReentrant` function.
+
+### 3. Modifier: `nonReentrant`
+- **Invariant**: Functions protected by `nonReentrant` should not allow reentrant calls.
+  - **Edge Case**: Test that a function protected by `nonReentrant` cannot call itself directly or indirectly.
+  - **Edge Case**: Ensure that nested calls to different functions protected by `nonReentrant` are not allowed.
+  - **Edge Case**: Verify that `_REENTRANCY_GUARD_SLOT` is reset correctly after the function execution, allowing subsequent calls.
+
+### 4. Modifier: `nonReadReentrant`
+- **Invariant**: Functions protected by `nonReadReentrant` should not allow reentrant calls.
+  - **Edge Case**: Test that a view function protected by `nonReadReentrant` cannot call itself directly or indirectly.
+  - **Edge Case**: Ensure that nested calls to different functions protected by `nonReadReentrant` are not allowed.
+  - **Edge Case**: Verify that `_REENTRANCY_GUARD_SLOT` remains unchanged after the function execution, allowing subsequent calls.
+
+### Combined Invariants
+- **Invariant**: Ensure that functions protected by `nonReentrant` and `nonReadReentrant` can coexist without interfering with each other.
+  - **Edge Case**: Test that a `nonReentrant` function can call a `nonReadReentrant` function and vice versa without causing reentrancy errors.
+  - **Edge Case**: Verify that the state of `_REENTRANCY_GUARD_SLOT` is correctly managed when switching between `nonReentrant` and `nonReadReentrant` functions.
+
+### Additional Edge Cases
+- **Invariant**: Ensure that the contract behaves correctly when no reentrancy is attempted.
+  - **Edge Case**: Test that functions protected by `nonReentrant` and `nonReadReentrant` execute successfully when called normally (i.e., without reentrancy).
+- **Invariant**: Ensure that the contract handles multiple concurrent transactions correctly.
+  - **Edge Case**: Simulate multiple concurrent transactions to functions protected by `nonReentrant` and `nonReadReentrant` to ensure that reentrancy is correctly prevented.
+
+By defining these test invariants, we can comprehensively test the Reentrancy Guard smart contract to ensure it behaves as expected under various conditions and edge cases.

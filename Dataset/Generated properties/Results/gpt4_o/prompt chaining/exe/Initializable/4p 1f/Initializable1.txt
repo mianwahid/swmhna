@@ -1,0 +1,37 @@
+The provided smart contract is an abstract contract named `Initializable` designed to manage the initialization process of upgradeable contracts. Below is a detailed explanation of its functionalities:
+
+### Custom Errors
+1. **`InvalidInitialization`**: This error is thrown when an invalid initialization attempt is made, such as trying to initialize an already initialized contract.
+2. **`NotInitializing`**: This error is thrown when a function that requires the contract to be in the initializing state is called outside of that state.
+
+### Events
+1. **`Initialized(uint64 version)`**: This event is emitted when the contract has been successfully initialized or reinitialized. It includes the version number of the initialization.
+
+### Constants
+1. **`_INTIALIZED_EVENT_SIGNATURE`**: This is the keccak256 hash of the `Initialized(uint64)` event signature, used for logging the event in a low-level manner.
+2. **`_INITIALIZABLE_SLOT`**: This constant defines the storage slot used to store the initialization state. The slot is derived from a specific hash to avoid collisions.
+
+### Storage Layout
+The storage slot `_INITIALIZABLE_SLOT` is used to store two pieces of information:
+- **`initializing`**: A boolean flag indicating whether the contract is currently in the process of initializing.
+- **`initializedVersion`**: A 64-bit integer indicating the version of the initialization.
+
+### Functions and Modifiers
+1. **`_initializableSlot()`**: This internal function returns the storage slot used for initialization state. It can be overridden to provide a custom slot if needed.
+   
+2. **`initializer`**: This modifier ensures that a function can only be called once for initialization. It sets the `initializing` flag and the `initializedVersion` to 1. If the contract is already initialized, it reverts with `InvalidInitialization()`. After the function execution, it resets the `initializing` flag and emits the `Initialized` event.
+
+3. **`reinitializer(uint64 version)`**: This modifier allows a function to be called once for reinitialization with a specific version. It checks that the contract is not already initializing and that the `initializedVersion` is less than the provided version. It sets the `initializing` flag and updates the `initializedVersion` to the provided version. After the function execution, it resets the `initializing` flag and emits the `Initialized` event with the new version.
+
+4. **`onlyInitializing`**: This modifier ensures that a function can only be called during the initialization process. It calls `_checkInitializing()` to verify that the contract is in the initializing state.
+
+5. **`_checkInitializing()`**: This internal function checks if the contract is currently initializing. If not, it reverts with `NotInitializing()`.
+
+6. **`_disableInitializers()`**: This internal function locks any future initializations by setting the `initializedVersion` to the maximum value (`2**64 - 1`). This is useful for implementation contracts that are meant to be called through proxies. It emits the `Initialized` event the first time it is successfully called.
+
+7. **`_getInitializedVersion()`**: This internal function returns the highest version that has been initialized. It reads the `initializedVersion` from the storage slot.
+
+8. **`_isInitializing()`**: This internal function returns whether the contract is currently in the initializing state. It reads the `initializing` flag from the storage slot.
+
+### Summary
+The `Initializable` contract provides a robust framework for managing the initialization and reinitialization of upgradeable contracts. It ensures that initialization functions can only be called once, supports versioned reinitialization, and provides mechanisms to lock the contract against future initializations. The use of custom errors and low-level assembly optimizations makes it both efficient and secure.

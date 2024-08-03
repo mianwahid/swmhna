@@ -1,0 +1,114 @@
+To ensure the robustness and correctness of the `Initializable` contract, we need to define a set of test invariants that cover various edge cases and functionalities. Here are the test invariants for the `Initializable` contract:
+
+### Test Invariants
+
+1. **Initial State Invariant**
+   - **Description**: Verify that the contract is not initializing and the initialized version is zero upon deployment.
+   - **Invariant**:
+     ```solidity
+     assert(!_isInitializing());
+     assert(_getInitializedVersion() == 0);
+     ```
+
+2. **Single Initialization Invariant**
+   - **Description**: Ensure that the `initializer` modifier can only be called once.
+   - **Invariant**:
+     ```solidity
+     // First initialization should succeed
+     contract.initializerFunction();
+     assert(_getInitializedVersion() == 1);
+     assert(!_isInitializing());
+
+     // Second initialization should revert
+     try contract.initializerFunction() {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+     }
+     ```
+
+3. **Reinitialization Invariant**
+   - **Description**: Ensure that the `reinitializer` modifier can only be called once per version and in increasing order.
+   - **Invariant**:
+     ```solidity
+     // First reinitialization with version 2 should succeed
+     contract.reinitializerFunction(2);
+     assert(_getInitializedVersion() == 2);
+     assert(!_isInitializing());
+
+     // Reinitialization with the same version should revert
+     try contract.reinitializerFunction(2) {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+     }
+
+     // Reinitialization with a lower version should revert
+     try contract.reinitializerFunction(1) {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+     }
+
+     // Reinitialization with a higher version should succeed
+     contract.reinitializerFunction(3);
+     assert(_getInitializedVersion() == 3);
+     assert(!_isInitializing());
+     ```
+
+4. **Only Initializing Invariant**
+   - **Description**: Ensure that functions guarded by `onlyInitializing` can only be called during initialization or reinitialization.
+   - **Invariant**:
+     ```solidity
+     // Function guarded by onlyInitializing should revert if called outside initialization
+     try contract.onlyInitializingFunction() {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("NotInitializing()"));
+     }
+
+     // Function should succeed if called during initialization
+     contract.initializerFunction();
+     contract.onlyInitializingFunction();
+     ```
+
+5. **Disable Initializers Invariant**
+   - **Description**: Ensure that `_disableInitializers` locks the contract against any future initializations or reinitializations.
+   - **Invariant**:
+     ```solidity
+     // Disable initializers
+     contract._disableInitializers();
+     assert(_getInitializedVersion() == type(uint64).max);
+
+     // Any further initialization or reinitialization should revert
+     try contract.initializerFunction() {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+     }
+
+     try contract.reinitializerFunction(4) {
+         assert(false); // Should not reach here
+     } catch Error(string memory reason) {
+         assert(keccak256(bytes(reason)) == keccak256("InvalidInitialization()"));
+     }
+     ```
+
+6. **Event Emission Invariant**
+   - **Description**: Ensure that the `Initialized` event is emitted with the correct version during initialization and reinitialization.
+   - **Invariant**:
+     ```solidity
+     // Capture events
+     contract.initializerFunction();
+     assert(events.length == 1);
+     assert(events[0].name == "Initialized");
+     assert(events[0].args[0] == 1);
+
+     contract.reinitializerFunction(2);
+     assert(events.length == 2);
+     assert(events[1].name == "Initialized");
+     assert(events[1].args[0] == 2);
+     ```
+
+### Summary
+These test invariants cover the core functionalities and edge cases of the `Initializable` contract, ensuring that it behaves as expected under various conditions. By implementing these invariants in your test suite, you can verify the correctness and robustness of the contract.

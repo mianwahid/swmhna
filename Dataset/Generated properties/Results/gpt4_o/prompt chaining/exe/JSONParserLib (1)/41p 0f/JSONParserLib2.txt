@@ -1,0 +1,109 @@
+To ensure the robustness and correctness of the `JSONParserLib` smart contract, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and functionalities provided by the contract. Below is a list of test invariants for each functionality:
+
+### General Invariants
+1. **Parsing Invalid JSON**:
+   - Ensure that parsing an invalid JSON string reverts with the `ParsingFailed` error.
+
+### `parse` Function
+2. **Valid JSON Parsing**:
+   - Ensure that a valid JSON string is parsed correctly and returns a root `Item`.
+3. **Empty JSON Object**:
+   - Ensure that parsing an empty JSON object (`{}`) returns an `Item` of type `TYPE_OBJECT` with no children.
+4. **Empty JSON Array**:
+   - Ensure that parsing an empty JSON array (`[]`) returns an `Item` of type `TYPE_ARRAY` with no children.
+
+### `value` Function
+5. **String Value**:
+   - Ensure that the `value` function returns the correct string representation for a JSON string item.
+6. **Number Value**:
+   - Ensure that the `value` function returns the correct string representation for a JSON number item.
+7. **Boolean Value**:
+   - Ensure that the `value` function returns the correct string representation for a JSON boolean item.
+8. **Null Value**:
+   - Ensure that the `value` function returns the correct string representation for a JSON null item.
+
+### `index` Function
+9. **Array Index**:
+   - Ensure that the `index` function returns the correct index for an item in an array.
+10. **Non-Array Index**:
+    - Ensure that the `index` function returns 0 for an item whose parent is not an array.
+
+### `key` Function
+11. **Object Key**:
+    - Ensure that the `key` function returns the correct key for an item in an object.
+12. **Non-Object Key**:
+    - Ensure that the `key` function returns an empty string for an item whose parent is not an object.
+
+### `children` Function
+13. **Array Children**:
+    - Ensure that the `children` function returns the correct children for an array item.
+14. **Object Children**:
+    - Ensure that the `children` function returns the correct children for an object item.
+15. **Non-Array/Object Children**:
+    - Ensure that the `children` function returns an empty array for an item that is neither an array nor an object.
+
+### `size` Function
+16. **Array Size**:
+    - Ensure that the `size` function returns the correct number of children for an array item.
+17. **Object Size**:
+    - Ensure that the `size` function returns the correct number of children for an object item.
+18. **Non-Array/Object Size**:
+    - Ensure that the `size` function returns zero for an item that is neither an array nor an object.
+
+### `at` Function (Array)
+19. **Valid Array Index**:
+    - Ensure that the `at` function returns the correct item for a valid index in an array.
+20. **Invalid Array Index**:
+    - Ensure that the `at` function returns an undefined type for an invalid index in an array.
+21. **Non-Array Item**:
+    - Ensure that the `at` function returns an undefined type for an item that is not an array.
+
+### `at` Function (Object)
+22. **Valid Object Key**:
+    - Ensure that the `at` function returns the correct item for a valid key in an object.
+23. **Invalid Object Key**:
+    - Ensure that the `at` function returns an undefined type for an invalid key in an object.
+24. **Non-Object Item**:
+    - Ensure that the `at` function returns an undefined type for an item that is not an object.
+
+### Type Checking Functions
+25. **Type Undefined**:
+    - Ensure that the `isUndefined` function correctly identifies an undefined item.
+26. **Type Array**:
+    - Ensure that the `isArray` function correctly identifies an array item.
+27. **Type Object**:
+    - Ensure that the `isObject` function correctly identifies an object item.
+28. **Type Number**:
+    - Ensure that the `isNumber` function correctly identifies a number item.
+29. **Type String**:
+    - Ensure that the `isString` function correctly identifies a string item.
+30. **Type Boolean**:
+    - Ensure that the `isBoolean` function correctly identifies a boolean item.
+31. **Type Null**:
+    - Ensure that the `isNull` function correctly identifies a null item.
+
+### `parent` Function
+32. **Valid Parent**:
+    - Ensure that the `parent` function returns the correct parent item for a child item.
+33. **No Parent**:
+    - Ensure that the `parent` function returns an undefined type for an item with no parent.
+
+### Utility Functions
+34. **Parse Valid Uint**:
+    - Ensure that the `parseUint` function correctly parses a valid uint256 string.
+35. **Parse Invalid Uint**:
+    - Ensure that the `parseUint` function reverts for an invalid uint256 string.
+36. **Parse Valid Int**:
+    - Ensure that the `parseInt` function correctly parses a valid int256 string.
+37. **Parse Invalid Int**:
+    - Ensure that the `parseInt` function reverts for an invalid int256 string.
+38. **Parse Valid Hex Uint**:
+    - Ensure that the `parseUintFromHex` function correctly parses a valid uint256 hex string.
+39. **Parse Invalid Hex Uint**:
+    - Ensure that the `parseUintFromHex` function reverts for an invalid uint256 hex string.
+40. **Decode Valid JSON String**:
+    - Ensure that the `decodeString` function correctly decodes a valid JSON encoded string.
+41. **Decode Invalid JSON String**:
+    - Ensure that the `decodeString` function reverts for an invalid JSON encoded string.
+
+These invariants cover the core functionalities and edge cases of the `JSONParserLib` smart contract, ensuring its reliability and correctness.

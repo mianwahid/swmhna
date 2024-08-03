@@ -1,0 +1,86 @@
+The provided smart contract is a Solidity library named `MetadataReaderLib` designed to read metadata from other contracts in a robust manner. Below is a detailed explanation of its functionalities:
+
+### Constants
+
+1. **GAS_STIPEND_NO_GRIEF**: 
+   - **Type**: `uint256`
+   - **Value**: `100000`
+   - **Description**: This constant defines a default gas stipend for contract reads. It is set high enough to handle most practical use cases (e.g., reading about 1000 bytes of data) but low enough to prevent potential griefing attacks.
+
+2. **STRING_LIMIT_DEFAULT**: 
+   - **Type**: `uint256`
+   - **Value**: `1000`
+   - **Description**: This constant sets a default byte length limit for strings. It ensures that strings read from other contracts do not exceed 1000 bytes.
+
+### Metadata Reading Operations
+
+These functions are designed to read metadata (like name, symbol, decimals) from other contracts. They are implemented to handle various edge cases and ensure that they do not revert as long as sufficient gas is provided.
+
+#### String Reading Functions
+
+1. **readName(address target)**:
+   - **Description**: Reads the `name` of a token from the target contract.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("name()"))`.
+
+2. **readName(address target, uint256 limit)**:
+   - **Description**: Reads the `name` of a token from the target contract with a specified byte length limit.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("name()"), limit)`.
+
+3. **readName(address target, uint256 limit, uint256 gasStipend)**:
+   - **Description**: Reads the `name` of a token from the target contract with a specified byte length limit and gas stipend.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("name()"), limit, gasStipend)`.
+
+4. **readSymbol(address target)**:
+   - **Description**: Reads the `symbol` of a token from the target contract.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("symbol()"))`.
+
+5. **readSymbol(address target, uint256 limit)**:
+   - **Description**: Reads the `symbol` of a token from the target contract with a specified byte length limit.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("symbol()"), limit)`.
+
+6. **readSymbol(address target, uint256 limit, uint256 gasStipend)**:
+   - **Description**: Reads the `symbol` of a token from the target contract with a specified byte length limit and gas stipend.
+   - **Equivalent to**: `readString(abi.encodeWithSignature("symbol()"), limit, gasStipend)`.
+
+7. **readString(address target, bytes memory data)**:
+   - **Description**: Performs a best-effort string query on the target contract with the provided calldata. The string is truncated to `STRING_LIMIT_DEFAULT` bytes.
+
+8. **readString(address target, bytes memory data, uint256 limit)**:
+   - **Description**: Performs a best-effort string query on the target contract with the provided calldata. The string is truncated to the specified byte length limit.
+
+9. **readString(address target, bytes memory data, uint256 limit, uint256 gasStipend)**:
+   - **Description**: Performs a best-effort string query on the target contract with the provided calldata. The string is truncated to the specified byte length limit and uses the specified gas stipend.
+
+#### Unsigned Integer Reading Functions
+
+1. **readDecimals(address target)**:
+   - **Description**: Reads the `decimals` of a token from the target contract.
+   - **Equivalent to**: `uint8(readUint(abi.encodeWithSignature("decimal()")))`.
+
+2. **readDecimals(address target, uint256 gasStipend)**:
+   - **Description**: Reads the `decimals` of a token from the target contract with a specified gas stipend.
+   - **Equivalent to**: `uint8(readUint(abi.encodeWithSignature("decimal()"), gasStipend))`.
+
+3. **readUint(address target, bytes memory data)**:
+   - **Description**: Performs a best-effort uint query on the target contract with the provided calldata.
+
+4. **readUint(address target, bytes memory data, uint256 gasStipend)**:
+   - **Description**: Performs a best-effort uint query on the target contract with the provided calldata and specified gas stipend.
+
+### Private Helper Functions
+
+1. **_string(address target, bytes32 ptr, uint256 limit, uint256 gasStipend)**:
+   - **Description**: Attempts to read and return a string from the target contract. It handles various edge cases, such as empty returndata, null-terminated strings, and `abi.decode` failures.
+
+2. **_uint(address target, bytes32 ptr, uint256 gasStipend)**:
+   - **Description**: Attempts to read and return a uint from the target contract. It handles cases where the returndata is insufficient or the `abi.decode` fails.
+
+3. **_ptr(uint256 s)**:
+   - **Description**: Casts a function selector into a pointer. This is used to prepare calldata for static calls.
+
+4. **_ptr(bytes memory data)**:
+   - **Description**: Casts the provided data into a pointer. This is used to prepare calldata for static calls.
+
+### Summary
+
+The `MetadataReaderLib` library provides robust and gas-efficient methods to read metadata from other contracts. It includes functions to read common token metadata like `name`, `symbol`, and `decimals`, as well as more generic functions to read strings and unsigned integers. The library is designed to handle various edge cases and ensure that it does not revert as long as sufficient gas is provided.

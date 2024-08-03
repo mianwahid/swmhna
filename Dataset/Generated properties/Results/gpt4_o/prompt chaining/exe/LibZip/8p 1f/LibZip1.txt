@@ -1,0 +1,66 @@
+The provided smart contract is a Solidity library named `LibZip` that offers functionalities for compressing and decompressing data using two different methods: FastLZ and selective run-length encoding (RLE) for calldata. Below is a detailed explanation of each functionality:
+
+### FastLZ Operations
+
+1. **`flzCompress(bytes memory data) internal pure returns (bytes memory result)`**
+   - **Purpose**: Compresses the input data using the FastLZ algorithm.
+   - **Details**:
+     - The function uses inline assembly to perform the compression.
+     - It initializes a hashmap and iterates through the input data to find matches and literals.
+     - Matches are encoded using a specific format, and literals are copied directly.
+     - The compressed data is stored in memory and returned.
+
+2. **`flzDecompress(bytes memory data) internal pure returns (bytes memory result)`**
+   - **Purpose**: Decompresses the input data that was compressed using the FastLZ algorithm.
+   - **Details**:
+     - The function uses inline assembly to perform the decompression.
+     - It reads the compressed data and decodes it back to its original form.
+     - The decompressed data is stored in memory and returned.
+
+### Calldata Operations
+
+1. **`cdCompress(bytes memory data) internal pure returns (bytes memory result)`**
+   - **Purpose**: Compresses the input data using selective run-length encoding (RLE).
+   - **Details**:
+     - The function uses inline assembly to perform the compression.
+     - It identifies sequences of 0x00 and 0xff bytes and encodes them using a control byte.
+     - The first 4 bytes of the compressed data are bitwise negated to allow dispatching into the `fallback` and `receive` functions.
+     - The compressed data is stored in memory and returned.
+
+2. **`cdDecompress(bytes memory data) internal pure returns (bytes memory result)`**
+   - **Purpose**: Decompresses the input data that was compressed using the selective RLE method.
+   - **Details**:
+     - The function uses inline assembly to perform the decompression.
+     - It reads the compressed data, negates the first 4 bytes, and decodes the RLE-encoded sequences back to their original form.
+     - The decompressed data is stored in memory and returned.
+
+3. **`cdFallback() internal`**
+   - **Purpose**: To be called in the `fallback` function of a contract to handle compressed calldata.
+   - **Details**:
+     - The function uses inline assembly to decompress the calldata.
+     - It negates the first 4 bytes of the calldata and decodes the RLE-encoded sequences.
+     - The decompressed data is then used to perform a `delegatecall` to the current contract.
+     - If the `delegatecall` fails, it reverts with the returned data.
+
+### Usage Example
+
+To use the `cdFallback` function in a contract, you would typically define the `fallback` and `receive` functions as follows:
+
+```solidity
+contract MyContract {
+    fallback() external payable {
+        LibZip.cdFallback();
+    }
+
+    receive() external payable {
+        // Silence compiler warning to add a `receive` function.
+    }
+}
+```
+
+### Summary
+
+- **FastLZ Operations**: Provides functions for compressing (`flzCompress`) and decompressing (`flzDecompress`) data using the FastLZ algorithm.
+- **Calldata Operations**: Provides functions for compressing (`cdCompress`) and decompressing (`cdDecompress`) calldata using selective RLE, and a function (`cdFallback`) to handle compressed calldata in the `fallback` function of a contract.
+
+These functionalities are useful for reducing the size of data stored on-chain or transmitted via calldata, potentially saving gas costs.

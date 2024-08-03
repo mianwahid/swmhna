@@ -1,0 +1,89 @@
+To ensure the robustness and correctness of the `SignatureCheckerLib` library, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and scenarios for each functionality provided by the library. Below are the test invariants for each function:
+
+### 1. `isValidSignatureNow(address signer, bytes32 hash, bytes memory signature)`
+
+**Invariants:**
+- **Valid EOA Signature:** Ensure that a valid EOA signature returns `true`.
+- **Invalid EOA Signature:** Ensure that an invalid EOA signature returns `false`.
+- **Valid Smart Contract Signature (ERC1271):** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid Smart Contract Signature (ERC1271):** Ensure that an invalid ERC1271 signature returns `false`.
+- **64-byte Signature (EIP-2098):** Ensure that a valid 64-byte signature returns `true`.
+- **65-byte Signature:** Ensure that a valid 65-byte signature returns `true`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 2. `isValidSignatureNowCalldata(address signer, bytes32 hash, bytes calldata signature)`
+
+**Invariants:**
+- **Valid EOA Signature:** Ensure that a valid EOA signature returns `true`.
+- **Invalid EOA Signature:** Ensure that an invalid EOA signature returns `false`.
+- **Valid Smart Contract Signature (ERC1271):** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid Smart Contract Signature (ERC1271):** Ensure that an invalid ERC1271 signature returns `false`.
+- **64-byte Signature (EIP-2098):** Ensure that a valid 64-byte signature returns `true`.
+- **65-byte Signature:** Ensure that a valid 65-byte signature returns `true`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 3. `isValidSignatureNow(address signer, bytes32 hash, bytes32 r, bytes32 vs)`
+
+**Invariants:**
+- **Valid EOA Signature:** Ensure that a valid EOA signature returns `true`.
+- **Invalid EOA Signature:** Ensure that an invalid EOA signature returns `false`.
+- **Valid Smart Contract Signature (ERC1271):** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid Smart Contract Signature (ERC1271):** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 4. `isValidSignatureNow(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s)`
+
+**Invariants:**
+- **Valid EOA Signature:** Ensure that a valid EOA signature returns `true`.
+- **Invalid EOA Signature:** Ensure that an invalid EOA signature returns `false`.
+- **Valid Smart Contract Signature (ERC1271):** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid Smart Contract Signature (ERC1271):** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 5. `isValidERC1271SignatureNow(address signer, bytes32 hash, bytes memory signature)`
+
+**Invariants:**
+- **Valid ERC1271 Signature:** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid ERC1271 Signature:** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 6. `isValidERC1271SignatureNowCalldata(address signer, bytes32 hash, bytes calldata signature)`
+
+**Invariants:**
+- **Valid ERC1271 Signature:** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid ERC1271 Signature:** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 7. `isValidERC1271SignatureNow(address signer, bytes32 hash, bytes32 r, bytes32 vs)`
+
+**Invariants:**
+- **Valid ERC1271 Signature:** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid ERC1271 Signature:** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 8. `isValidERC1271SignatureNow(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s)`
+
+**Invariants:**
+- **Valid ERC1271 Signature:** Ensure that a valid ERC1271 signature returns `true`.
+- **Invalid ERC1271 Signature:** Ensure that an invalid ERC1271 signature returns `false`.
+- **Dirty Upper Bits in Signer Address:** Ensure that the function correctly handles dirty upper bits in the signer address.
+
+### 9. `toEthSignedMessageHash(bytes32 hash)`
+
+**Invariants:**
+- **Correct Hash Calculation:** Ensure that the function returns the correct Ethereum Signed Message hash for a given input hash.
+
+### 10. `toEthSignedMessageHash(bytes memory s)`
+
+**Invariants:**
+- **Correct Hash Calculation:** Ensure that the function returns the correct Ethereum Signed Message hash for a given input byte array.
+- **Maximum Length Handling:** Ensure that the function correctly handles input byte arrays up to the maximum supported length (999999 bytes).
+
+### 11. `emptySignature()`
+
+**Invariants:**
+- **Empty Signature:** Ensure that the function returns an empty calldata bytes.
+
+### Summary
+
+These test invariants cover a wide range of edge cases and scenarios for each function in the `SignatureCheckerLib` library. By implementing tests based on these invariants, we can ensure the robustness and correctness of the library's signature verification functionalities.

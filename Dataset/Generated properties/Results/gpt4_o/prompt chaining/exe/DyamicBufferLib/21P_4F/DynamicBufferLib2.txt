@@ -1,0 +1,44 @@
+To ensure the robustness and correctness of the `DynamicBufferLib` library, we need to define test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for each function:
+
+### 1. `reserve` Function
+- **Invariant 1**: When `minimum` is less than or equal to the current length of the buffer, the buffer should remain unchanged.
+- **Invariant 2**: When `minimum` is greater than the current length of the buffer, the buffer should expand to accommodate the new size.
+- **Invariant 3**: The buffer should not shrink if `minimum` is less than the current length.
+- **Invariant 4**: The function should handle the case where `minimum` is zero without errors.
+- **Invariant 5**: The function should handle very large values of `minimum` without causing out-of-gas errors or memory overflow.
+
+### 2. `clear` Function
+- **Invariant 1**: After calling `clear`, the length of the buffer should be zero.
+- **Invariant 2**: The underlying memory should not be deallocated, meaning subsequent operations should not cause memory errors.
+- **Invariant 3**: The function should handle the case where the buffer is already empty without errors.
+
+### 3. `s` Function
+- **Invariant 1**: The returned string should accurately reflect the current state of the buffer's data.
+- **Invariant 2**: If the buffer is empty, the returned string should be an empty string.
+- **Invariant 3**: The function should handle large buffers and return the correct string representation.
+
+### 4. `p` (append) Function
+- **Invariant 1**: Appending an empty `bytes` array should not change the buffer.
+- **Invariant 2**: Appending data should correctly increase the length of the buffer.
+- **Invariant 3**: The appended data should be correctly placed at the end of the buffer.
+- **Invariant 4**: The function should handle appending large data without causing out-of-gas errors or memory overflow.
+- **Invariant 5**: The function should correctly handle multiple consecutive appends.
+- **Invariant 6**: The function should handle appending data to an empty buffer correctly.
+
+### 5. `p` (overloaded) Function
+- **Invariant 1**: Appending multiple empty `bytes` arrays should not change the buffer.
+- **Invariant 2**: Appending multiple data segments should correctly increase the length of the buffer.
+- **Invariant 3**: The appended data segments should be correctly placed in sequence at the end of the buffer.
+- **Invariant 4**: The function should handle appending multiple large data segments without causing out-of-gas errors or memory overflow.
+- **Invariant 5**: The function should correctly handle appending multiple data segments to an empty buffer.
+
+### 6. `_deallocate` Function
+- **Invariant 1**: The function should correctly reset the free memory pointer to the start of the buffer.
+- **Invariant 2**: The function should handle the case where the buffer is already deallocated without errors.
+
+### General Invariants
+- **Invariant 1**: All functions should handle edge cases such as empty buffers, very large buffers, and buffers with maximum possible length without causing errors.
+- **Invariant 2**: All functions should maintain memory safety and not cause buffer overflows or memory corruption.
+- **Invariant 3**: All functions should be gas-efficient and not cause out-of-gas errors under normal usage scenarios.
+
+By defining these test invariants, we can create a comprehensive test suite to ensure the `DynamicBufferLib` library functions correctly and handles various edge cases gracefully.

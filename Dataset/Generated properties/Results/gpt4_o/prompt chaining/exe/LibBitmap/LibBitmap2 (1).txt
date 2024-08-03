@@ -1,0 +1,75 @@
+To ensure the correctness and robustness of the `LibBitmap` library, we need to write test invariants that cover various edge cases for each functionality. Here are the test invariants for the functionalities provided in the `LibBitmap` library:
+
+### 1. `get` Function
+- **Invariant 1**: For an unset bit, `get` should return `false`.
+- **Invariant 2**: For a set bit, `get` should return `true`.
+- **Invariant 3**: For an index out of the range of the bitmap, `get` should return `false`.
+
+### 2. `set` Function
+- **Invariant 1**: After setting a bit, `get` should return `true` for that bit.
+- **Invariant 2**: Setting a bit that is already set should not change its state.
+- **Invariant 3**: Setting a bit should not affect other bits.
+
+### 3. `unset` Function
+- **Invariant 1**: After unsetting a bit, `get` should return `false` for that bit.
+- **Invariant 2**: Unsetting a bit that is already unset should not change its state.
+- **Invariant 3**: Unsetting a bit should not affect other bits.
+
+### 4. `toggle` Function
+- **Invariant 1**: Toggling a bit should change its state from `false` to `true` or from `true` to `false`.
+- **Invariant 2**: Toggling a bit twice should return it to its original state.
+- **Invariant 3**: Toggling a bit should not affect other bits.
+
+### 5. `setTo` Function
+- **Invariant 1**: Setting a bit to `true` should make `get` return `true` for that bit.
+- **Invariant 2**: Setting a bit to `false` should make `get` return `false` for that bit.
+- **Invariant 3**: Setting a bit to its current state should not change its state.
+- **Invariant 4**: Setting a bit should not affect other bits.
+
+### 6. `setBatch` Function
+- **Invariant 1**: After setting a batch of bits, `get` should return `true` for all bits in the range.
+- **Invariant 2**: Setting a batch of bits should not affect bits outside the range.
+- **Invariant 3**: Setting a batch of bits that are already set should not change their state.
+
+### 7. `unsetBatch` Function
+- **Invariant 1**: After unsetting a batch of bits, `get` should return `false` for all bits in the range.
+- **Invariant 2**: Unsetting a batch of bits should not affect bits outside the range.
+- **Invariant 3**: Unsetting a batch of bits that are already unset should not change their state.
+
+### 8. `popCount` Function
+- **Invariant 1**: The count of set bits in a range should be accurate.
+- **Invariant 2**: The count should be zero if no bits are set in the range.
+- **Invariant 3**: The count should be equal to the number of bits in the range if all bits are set.
+
+### 9. `findLastSet` Function
+- **Invariant 1**: Should return the index of the most significant set bit within the range.
+- **Invariant 2**: Should return `NOT_FOUND` if no bits are set in the range.
+- **Invariant 3**: Should handle the case where the most significant set bit is at the boundary of the range.
+
+### Additional Edge Cases
+- **Invariant 1**: Operations on an empty bitmap should not cause errors.
+- **Invariant 2**: Operations with the maximum possible index should be handled correctly.
+- **Invariant 3**: Operations with zero-length ranges (e.g., `setBatch` or `unsetBatch` with `amount` = 0) should not change the bitmap.
+
+### Example Test Cases
+Here are some example test cases for the `get` function:
+
+```solidity
+function testGetUnsetBit() public {
+    LibBitmap.Bitmap storage bitmap;
+    assert(!LibBitmap.get(bitmap, 0));
+}
+
+function testGetSetBit() public {
+    LibBitmap.Bitmap storage bitmap;
+    LibBitmap.set(bitmap, 0);
+    assert(LibBitmap.get(bitmap, 0));
+}
+
+function testGetOutOfRangeBit() public {
+    LibBitmap.Bitmap storage bitmap;
+    assert(!LibBitmap.get(bitmap, type(uint256).max));
+}
+```
+
+These invariants and test cases ensure that the `LibBitmap` library functions correctly under various conditions and edge cases. Each function should be tested similarly to cover all possible scenarios.

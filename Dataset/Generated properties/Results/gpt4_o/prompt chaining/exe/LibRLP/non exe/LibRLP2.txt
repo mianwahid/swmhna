@@ -1,0 +1,77 @@
+To ensure the correctness and robustness of the `LibRLP` library, we need to define a set of test invariants that cover various edge cases and functionalities of the `computeAddress` function. Here are the test invariants:
+
+### Test Invariants for `computeAddress`
+
+1. **Invariant: Correct Address Calculation for Small Nonce**
+   - **Description**: Verify that the function correctly computes the address when the nonce is less than or equal to 127.
+   - **Edge Cases**:
+     - `nonce = 0`
+     - `nonce = 1`
+     - `nonce = 127`
+
+2. **Invariant: Correct Address Calculation for Large Nonce**
+   - **Description**: Verify that the function correctly computes the address when the nonce is greater than 127.
+   - **Edge Cases**:
+     - `nonce = 128`
+     - `nonce = 255`
+     - `nonce = 1024`
+     - `nonce = 2**64-2` (maximum theoretical nonce)
+
+3. **Invariant: Correct Address Calculation for Boundary Nonce Values**
+   - **Description**: Verify that the function correctly computes the address for boundary values of the nonce.
+   - **Edge Cases**:
+     - `nonce = 2**8-1` (255)
+     - `nonce = 2**16-1` (65535)
+     - `nonce = 2**32-1` (4294967295)
+     - `nonce = 2**64-2` (maximum theoretical nonce)
+
+4. **Invariant: Correct Address Calculation for Different Deployer Addresses**
+   - **Description**: Verify that the function correctly computes the address for different deployer addresses.
+   - **Edge Cases**:
+     - `deployer = 0x0000000000000000000000000000000000000000` (zero address)
+     - `deployer = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF` (maximum address)
+     - `deployer = 0x1234567890abcdef1234567890abcdef12345678` (random address)
+
+5. **Invariant: Consistency with Known Address Calculation**
+   - **Description**: Verify that the function's output matches known correct address calculations.
+   - **Edge Cases**:
+     - Compare the output with precomputed addresses for specific deployer and nonce pairs.
+
+6. **Invariant: Nonce Encoding Verification**
+   - **Description**: Verify that the nonce is correctly encoded in the RLP format.
+   - **Edge Cases**:
+     - `nonce = 0`
+     - `nonce = 1`
+     - `nonce = 127`
+     - `nonce = 128`
+     - `nonce = 255`
+     - `nonce = 1024`
+
+7. **Invariant: Deployer Address Encoding Verification**
+   - **Description**: Verify that the deployer address is correctly encoded in the RLP format.
+   - **Edge Cases**:
+     - `deployer = 0x0000000000000000000000000000000000000000` (zero address)
+     - `deployer = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF` (maximum address)
+     - `deployer = 0x1234567890abcdef1234567890abcdef12345678` (random address)
+
+8. **Invariant: Assembly Code Execution Path**
+   - **Description**: Verify that the correct execution path in the assembly code is taken based on the nonce value.
+   - **Edge Cases**:
+     - `nonce = 0`
+     - `nonce = 127`
+     - `nonce = 128`
+     - `nonce = 255`
+
+9. **Invariant: No Dirty Upper Bits in Deployed Address**
+   - **Description**: Verify that the deployed address does not have dirty upper bits.
+   - **Edge Cases**:
+     - Any valid `deployer` and `nonce` combination.
+
+10. **Invariant: Performance and Gas Usage**
+    - **Description**: Verify that the function performs efficiently and within acceptable gas limits.
+    - **Edge Cases**:
+      - Measure gas usage for small nonce values.
+      - Measure gas usage for large nonce values.
+
+### Summary
+These test invariants cover a wide range of edge cases and functionalities of the `computeAddress` function in the `LibRLP` library. By testing these invariants, we can ensure that the function behaves correctly and efficiently under various conditions.

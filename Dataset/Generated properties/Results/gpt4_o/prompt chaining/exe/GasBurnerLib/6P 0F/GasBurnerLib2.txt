@@ -1,0 +1,56 @@
+To create test invariants for the `GasBurnerLib` smart contract, we need to ensure that the `burn` function behaves as expected under various conditions. Here are the test invariants that cover specific edge cases for the `burn` function:
+
+### Test Invariants
+
+1. **Invariant: Gas Consumption**
+   - **Description**: Ensure that the function consumes a predictable amount of gas based on the input `x`.
+   - **Edge Cases**:
+     - `x = 0`: The function should consume minimal gas.
+     - `x = 1`: The function should consume a small amount of gas.
+     - `x = 120`: The function should consume gas but not enter the loop.
+     - `x = 121`: The function should start entering the loop.
+     - `x = 1000`: The function should consume a significant amount of gas.
+
+2. **Invariant: Memory Manipulation**
+   - **Description**: Ensure that the memory at location `0x10` is manipulated correctly.
+   - **Edge Cases**:
+     - `x = 0`: The memory should be set to `1`.
+     - `x = 1`: The memory should be set to `1 | 1 = 1`.
+     - `x = 120`: The memory should be set to `1 | 120 = 121`.
+     - `x = 121`: The memory should be set to `1 | 121 = 121`.
+     - `x = 1000`: The memory should be set to `1 | 1000 = 1001`.
+
+3. **Invariant: Loop Execution**
+   - **Description**: Ensure that the loop executes the correct number of times.
+   - **Edge Cases**:
+     - `x = 0`: The loop should not execute.
+     - `x = 120`: The loop should not execute.
+     - `x = 121`: The loop should execute `121 / 91 = 1` time.
+     - `x = 182`: The loop should execute `182 / 91 = 2` times.
+     - `x = 1000`: The loop should execute `1000 / 91 ≈ 10` times.
+
+4. **Invariant: Invalid Opcode Execution**
+   - **Description**: Ensure that the `invalid()` opcode is executed correctly when the memory at `0x10` is zero.
+   - **Edge Cases**:
+     - `x = 0`: The memory should not be zero, so `invalid()` should not be executed.
+     - `x = 1`: The memory should not be zero, so `invalid()` should not be executed.
+     - `x = 120`: The memory should not be zero, so `invalid()` should not be executed.
+     - `x = 121`: The memory should not be zero, so `invalid()` should not be executed.
+     - `x = 1000`: The memory should not be zero, so `invalid()` should not be executed.
+
+5. **Invariant: No Reversion on Valid Input**
+   - **Description**: Ensure that the function does not revert for valid inputs.
+   - **Edge Cases**:
+     - `x = 0`: The function should not revert.
+     - `x = 1`: The function should not revert.
+     - `x = 120`: The function should not revert.
+     - `x = 121`: The function should not revert.
+     - `x = 1000`: The function should not revert.
+
+6. **Invariant: Reversion on Invalid Memory State**
+   - **Description**: Ensure that the function reverts if the memory at `0x10` is zero after the loop.
+   - **Edge Cases**:
+     - Modify the function to force `mstore(0x10, 0)` after the loop and ensure it reverts.
+
+### Summary
+These test invariants cover the critical aspects of the `burn` function, including gas consumption, memory manipulation, loop execution, and the correct handling of the `invalid()` opcode. By testing these invariants, we can ensure that the `GasBurnerLib` library functions as intended under various conditions.

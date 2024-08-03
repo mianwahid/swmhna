@@ -1,0 +1,332 @@
+To ensure the correctness and robustness of the `LibBitmap` library, we need to write test invariants that cover various edge cases for each functionality. Here are the test invariants for the `LibBitmap` library:
+
+### Test Invariants for `LibBitmap`
+
+1. **Invariant for `get` Function**:
+   - **Edge Cases**:
+     - Querying a bit that has never been set should return `false`.
+     - Querying a bit that has been set should return `true`.
+     - Querying a bit that has been unset should return `false`.
+   - **Test Cases**:
+     ```solidity
+     function testGet() public {
+         LibBitmap.Bitmap storage bitmap;
+         assert(!LibBitmap.get(bitmap, 0)); // Never set
+         LibBitmap.set(bitmap, 0);
+         assert(LibBitmap.get(bitmap, 0)); // Set
+         LibBitmap.unset(bitmap, 0);
+         assert(!LibBitmap.get(bitmap, 0)); // Unset
+     }
+     ```
+
+2. **Invariant for `set` Function**:
+   - **Edge Cases**:
+     - Setting a bit should make it `true`.
+     - Setting a bit that is already `true` should remain `true`.
+   - **Test Cases**:
+     ```solidity
+     function testSet() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.set(bitmap, 1);
+         assert(LibBitmap.get(bitmap, 1)); // Set
+         LibBitmap.set(bitmap, 1);
+         assert(LibBitmap.get(bitmap, 1)); // Already set
+     }
+     ```
+
+3. **Invariant for `unset` Function**:
+   - **Edge Cases**:
+     - Unsetting a bit should make it `false`.
+     - Unsetting a bit that is already `false` should remain `false`.
+   - **Test Cases**:
+     ```solidity
+     function testUnset() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.unset(bitmap, 2);
+         assert(!LibBitmap.get(bitmap, 2)); // Already unset
+         LibBitmap.set(bitmap, 2);
+         LibBitmap.unset(bitmap, 2);
+         assert(!LibBitmap.get(bitmap, 2)); // Unset
+     }
+     ```
+
+4. **Invariant for `toggle` Function**:
+   - **Edge Cases**:
+     - Toggling a bit should flip its value.
+     - Toggling a bit twice should return it to its original value.
+   - **Test Cases**:
+     ```solidity
+     function testToggle() public {
+         LibBitmap.Bitmap storage bitmap;
+         bool newIsSet = LibBitmap.toggle(bitmap, 3);
+         assert(newIsSet == true); // Toggled to true
+         newIsSet = LibBitmap.toggle(bitmap, 3);
+         assert(newIsSet == false); // Toggled back to false
+     }
+     ```
+
+5. **Invariant for `setTo` Function**:
+   - **Edge Cases**:
+     - Setting a bit to `true` should make it `true`.
+     - Setting a bit to `false` should make it `false`.
+     - Setting a bit to its current value should not change it.
+   - **Test Cases**:
+     ```solidity
+     function testSetTo() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.setTo(bitmap, 4, true);
+         assert(LibBitmap.get(bitmap, 4)); // Set to true
+         LibBitmap.setTo(bitmap, 4, false);
+         assert(!LibBitmap.get(bitmap, 4)); // Set to false
+         LibBitmap.setTo(bitmap, 4, false);
+         assert(!LibBitmap.get(bitmap, 4)); // Already false
+     }
+     ```
+
+6. **Invariant for `setBatch` Function**:
+   - **Edge Cases**:
+     - Setting a batch of bits should make all of them `true`.
+     - Setting a batch that spans multiple storage slots.
+   - **Test Cases**:
+     ```solidity
+     function testSetBatch() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.setBatch(bitmap, 5, 10);
+         for (uint256 i = 5; i < 15; i++) {
+             assert(LibBitmap.get(bitmap, i)); // All set to true
+         }
+         LibBitmap.setBatch(bitmap, 255, 10);
+         for (uint256 i = 255; i < 265; i++) {
+             assert(LibBitmap.get(bitmap, i)); // All set to true
+         }
+     }
+     ```
+
+7. **Invariant for `unsetBatch` Function**:
+   - **Edge Cases**:
+     - Unsetting a batch of bits should make all of them `false`.
+     - Unsetting a batch that spans multiple storage slots.
+   - **Test Cases**:
+     ```solidity
+     function testUnsetBatch() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.setBatch(bitmap, 6, 10);
+         LibBitmap.unsetBatch(bitmap, 6, 10);
+         for (uint256 i = 6; i < 16; i++) {
+             assert(!LibBitmap.get(bitmap, i)); // All unset to false
+         }
+         LibBitmap.setBatch(bitmap, 255, 10);
+         LibBitmap.unsetBatch(bitmap, 255, 10);
+         for (uint256 i = 255; i < 265; i++) {
+             assert(!LibBitmap.get(bitmap, i)); // All unset to false
+         }
+     }
+     ```
+
+8. **Invariant for `popCount` Function**:
+   - **Edge Cases**:
+     - Counting the number of set bits in a range.
+     - Counting in a range that spans multiple storage slots.
+   - **Test Cases**:
+     ```solidity
+     function testPopCount() public {
+         LibBitmap.Bitmap storage bitmap;
+         LibBitmap.setBatch(bitmap, 7, 10);
+         assert(LibBitmap.popCount(bitmap, 7, 10) == 10); // 10 bits set
+         LibBitmap.setBatch(bitmap, 255, 10);
+         assert(LibBitmap.popCount(bitmap, 255, 10) == 10); // 10 bits set
+     }
+     ```
+
+9. **Invariant for `findLastSet` Function**:
+   - **Edge Cases**:
+     - Finding the last set bit in a range.
+     - Finding in a range that spans multiple storage slots.
+     - No set bit in the range.
+   - **Test Cases**:
+     ```solidity
+     function testFindLastSet() public {
+         LibBitmap.Bitmap storage bitmap;
+         assert(LibBitmap.findLastSet(bitmap, 100) == LibBitmap.NOT_FOUND); // No set bit
+         LibBitmap.set(bitmap, 50);
+         assert(LibBitmap.findLastSet(bitmap, 100) == 50); // Last set bit at 50
+         LibBitmap.set(bitmap, 75);
+         assert(LibBitmap.findLastSet(bitmap, 100) == 75); // Last set bit at 75
+     }
+     ```
+
+### Test Invariants for `LibBit`
+
+1. **Invariant for `fls` Function**:
+   - **Edge Cases**:
+     - Finding the last set bit in a value.
+     - No set bit in the value.
+   - **Test Cases**:
+     ```solidity
+     function testFls() public {
+         assert(LibBit.fls(0) == 256); // No set bit
+         assert(LibBit.fls(1) == 0); // Last set bit at 0
+         assert(LibBit.fls(2) == 1); // Last set bit at 1
+         assert(LibBit.fls(3) == 1); // Last set bit at 1
+     }
+     ```
+
+2. **Invariant for `clz` Function**:
+   - **Edge Cases**:
+     - Counting leading zeros in a value.
+     - No leading zeros in the value.
+   - **Test Cases**:
+     ```solidity
+     function testClz() public {
+         assert(LibBit.clz(0) == 256); // All zeros
+         assert(LibBit.clz(1) == 255); // 255 leading zeros
+         assert(LibBit.clz(2) == 254); // 254 leading zeros
+         assert(LibBit.clz(3) == 254); // 254 leading zeros
+     }
+     ```
+
+3. **Invariant for `ffs` Function**:
+   - **Edge Cases**:
+     - Finding the first set bit in a value.
+     - No set bit in the value.
+   - **Test Cases**:
+     ```solidity
+     function testFfs() public {
+         assert(LibBit.ffs(0) == 256); // No set bit
+         assert(LibBit.ffs(1) == 0); // First set bit at 0
+         assert(LibBit.ffs(2) == 1); // First set bit at 1
+         assert(LibBit.ffs(3) == 0); // First set bit at 0
+     }
+     ```
+
+4. **Invariant for `popCount` Function**:
+   - **Edge Cases**:
+     - Counting the number of set bits in a value.
+     - No set bits in the value.
+   - **Test Cases**:
+     ```solidity
+     function testPopCount() public {
+         assert(LibBit.popCount(0) == 0); // No set bits
+         assert(LibBit.popCount(1) == 1); // 1 set bit
+         assert(LibBit.popCount(3) == 2); // 2 set bits
+         assert(LibBit.popCount(255) == 8); // 8 set bits
+     }
+     ```
+
+5. **Invariant for `isPo2` Function**:
+   - **Edge Cases**:
+     - Checking if a value is a power of 2.
+     - Value is not a power of 2.
+   - **Test Cases**:
+     ```solidity
+     function testIsPo2() public {
+         assert(!LibBit.isPo2(0)); // Not a power of 2
+         assert(LibBit.isPo2(1)); // Power of 2
+         assert(LibBit.isPo2(2)); // Power of 2
+         assert(!LibBit.isPo2(3)); // Not a power of 2
+     }
+     ```
+
+6. **Invariant for `reverseBits` Function**:
+   - **Edge Cases**:
+     - Reversing the bits in a value.
+     - Reversing a value with all bits set.
+   - **Test Cases**:
+     ```solidity
+     function testReverseBits() public {
+         assert(LibBit.reverseBits(0) == 0); // All zeros
+         assert(LibBit.reverseBits(1) == 2**255); // Reversed 1
+         assert(LibBit.reverseBits(2**255) == 1); // Reversed 2**255
+         assert(LibBit.reverseBits(type(uint256).max) == type(uint256).max); // All bits set
+     }
+     ```
+
+7. **Invariant for `reverseBytes` Function**:
+   - **Edge Cases**:
+     - Reversing the bytes in a value.
+     - Reversing a value with all bytes set.
+   - **Test Cases**:
+     ```solidity
+     function testReverseBytes() public {
+         assert(LibBit.reverseBytes(0) == 0); // All zeros
+         assert(LibBit.reverseBytes(1) == 2**248); // Reversed 1
+         assert(LibBit.reverseBytes(2**248) == 1); // Reversed 2**248
+         assert(LibBit.reverseBytes(type(uint256).max) == type(uint256).max); // All bytes set
+     }
+     ```
+
+8. **Invariant for `rawAnd` Function**:
+   - **Edge Cases**:
+     - Performing a bitwise AND on two boolean values.
+   - **Test Cases**:
+     ```solidity
+     function testRawAnd() public {
+         assert(!LibBit.rawAnd(false, false)); // false & false
+         assert(!LibBit.rawAnd(false, true)); // false & true
+         assert(!LibBit.rawAnd(true, false)); // true & false
+         assert(LibBit.rawAnd(true, true)); // true & true
+     }
+     ```
+
+9. **Invariant for `and` Function**:
+   - **Edge Cases**:
+     - Performing a bitwise AND on two boolean values, ensuring they are clean.
+   - **Test Cases**:
+     ```solidity
+     function testAnd() public {
+         assert(!LibBit.and(false, false)); // false & false
+         assert(!LibBit.and(false, true)); // false & true
+         assert(!LibBit.and(true, false)); // true & false
+         assert(LibBit.and(true, true)); // true & true
+     }
+     ```
+
+10. **Invariant for `rawOr` Function**:
+    - **Edge Cases**:
+      - Performing a bitwise OR on two boolean values.
+    - **Test Cases**:
+      ```solidity
+      function testRawOr() public {
+          assert(!LibBit.rawOr(false, false)); // false | false
+          assert(LibBit.rawOr(false, true)); // false | true
+          assert(LibBit.rawOr(true, false)); // true | false
+          assert(LibBit.rawOr(true, true)); // true | true
+      }
+      ```
+
+11. **Invariant for `or` Function**:
+    - **Edge Cases**:
+      - Performing a bitwise OR on two boolean values, ensuring they are clean.
+    - **Test Cases**:
+      ```solidity
+      function testOr() public {
+          assert(!LibBit.or(false, false)); // false | false
+          assert(LibBit.or(false, true)); // false | true
+          assert(LibBit.or(true, false)); // true | false
+          assert(LibBit.or(true, true)); // true | true
+      }
+      ```
+
+12. **Invariant for `rawToUint` Function**:
+    - **Edge Cases**:
+      - Converting a boolean value to a `uint256`.
+    - **Test Cases**:
+      ```solidity
+      function testRawToUint() public {
+          assert(LibBit.rawToUint(false) == 0); // false to uint
+          assert(LibBit.rawToUint(true) == 1); // true to uint
+      }
+      ```
+
+13. **Invariant for `toUint` Function**:
+    - **Edge Cases**:
+      - Converting a boolean value to a `uint256`, ensuring it is clean.
+    - **Test Cases**:
+      ```solidity
+      function testToUint() public {
+          assert(LibBit.toUint(false) == 0); // false to uint
+          assert(LibBit.toUint(true) == 1); // true to uint
+      }
+      ```
+
+These test invariants cover the edge cases for each functionality provided by the `LibBitmap` and `LibBit` libraries, ensuring their correctness and robustness.

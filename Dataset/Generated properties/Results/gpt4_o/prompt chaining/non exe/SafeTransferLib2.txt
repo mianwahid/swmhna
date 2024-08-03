@@ -1,0 +1,85 @@
+To ensure the robustness and correctness of the `SafeTransferLib` library, we need to define test invariants that cover various edge cases for each functionality. Here are the test invariants for the provided smart contract:
+
+### ETH Operations
+
+1. **safeTransferETH**
+   - **Invariant**: The function should revert if the contract has insufficient balance.
+   - **Invariant**: The function should revert if the recipient address reverts.
+   - **Invariant**: The function should succeed if the contract has sufficient balance and the recipient address does not revert.
+
+2. **safeTransferAllETH**
+   - **Invariant**: The function should revert if the recipient address reverts.
+   - **Invariant**: The function should transfer all ETH in the contract to the recipient address if the recipient address does not revert.
+
+3. **forceSafeTransferETH**
+   - **Invariant**: The function should revert if the contract has insufficient balance.
+   - **Invariant**: The function should use `SELFDESTRUCT` to transfer ETH if the initial transfer attempt fails.
+   - **Invariant**: The function should succeed if the contract has sufficient balance and the recipient address does not revert.
+
+4. **forceSafeTransferAllETH**
+   - **Invariant**: The function should use `SELFDESTRUCT` to transfer all ETH if the initial transfer attempt fails.
+   - **Invariant**: The function should succeed if the recipient address does not revert.
+
+5. **trySafeTransferETH**
+   - **Invariant**: The function should return `false` if the contract has insufficient balance.
+   - **Invariant**: The function should return `false` if the recipient address reverts.
+   - **Invariant**: The function should return `true` if the contract has sufficient balance and the recipient address does not revert.
+
+6. **trySafeTransferAllETH**
+   - **Invariant**: The function should return `false` if the recipient address reverts.
+   - **Invariant**: The function should return `true` if the recipient address does not revert.
+
+### ERC20 Operations
+
+1. **safeTransferFrom**
+   - **Invariant**: The function should revert if the `from` address has insufficient balance.
+   - **Invariant**: The function should revert if the `from` address has not approved the contract to spend the specified amount.
+   - **Invariant**: The function should succeed if the `from` address has sufficient balance and has approved the contract to spend the specified amount.
+
+2. **trySafeTransferFrom**
+   - **Invariant**: The function should return `false` if the `from` address has insufficient balance.
+   - **Invariant**: The function should return `false` if the `from` address has not approved the contract to spend the specified amount.
+   - **Invariant**: The function should return `true` if the `from` address has sufficient balance and has approved the contract to spend the specified amount.
+
+3. **safeTransferAllFrom**
+   - **Invariant**: The function should revert if the `from` address has not approved the contract to spend the entire balance.
+   - **Invariant**: The function should transfer the entire balance of the `from` address to the `to` address if the `from` address has approved the contract to spend the entire balance.
+
+4. **safeTransfer**
+   - **Invariant**: The function should revert if the contract has insufficient balance.
+   - **Invariant**: The function should succeed if the contract has sufficient balance.
+
+5. **safeTransferAll**
+   - **Invariant**: The function should revert if the contract has insufficient balance.
+   - **Invariant**: The function should transfer the entire balance of the contract to the `to` address if the contract has sufficient balance.
+
+6. **safeApprove**
+   - **Invariant**: The function should revert if the approval fails.
+   - **Invariant**: The function should succeed if the approval is successful.
+
+7. **safeApproveWithRetry**
+   - **Invariant**: The function should revert if both the initial approval and the retry fail.
+   - **Invariant**: The function should succeed if either the initial approval or the retry is successful.
+
+8. **balanceOf**
+   - **Invariant**: The function should return zero if the token does not exist.
+   - **Invariant**: The function should return the correct balance of the `account` if the token exists.
+
+9. **safeTransferFrom2**
+   - **Invariant**: The function should revert if both the initial transfer and the Permit2 transfer fail.
+   - **Invariant**: The function should succeed if either the initial transfer or the Permit2 transfer is successful.
+
+10. **permit2TransferFrom**
+    - **Invariant**: The function should revert if the Permit2 transfer fails.
+    - **Invariant**: The function should succeed if the Permit2 transfer is successful.
+
+11. **permit2**
+    - **Invariant**: The function should revert if both the native permit and the Permit2 permit fail.
+    - **Invariant**: The function should succeed if either the native permit or the Permit2 permit is successful.
+
+12. **simplePermit2**
+    - **Invariant**: The function should revert if the Permit2 permit fails.
+    - **Invariant**: The function should succeed if the Permit2 permit is successful.
+
+### Summary
+These test invariants cover various edge cases for each functionality provided by the `SafeTransferLib` library. They ensure that the library handles different scenarios correctly, including insufficient balances, failed approvals, and failed transfers. By testing these invariants, we can ensure the robustness and reliability of the library.

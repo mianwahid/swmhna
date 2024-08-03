@@ -1,0 +1,90 @@
+The provided smart contract is a library named `SSTORE2` that allows for efficient storage and retrieval of data on the Ethereum blockchain. It achieves this by deploying small contracts that store the data in their bytecode, which can be read later. Below is a detailed explanation of each functionality provided by the contract:
+
+### Constants
+
+1. **DATA_OFFSET**
+   ```solidity
+   uint256 internal constant DATA_OFFSET = 1;
+   ```
+   - This constant is used to skip the first byte of the contract's bytecode, which is a STOP opcode. This ensures that the contract cannot be called.
+
+### Custom Errors
+
+2. **DeploymentFailed**
+   ```solidity
+   error DeploymentFailed();
+   ```
+   - This error is thrown when the deployment of a storage contract fails.
+
+3. **InvalidPointer**
+   ```solidity
+   error InvalidPointer();
+   ```
+   - This error is thrown when the address of the storage contract is invalid.
+
+4. **ReadOutOfBounds**
+   ```solidity
+   error ReadOutOfBounds();
+   ```
+   - This error is thrown when an attempt is made to read outside the bounds of the storage contract's bytecode.
+
+### Write Logic
+
+5. **write**
+   ```solidity
+   function write(bytes memory data) internal returns (address pointer)
+   ```
+   - This function writes the provided `data` into the bytecode of a new storage contract and returns its address.
+   - It prefixes the data with a STOP opcode to ensure the contract cannot be called.
+   - If the deployment fails, it reverts with the `DeploymentFailed` error.
+
+6. **writeDeterministic**
+   ```solidity
+   function writeDeterministic(bytes memory data, bytes32 salt) internal returns (address pointer)
+   ```
+   - This function writes the provided `data` into the bytecode of a new storage contract using a deterministic address (using `create2`) and returns its address.
+   - It also prefixes the data with a STOP opcode.
+   - If the deployment fails, it reverts with the `DeploymentFailed` error.
+
+### Utility Functions
+
+7. **initCodeHash**
+   ```solidity
+   function initCodeHash(bytes memory data) internal pure returns (bytes32 hash)
+   ```
+   - This function returns the initialization code hash of the storage contract for the provided `data`.
+   - It is useful for mining vanity addresses with `create2`.
+
+8. **predictDeterministicAddress**
+   ```solidity
+   function predictDeterministicAddress(bytes memory data, bytes32 salt, address deployer) internal pure returns (address predicted)
+   ```
+   - This function returns the address of the storage contract for the provided `data` deployed with `salt` by `deployer`.
+   - Note: The returned result has dirty upper 96 bits, which should be cleaned if used in assembly.
+
+### Read Logic
+
+9. **read**
+   ```solidity
+   function read(address pointer) internal view returns (bytes memory data)
+   ```
+   - This function returns all the `data` from the bytecode of the storage contract at the given `pointer`.
+   - It checks if the `pointer` is valid and skips the STOP opcode.
+
+10. **read (with start)**
+    ```solidity
+    function read(address pointer, uint256 start) internal view returns (bytes memory data)
+    ```
+    - This function returns the `data` from the bytecode of the storage contract at the given `pointer`, starting from the byte at `start` to the end of the data stored.
+    - It checks if the `pointer` is valid and if the `start` position is within bounds.
+
+11. **read (with start and end)**
+    ```solidity
+    function read(address pointer, uint256 start, uint256 end) internal view returns (bytes memory data)
+    ```
+    - This function returns the `data` from the bytecode of the storage contract at the given `pointer`, from the byte at `start` to the byte at `end` (exclusive) of the data stored.
+    - It checks if the `pointer` is valid and if the `start` and `end` positions are within bounds and valid.
+
+### Summary
+
+The `SSTORE2` library provides a cost-efficient way to store and retrieve data on the Ethereum blockchain by deploying small contracts that store the data in their bytecode. The library includes functions for writing data to these storage contracts, both deterministically and non-deterministically, and for reading the data back. It also includes utility functions for predicting the addresses of these storage contracts and for computing their initialization code hashes. Custom errors are defined to handle various failure scenarios.

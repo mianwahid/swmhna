@@ -1,0 +1,94 @@
+## Test Invariants for LibPRNG Smart Contract
+
+This document outlines test invariants for the `LibPRNG` smart contract, focusing on edge cases and ensuring the contract's functionalities work as intended.
+
+**Part 1: Pseudorandom Number Generation (PRNG) in Memory**
+
+**Function: `seed(PRNG memory prng, uint256 state)`**
+
+* **Invariant:** After calling `seed`, the `state` of the `prng` struct MUST be equal to the provided `state` value.
+
+**Function: `next(PRNG memory prng) internal pure returns (uint256 result)`**
+
+* **Invariant:** Each call to `next` MUST produce a different `result` than the previous call, given the same initial `prng` state.
+* **Invariant:** The distribution of `result` values over multiple calls MUST exhibit characteristics of a uniform distribution (test with statistical analysis).
+
+**Function: `uniform(PRNG memory prng, uint256 upper) internal pure returns (uint256 result)`**
+
+* **Invariant:** `result` MUST always be within the range `[0, upper)`, meaning `0 <= result < upper`.
+* **Invariant:** When called multiple times with the same `upper` and different `prng` states, the distribution of `result` values MUST be uniform within the specified range (test with statistical analysis).
+* **Edge Case:** Test with `upper` values of `1`, `2`, and other small numbers to ensure correct behavior at the boundaries.
+
+**Function: `shuffle(PRNG memory prng, uint256[] memory a) internal pure`**
+
+* **Invariant:** After calling `shuffle`, all elements of array `a` MUST be present, but their order may be different.
+* **Invariant:** The probability of each possible permutation of `a` MUST be equal (test with a large number of shuffles and statistical analysis).
+* **Edge Case:** Test with arrays of size `0`, `1`, `2`, and other small sizes to ensure correct behavior.
+
+**Function: `shuffle(PRNG memory prng, bytes memory a) internal pure`**
+
+* **Invariant:** After calling `shuffle`, all bytes of `a` MUST be present, but their order may be different.
+* **Invariant:** The probability of each possible permutation of `a` MUST be equal (test with a large number of shuffles and statistical analysis).
+* **Edge Case:** Test with byte arrays of size `0`, `1`, `2`, and other small sizes to ensure correct behavior.
+
+**Function: `standardNormalWad(PRNG memory prng) internal pure returns (int256 result)`**
+
+* **Invariant:** The distribution of `result` values over multiple calls MUST approximate a standard normal distribution (test with statistical analysis, e.g., Kolmogorov-Smirnov test).
+
+**Function: `exponentialWad(PRNG memory prng) internal pure returns (uint256 result)`**
+
+* **Invariant:** The distribution of `result` values over multiple calls MUST approximate a unit exponential distribution (test with statistical analysis, e.g., Kolmogorov-Smirnov test).
+
+**Part 2: Lazy Fisher-Yates Shuffling in Storage**
+
+**Function: `initialize(LazyShuffler storage $, uint256 n) internal`**
+
+* **Invariant:** After calling `initialize`, `length($)` MUST equal `n`.
+* **Invariant:** `numShuffled($)` MUST be `0`.
+* **Error Handling:** Reverts with `InvalidInitialLazyShufflerLength` if `n == 0 || n >= 2**32 - 1`.
+* **Error Handling:** Reverts with `LazyShufflerAlreadyInitialized` if `$` has already been initialized.
+
+**Function: `grow(LazyShuffler storage $, uint256 n) internal`**
+
+* **Invariant:** After calling `grow`, `length($)` MUST equal `n`.
+* **Invariant:** `numShuffled($)` MUST remain unchanged.
+* **Error Handling:** Reverts with `InvalidNewLazyShufflerLength` if `n` is less than the current length of `$`.
+* **Error Handling:** Reverts with `LazyShufflerNotInitialized` if `$` has not been initialized.
+
+**Function: `restart(LazyShuffler storage $) internal`**
+
+* **Invariant:** After calling `restart`, `numShuffled($)` MUST be `0`.
+* **Invariant:** `length($)` MUST remain unchanged.
+* **Error Handling:** Reverts with `LazyShufflerNotInitialized` if `$` has not been initialized.
+
+**Function: `numShuffled(LazyShuffler storage $) internal view returns (uint256 result)`**
+
+* **Invariant:** `result` MUST always be less than or equal to `length($)`.
+
+**Function: `length(LazyShuffler storage $) internal view returns (uint256 result)`**
+
+* **Invariant:** `result` MUST be `0` if `$` is not initialized.
+* **Invariant:** `result` MUST be non-zero and less than `2**32 - 1` if `$` is initialized.
+
+**Function: `initialized(LazyShuffler storage $) internal view returns (bool result)`**
+
+* **Invariant:** `result` MUST be `true` if and only if `$` has been initialized.
+
+**Function: `finished(LazyShuffler storage $) internal view returns (bool result)`**
+
+* **Invariant:** `result` MUST be `true` if and only if `numShuffled($)` equals `length($)`.
+* **Error Handling:** Reverts with `LazyShufflerNotInitialized` if `$` has not been initialized.
+
+**Function: `get(LazyShuffler storage $, uint256 index) internal view returns (uint256 result)`**
+
+* **Invariant:** `result` MUST be a value within the range `[0, length($))`, considering all previous shuffles.
+* **Error Handling:** Reverts with `LazyShufflerGetOutOfBounds` if `index >= length($)`.
+
+**Function: `next(LazyShuffler storage $, uint256 randomness) internal returns (uint256 chosen)`**
+
+* **Invariant:** After each call, `numShuffled($)` MUST increment by `1`.
+* **Invariant:** `chosen` MUST be a value within the range `[0, length($))` that has not been returned by previous calls to `next` for the same `$`.
+* **Error Handling:** Reverts with `LazyShuffleFinished` if `numShuffled($)` equals `length($)`.
+* **Error Handling:** Reverts with `LazyShufflerNotInitialized` if `$` has not been initialized.
+
+These test invariants provide a comprehensive framework for testing the `LibPRNG` smart contract. By focusing on edge cases and ensuring the invariants hold true, we can gain confidence in the correctness and reliability of this library for generating pseudorandom numbers and performing lazy Fisher-Yates shuffles.

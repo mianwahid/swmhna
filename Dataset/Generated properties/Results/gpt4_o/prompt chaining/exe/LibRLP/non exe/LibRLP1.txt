@@ -1,0 +1,85 @@
+The provided smart contract is a Solidity library named `LibRLP` that is designed to compute the address where a contract will be stored if deployed via a specific deployer address and nonce using the `CREATE` opcode. Below is a detailed explanation of its functionalities:
+
+### Library Declaration
+```solidity
+library LibRLP {
+```
+- **Library**: This is a Solidity library, which means it contains reusable code that can be called by other contracts. Libraries in Solidity are similar to contracts but cannot hold state or receive Ether.
+
+### Function: `computeAddress`
+```solidity
+function computeAddress(address deployer, uint256 nonce)
+    internal
+    pure
+    returns (address deployed)
+```
+- **Function Name**: `computeAddress`
+- **Visibility**: `internal` - This function can only be called within the library or by contracts that use the library.
+- **State Mutability**: `pure` - This function does not read or modify the state of the blockchain.
+- **Parameters**:
+  - `address deployer`: The address of the deployer (the account or contract that is deploying the new contract).
+  - `uint256 nonce`: The nonce of the deployer at the time of deployment. The nonce is a counter that is incremented with each transaction sent from an address.
+- **Returns**: `address deployed` - The computed address where the contract will be deployed.
+
+### Function Logic
+The function uses assembly code to compute the address based on the deployer address and nonce. Here is a step-by-step breakdown of the logic:
+
+1. **Assembly Block**:
+   ```solidity
+   assembly {
+   ```
+   - The function uses inline assembly for low-level operations and optimizations.
+
+2. **Loop and Conditional Check**:
+   ```solidity
+   for {} 1 {} {
+       if iszero(gt(nonce, 0x7f)) {
+   ```
+   - A loop is initiated, but it will only run once due to the `break` statements.
+   - The condition `if iszero(gt(nonce, 0x7f))` checks if the nonce is less than or equal to 127 (0x7f). This is because nonces in this range have a simpler encoding.
+
+3. **Simple Nonce Encoding**:
+   ```solidity
+   mstore(0x00, deployer)
+   mstore8(0x0b, 0x94)
+   mstore8(0x0a, 0xd6)
+   mstore8(0x20, or(shl(7, iszero(nonce)), nonce))
+   deployed := keccak256(0x0a, 0x17)
+   break
+   ```
+   - If the nonce is less than or equal to 127:
+     - The deployer address is stored in memory.
+     - Specific bytes are stored to represent the RLP encoding.
+     - The nonce is stored with appropriate encoding.
+     - The `keccak256` hash is computed over the memory range to get the deployed address.
+     - The loop is exited with `break`.
+
+4. **Complex Nonce Encoding**:
+   ```solidity
+   let i := 8
+   for {} shr(i, nonce) { i := add(i, 8) } {}
+   i := shr(3, i)
+   mstore(i, nonce)
+   mstore(0x00, shl(8, deployer))
+   mstore8(0x1f, add(0x80, i))
+   mstore8(0x0a, 0x94)
+   mstore8(0x09, add(0xd6, i))
+   deployed := keccak256(0x09, add(0x17, i))
+   break
+   ```
+   - If the nonce is greater than 127:
+     - A loop calculates the number of bytes needed to represent the nonce.
+     - The nonce is stored in memory with the appropriate length prefix.
+     - The deployer address is stored with a shift to align it correctly.
+     - Specific bytes are stored to represent the RLP encoding.
+     - The `keccak256` hash is computed over the memory range to get the deployed address.
+     - The loop is exited with `break`.
+
+5. **End of Assembly Block**:
+   ```solidity
+   }
+   ```
+   - The assembly block is closed.
+
+### Summary
+The `LibRLP` library provides a single function `computeAddress` that calculates the address of a contract deployed by a specific deployer with a given nonce. It uses the RLP encoding scheme and inline assembly for efficient computation. The function handles both simple and complex nonce values, ensuring accurate address computation based on the Ethereum Yellow Paper and EIP specifications.

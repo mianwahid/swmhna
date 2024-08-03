@@ -1,0 +1,72 @@
+To ensure the robustness and correctness of the `LibPRNG` library, we need to write test invariants that cover all functionalities and edge cases. Here are the test invariants for each functionality:
+
+### PRNG Operations
+
+1. **seed(PRNG memory prng, uint256 state)**
+   - **Invariant**: After seeding, the state of the PRNG should be equal to the provided state.
+   - **Edge Case**: Seed with the maximum possible `uint256` value.
+
+2. **next(PRNG memory prng)**
+   - **Invariant**: The state of the PRNG should change after calling `next`.
+   - **Edge Case**: Call `next` multiple times and ensure that the state changes each time.
+
+3. **uniform(PRNG memory prng, uint256 upper)**
+   - **Invariant**: The returned value should be between 0 (inclusive) and `upper` (exclusive).
+   - **Edge Case**: Test with `upper` as 1 (should always return 0) and with the maximum possible `uint256` value.
+
+4. **shuffle(PRNG memory prng, uint256[] memory a)**
+   - **Invariant**: The shuffled array should contain the same elements as the original array.
+   - **Edge Case**: Shuffle an empty array, a single-element array, and a large array.
+
+5. **shuffle(PRNG memory prng, bytes memory a)**
+   - **Invariant**: The shuffled byte array should contain the same bytes as the original array.
+   - **Edge Case**: Shuffle an empty byte array, a single-byte array, and a large byte array.
+
+6. **standardNormalWad(PRNG memory prng)**
+   - **Invariant**: The returned value should be a sample from the standard normal distribution.
+   - **Edge Case**: Call multiple times and ensure the distribution of values is approximately normal.
+
+7. **exponentialWad(PRNG memory prng)**
+   - **Invariant**: The returned value should be a sample from the unit exponential distribution.
+   - **Edge Case**: Call multiple times and ensure the distribution of values is approximately exponential.
+
+### Lazy Shuffler Operations
+
+1. **initialize(LazyShuffler storage $, uint256 n)**
+   - **Invariant**: The lazy shuffler should be initialized with the correct length.
+   - **Edge Case**: Initialize with `n` as 0 (should revert) and with the maximum possible value (`2**32 - 1`).
+
+2. **grow(LazyShuffler storage $, uint256 n)**
+   - **Invariant**: The length of the lazy shuffler should increase to the new length.
+   - **Edge Case**: Grow to a length smaller than the current length (should revert) and grow to the maximum possible value.
+
+3. **restart(LazyShuffler storage $)**
+   - **Invariant**: The `numShuffled` should be reset to zero.
+   - **Edge Case**: Restart an uninitialized shuffler (should revert).
+
+4. **numShuffled(LazyShuffler storage $)**
+   - **Invariant**: The returned value should be the number of elements that have been shuffled.
+   - **Edge Case**: Call before and after shuffling elements.
+
+5. **length(LazyShuffler storage $)**
+   - **Invariant**: The returned value should be the length of the lazy shuffler.
+   - **Edge Case**: Call on an uninitialized shuffler (should return zero).
+
+6. **initialized(LazyShuffler storage $)**
+   - **Invariant**: The returned value should indicate whether the lazy shuffler has been initialized.
+   - **Edge Case**: Call before and after initialization.
+
+7. **finished(LazyShuffler storage $)**
+   - **Invariant**: The returned value should indicate whether there are any more elements left to shuffle.
+   - **Edge Case**: Call on an uninitialized shuffler (should revert) and after all elements have been shuffled.
+
+8. **get(LazyShuffler storage $, uint256 index)**
+   - **Invariant**: The returned value should be the current value stored at the given index.
+   - **Edge Case**: Query an index out of bounds (should revert) and query all indices after shuffling.
+
+9. **next(LazyShuffler storage $, uint256 randomness)**
+   - **Invariant**: The returned value should be the next value in the shuffled range.
+   - **Edge Case**: Call when no more values are left to shuffle (should revert) and call on an uninitialized shuffler (should revert).
+
+### Summary
+These test invariants ensure that the `LibPRNG` library functions correctly under various conditions and edge cases. They cover the initialization, state changes, and boundary conditions for both the PRNG and lazy shuffler functionalities.

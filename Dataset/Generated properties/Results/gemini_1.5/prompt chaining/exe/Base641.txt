@@ -1,0 +1,45 @@
+This smart contract provides functionalities for encoding and decoding data using the Base64 encoding scheme as described in RFC 4648. Let's break down the code:
+
+**1. `library Base64`:**
+
+   - This line declares a library named `Base64`. Libraries in Solidity are collections of functions that can be called by other contracts to perform specific tasks. In this case, the `Base64` library provides functions for Base64 encoding and decoding.
+
+**2. `encode` Function (Multiple Overloads):**
+
+   - **Purpose:** Encodes bytes data into a Base64 encoded string.
+   - **Overloads:**
+     - `encode(bytes memory data, bool fileSafe, bool noPadding)`: This is the most versatile overload. It takes the following arguments:
+       - `data`: The bytes data to be encoded.
+       - `fileSafe`: A boolean flag indicating whether to use the file-safe encoding variant (replacing '+' with '-' and '/' with '_').
+       - `noPadding`: A boolean flag indicating whether to omit the padding characters ('=') at the end of the encoded string.
+     - `encode(bytes memory data)`: This overload encodes the data using the standard Base64 encoding (not file-safe, with padding).
+     - `encode(bytes memory data, bool fileSafe)`: This overload allows specifying whether to use file-safe encoding but always includes padding.
+
+   - **How it Works:**
+     - The function uses assembly code for efficient manipulation of data in memory.
+     - It calculates the length of the encoded string based on the input data length.
+     - It iterates through the input data in chunks of 3 bytes and encodes them into 4 Base64 characters.
+     - It handles padding (if enabled) and file-safe encoding (if enabled).
+     - Finally, it returns the resulting Base64 encoded string.
+
+**3. `decode` Function:**
+
+   - **Purpose:** Decodes a Base64 encoded string back into its original bytes data.
+   - **Arguments:**
+     - `data`: The Base64 encoded string to be decoded.
+
+   - **How it Works:**
+     - Similar to the `encode` function, it uses assembly for efficiency.
+     - It calculates the expected length of the decoded data.
+     - It handles both padded and non-padded encoded strings.
+     - It decodes the input string in chunks of 4 characters, converting them back to 3 bytes of data.
+     - It returns the decoded bytes data.
+
+**Important Notes:**
+
+   - **Error Handling:** The `decode` function, for performance reasons, does not include explicit error handling for invalid Base64 input. It's the responsibility of the caller to ensure the input string is valid.
+   - **Memory Efficiency:** The use of assembly in both `encode` and `decode` functions is crucial for optimizing memory usage and gas costs, making these operations more efficient on the blockchain.
+
+**In Summary:**
+
+This `Base64` library provides a robust and gas-efficient way for Solidity contracts to work with Base64 encoded data, a common requirement when interacting with off-chain systems or storing data in a compact format.

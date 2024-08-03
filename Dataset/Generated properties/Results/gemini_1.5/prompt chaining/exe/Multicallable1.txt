@@ -1,0 +1,50 @@
+## Multicallable Smart Contract Functionality Breakdown
+
+This smart contract provides a single function, `multicall`, which allows users to execute multiple methods on the contract in a single transaction. This can be incredibly efficient, saving gas and time.
+
+Here's a detailed breakdown of the `multicall` function:
+
+**Function Signature:**
+
+```solidity
+function multicall(bytes[] calldata data) public virtual returns (bytes[] memory)
+```
+
+**Parameters:**
+
+* **`data`:** An array of `bytes` where each element represents the calldata for a specific function call. This calldata should be formatted as if you were directly calling the function.
+
+**Return Value:**
+
+* An array of `bytes` where each element contains the return data of the corresponding function call made within the `multicall`.
+
+**Functionality:**
+
+1. **Initialization:**
+    * The function initializes memory space to store the results of each function call.
+    * It performs an early return if the `data` array is empty.
+
+2. **Iterating through Function Calls:**
+    * The function iterates through each `bytes` element in the `data` array.
+    * For each element:
+        * It retrieves the calldata for the function call from the `data` array.
+        * It uses `delegatecall` to execute the function call on the current contract. 
+            * `delegatecall` is crucial here as it executes the called function in the context of the calling contract, meaning it can modify the calling contract's state.
+        * It captures the return data from the `delegatecall`.
+
+3. **Handling Reverts:**
+    * If any of the `delegatecall` executions revert, the entire `multicall` function reverts, ensuring atomicity. The error message from the reverted call is bubbled up.
+
+4. **Storing and Returning Results:**
+    * The return data from each successful `delegatecall` is appended to the `results` array.
+    * Once all function calls are processed, the `multicall` function returns the `results` array.
+
+**Important Considerations:**
+
+* **Non-Payable:** The `multicall` function is deliberately non-payable to prevent potential double-spending vulnerabilities.
+* **ERC2771 Compatibility:** The contract explicitly states that it's NOT designed to work with ERC2771 out-of-the-box due to potential security risks. Using it with ERC2771 requires careful consideration and potential modifications.
+* **Alternative Patterns:** The contract recommends exploring alternative patterns like the `multicaller` library from Vectorized for enhanced flexibility, future-proofing, and security.
+
+**In Summary:**
+
+The `Multicallable` contract provides a powerful and efficient way to batch multiple function calls into a single transaction. However, it's crucial to be aware of its limitations, especially regarding ERC2771 compatibility, and consider alternative solutions when necessary. 

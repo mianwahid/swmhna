@@ -1,0 +1,73 @@
+## Test Invariants for EnumerableSetLib
+
+This document outlines test invariants for the provided `EnumerableSetLib` contract. Each invariant targets specific functionalities and edge cases to ensure robust testing.
+
+**General Invariants (Applicable to all set types):**
+
+1. **Zero Sentinel:**
+    - **Invariant:** It should be impossible to add the `_ZERO_SENTINEL` value to any set.
+    - **Test Cases:** Attempt to add `_ZERO_SENTINEL` using the `add` function for each set type. Expect `ValueIsZeroSentinel` error.
+
+2. **Initial Length:**
+    - **Invariant:** The length of a newly declared set should always be zero.
+    - **Test Cases:** Declare a new set of each type and assert that `length` returns 0.
+
+3. **Length After Adding Unique Elements:**
+    - **Invariant:** After adding a unique element to a set, the length of the set should increase by one.
+    - **Test Cases:** Add unique values to sets of each type and verify that `length` increments correctly.
+
+4. **Length After Adding Duplicate Elements:**
+    - **Invariant:** Adding a duplicate element to a set should not change the length of the set.
+    - **Test Cases:** Add duplicate values to sets of each type and assert that `length` remains the same.
+
+5. **Length After Removing Existing Elements:**
+    - **Invariant:** Removing an existing element from a set should decrease the length of the set by one.
+    - **Test Cases:** Remove existing values from sets of each type and verify that `length` decrements correctly.
+
+6. **Length After Removing Non-Existing Elements:**
+    - **Invariant:** Attempting to remove a non-existing element from a set should not change the length of the set.
+    - **Test Cases:** Remove non-existing values from sets of each type and assert that `length` remains the same.
+
+7. **Contains After Adding:**
+    - **Invariant:** After adding a value to a set, the `contains` function should return `true` for that value.
+    - **Test Cases:** Add values to sets of each type and check if `contains` returns `true` for those values.
+
+8. **Contains After Removing:**
+    - **Invariant:** After removing a value from a set, the `contains` function should return `false` for that value.
+    - **Test Cases:** Remove values from sets of each type and check if `contains` returns `false` for those values.
+
+9. **Values Array Length:**
+    - **Invariant:** The length of the array returned by the `values` function should be equal to the length of the set.
+    - **Test Cases:** Call `values` for sets of each type and assert that the returned array's length matches the set's length.
+
+10. **Values Array Content:**
+    - **Invariant:** The array returned by the `values` function should contain all the elements present in the set, and no other elements.
+    - **Test Cases:** Call `values` for sets of each type and verify that the returned array contains exactly the elements added to the set.
+
+11. **At Function - Valid Index:**
+    - **Invariant:** The `at` function should return the correct element at a given valid index.
+    - **Test Cases:** Call `at` with valid indices for sets of each type and assert that the returned values match the expected elements.
+
+12. **At Function - Invalid Index:**
+    - **Invariant:** The `at` function should revert with `IndexOutOfBounds` error when called with an invalid index (out of bounds).
+    - **Test Cases:** Call `at` with invalid indices (negative, equal to length, greater than length) for sets of each type. Expect `IndexOutOfBounds` error.
+
+**Specific Invariants for AddressSet:**
+
+13. **Address Normalization:**
+    - **Invariant:** The `AddressSet` should handle address normalization correctly, ensuring that both lowercase and checksummed addresses are treated as the same.
+    - **Test Cases:** Add and remove addresses with different capitalization and checksum formats. Verify that `contains`, `add`, and `remove` functions behave consistently.
+
+**Edge Case Considerations:**
+
+- **Empty Set Operations:** Test all functions with an empty set to ensure they handle this edge case correctly.
+- **Maximum Set Size:** While not explicitly defined, consider testing with a large number of elements to identify potential performance bottlenecks or limitations.
+- **Reverts:** Ensure that functions revert with appropriate error messages for invalid inputs or conditions, as specified in the contract.
+
+**Testing Methodology:**
+
+- Utilize a testing framework like Foundry to write unit tests that cover all the invariants and edge cases mentioned above.
+- Employ property-based testing techniques where applicable to generate a wider range of test cases and increase test coverage.
+- Consider using gas profiling tools to analyze the gas consumption of different functions and optimize for efficiency.
+
+By thoroughly testing the `EnumerableSetLib` contract with these invariants and edge cases in mind, you can ensure its correctness, reliability, and efficiency for various use cases in your Solidity projects.

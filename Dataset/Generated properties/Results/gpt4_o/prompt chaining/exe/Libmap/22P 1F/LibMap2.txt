@@ -1,0 +1,106 @@
+To ensure the correctness and robustness of the `LibMap` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for the `LibMap` library:
+
+### General Invariants
+
+1. **Initial State Invariant**:
+   - For any index in any map, the initial value should be zero before any set operation is performed.
+
+### Uint8Map Invariants
+
+2. **Uint8Map Get/Set Invariant**:
+   - After setting a value at a specific index, getting the value at the same index should return the set value.
+   - Edge Case: Set and get the maximum `uint8` value (255) and the minimum `uint8` value (0).
+
+3. **Uint8Map Overwrite Invariant**:
+   - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+4. **Uint8Map Boundary Invariant**:
+   - Test setting and getting values at boundary indices (e.g., 0, 31, 32, 63, etc.) to ensure no overflow or underflow occurs.
+
+### Uint16Map Invariants
+
+5. **Uint16Map Get/Set Invariant**:
+   - After setting a value at a specific index, getting the value at the same index should return the set value.
+   - Edge Case: Set and get the maximum `uint16` value (65535) and the minimum `uint16` value (0).
+
+6. **Uint16Map Overwrite Invariant**:
+   - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+7. **Uint16Map Boundary Invariant**:
+   - Test setting and getting values at boundary indices (e.g., 0, 15, 16, 31, etc.) to ensure no overflow or underflow occurs.
+
+### Uint32Map Invariants
+
+8. **Uint32Map Get/Set Invariant**:
+   - After setting a value at a specific index, getting the value at the same index should return the set value.
+   - Edge Case: Set and get the maximum `uint32` value (4294967295) and the minimum `uint32` value (0).
+
+9. **Uint32Map Overwrite Invariant**:
+   - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+10. **Uint32Map Boundary Invariant**:
+    - Test setting and getting values at boundary indices (e.g., 0, 7, 8, 15, etc.) to ensure no overflow or underflow occurs.
+
+### Uint40Map Invariants
+
+11. **Uint40Map Get/Set Invariant**:
+    - After setting a value at a specific index, getting the value at the same index should return the set value.
+    - Edge Case: Set and get the maximum `uint40` value (1099511627775) and the minimum `uint40` value (0).
+
+12. **Uint40Map Overwrite Invariant**:
+    - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+13. **Uint40Map Boundary Invariant**:
+    - Test setting and getting values at boundary indices (e.g., 0, 5, 6, 11, etc.) to ensure no overflow or underflow occurs.
+
+### Uint64Map Invariants
+
+14. **Uint64Map Get/Set Invariant**:
+    - After setting a value at a specific index, getting the value at the same index should return the set value.
+    - Edge Case: Set and get the maximum `uint64` value (18446744073709551615) and the minimum `uint64` value (0).
+
+15. **Uint64Map Overwrite Invariant**:
+    - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+16. **Uint64Map Boundary Invariant**:
+    - Test setting and getting values at boundary indices (e.g., 0, 3, 4, 7, etc.) to ensure no overflow or underflow occurs.
+
+### Uint128Map Invariants
+
+17. **Uint128Map Get/Set Invariant**:
+    - After setting a value at a specific index, getting the value at the same index should return the set value.
+    - Edge Case: Set and get the maximum `uint128` value (340282366920938463463374607431768211455) and the minimum `uint128` value (0).
+
+18. **Uint128Map Overwrite Invariant**:
+    - Setting a value at an index and then setting a different value at the same index should return the last set value.
+
+19. **Uint128Map Boundary Invariant**:
+    - Test setting and getting values at boundary indices (e.g., 0, 1, 2, 3, etc.) to ensure no overflow or underflow occurs.
+
+### Generic Mapping Invariants
+
+20. **Generic Get/Set Invariant**:
+    - After setting a value at a specific index with a specific bit width, getting the value at the same index should return the set value.
+    - Edge Case: Test with various bit widths (e.g., 8, 16, 32, 64, 128) and their maximum and minimum values.
+
+21. **Generic Overwrite Invariant**:
+    - Setting a value at an index with a specific bit width and then setting a different value at the same index should return the last set value.
+
+22. **Generic Boundary Invariant**:
+    - Test setting and getting values at boundary indices for various bit widths to ensure no overflow or underflow occurs.
+
+### Binary Search Invariants
+
+23. **Binary Search Existence Invariant**:
+    - For a sorted map, searching for an existing value should return `found = true` and the correct index.
+
+24. **Binary Search Non-Existence Invariant**:
+    - For a sorted map, searching for a non-existing value should return `found = false` and the index where it would be inserted.
+
+25. **Binary Search Boundary Invariant**:
+    - Test binary search on boundary indices (e.g., start = 0, end = map length) to ensure correct behavior.
+
+26. **Binary Search Empty Range Invariant**:
+    - Searching in an empty range (start >= end) should return `found = false` and `index = start`.
+
+By covering these invariants, we can ensure that the `LibMap` library functions correctly across a wide range of scenarios and edge cases.

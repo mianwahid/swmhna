@@ -1,0 +1,44 @@
+The provided smart contract is a Solidity library named `LibPRNG` that offers functionalities for generating pseudorandom numbers and performing lazy shuffling operations. Below is a detailed explanation of each functionality:
+
+### Custom Errors
+1. **InvalidInitialLazyShufflerLength**: Thrown when the initial length for the lazy shuffler is not within the valid range (greater than zero and less than `2**32 - 1`).
+2. **InvalidNewLazyShufflerLength**: Thrown when the new length for the lazy shuffler is less than the current length.
+3. **LazyShufflerNotInitialized**: Thrown when an operation is attempted on an uninitialized lazy shuffler.
+4. **LazyShufflerAlreadyInitialized**: Thrown when trying to initialize an already initialized lazy shuffler.
+5. **LazyShuffleFinished**: Thrown when trying to shuffle more elements than available.
+6. **LazyShufflerGetOutOfBounds**: Thrown when querying an index out of the bounds of the lazy shuffler.
+
+### Constants
+- **WAD**: A constant representing the scalar of ETH and most ERC20 tokens, set to `1e18`.
+
+### Structs
+1. **PRNG**: Represents a pseudorandom number generator state in memory.
+   - `state`: A `uint256` value representing the current state of the PRNG.
+2. **LazyShuffler**: Represents a lazy Fisher-Yates shuffler for a range `[0..n)` in storage.
+   - `_state`: A `uint256` value with a specific bit layout:
+     - `[0..31]`: `numShuffled` (number of elements shuffled).
+     - `[32..223]`: `permutationSlot` (internal permutation state).
+     - `[224..255]`: `length` (length of the range).
+
+### Operations
+1. **seed(PRNG memory prng, uint256 state)**: Seeds the PRNG with a given state.
+2. **next(PRNG memory prng)**: Returns the next pseudorandom `uint256` value.
+3. **uniform(PRNG memory prng, uint256 upper)**: Returns a pseudorandom `uint256` value uniformly distributed between 0 (inclusive) and `upper` (exclusive).
+4. **shuffle(PRNG memory prng, uint256[] memory a)**: Shuffles an array of `uint256` values in-place using the Fisher-Yates shuffle algorithm.
+5. **shuffle(PRNG memory prng, bytes memory a)**: Shuffles a byte array in-place using the Fisher-Yates shuffle algorithm.
+6. **standardNormalWad(PRNG memory prng)**: Returns a sample from the standard normal distribution, denominated in `WAD`.
+7. **exponentialWad(PRNG memory prng)**: Returns a sample from the unit exponential distribution, denominated in `WAD`.
+
+### Storage-Based Range Lazy Shuffling Operations
+1. **initialize(LazyShuffler storage $, uint256 n)**: Initializes the lazy shuffler for a range `[0..n)`. Reverts if `n` is zero or exceeds `2**32 - 1`, or if the shuffler is already initialized.
+2. **grow(LazyShuffler storage $, uint256 n)**: Increases the length of the lazy shuffler. Reverts if the new length is less than the current length or if the shuffler is not initialized.
+3. **restart(LazyShuffler storage $)**: Restarts the shuffler by setting `numShuffled` to zero, allowing all elements to be drawn again.
+4. **numShuffled(LazyShuffler storage $)**: Returns the number of elements that have been shuffled.
+5. **length(LazyShuffler storage $)**: Returns the length of the lazy shuffler. Returns zero if not initialized.
+6. **initialized(LazyShuffler storage $)**: Returns whether the lazy shuffler has been initialized.
+7. **finished(LazyShuffler storage $)**: Returns whether there are any more elements left to shuffle. Reverts if the shuffler is not initialized.
+8. **get(LazyShuffler storage $, uint256 index)**: Returns the current value stored at a given index, accounting for all historical shuffling. Reverts if the index is out of bounds.
+9. **next(LazyShuffler storage $, uint256 randomness)**: Performs a single Fisher-Yates shuffle step, increments the `numShuffled`, and returns the next value in the shuffled range. Reverts if there are no more values to shuffle or if the shuffler is not initialized.
+
+### Summary
+The `LibPRNG` library provides a comprehensive set of tools for generating pseudorandom numbers and performing lazy shuffling operations. It includes functions for seeding and generating random numbers, shuffling arrays and bytes, and handling lazy shuffling with storage-based state management. The library also includes custom errors for robust error handling and ensures memory safety using Solidity's assembly language.

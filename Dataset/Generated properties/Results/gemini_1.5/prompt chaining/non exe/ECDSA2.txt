@@ -1,0 +1,45 @@
+## Test Invariants for the ECDSA Library
+
+This list outlines test invariants for the provided ECDSA library, focusing on edge cases and functionality coverage:
+
+**General Invariants:**
+
+- **Zero Hash:** Recovering a signature for a zero hash should always fail (return zero address or revert, depending on the function).
+- **Empty Signature:** Recovering a signature from an empty signature should always fail.
+- **Mismatched Lengths:** Providing signatures with lengths other than 64 or 65 bytes should always fail.
+- **Invalid V Value:** Providing a `v` value outside of 27, 28, or their chain-specific counterparts (e.g., 37, 38 on some chains) should always fail.
+- **Gas Efficiency:** Ensure all assembly-optimized functions are more gas-efficient than their Solidity counterparts.
+
+**`recover` Function Family:**
+
+- **Valid Signature:** Recovering a valid signature should always return the correct signer address.
+- **Malleability:** Test for signature malleability by modifying `s` to `-s` (modulo the order of the secp256k1 curve). Both signatures should recover to the same address.
+- **Regular vs. Short Form:** Ensure both regular 65-byte and EIP-2098 64-byte signatures are handled correctly by all `recover` variants.
+- **Calldata Efficiency:** Verify `recoverCalldata` is more gas-efficient than `recover` when dealing with calldata signatures.
+
+**`tryRecover` Function Family:**
+
+- **Failure Return Value:** Upon recovery failure, all `tryRecover` variants should return the zero address.
+- **Zero Address Comparison:** Implement tests that explicitly check for the zero address return value and handle it safely to avoid vulnerabilities.
+
+**Hashing Functions:**
+
+- **Standard Message Format:** Verify `toEthSignedMessageHash` produces hashes compliant with the Ethereum Signed Message standard (EIP-191).
+- **Length Limit:** Test `toEthSignedMessageHash(bytes memory s)` with messages of varying lengths, including the maximum supported length (999999 bytes) and exceeding it.
+- **Bytes vs. Bytes32:** Ensure both `toEthSignedMessageHash` variants produce the same hash for the same message when provided as bytes or its keccak256 hash.
+
+**`emptySignature` Function:**
+
+- **Zero Length:** Verify the returned calldata bytes array has a length of 0.
+
+**Edge Cases:**
+
+- **Low-S Value:** Test signatures with `s` values less than half the curve order to ensure they are accepted (as per EIP-2098).
+- **High-S Value:** Test signatures with `s` values greater than half the curve order to ensure they are rejected (as per EIP-2098).
+- **Curve Order Boundaries:** Test signatures with `r` and `s` values close to the boundaries of the secp256k1 curve order to ensure correct handling.
+
+**Security Considerations:**
+
+- **Replay Attacks:** While not directly addressed in the library, emphasize in your tests the importance of using nonces and EIP-712 to prevent replay attacks when using this library in larger applications.
+
+By thoroughly testing these invariants and edge cases, you can gain confidence in the correctness and security of this ECDSA library. Remember to use a combination of unit tests and property-based testing to achieve comprehensive coverage. 

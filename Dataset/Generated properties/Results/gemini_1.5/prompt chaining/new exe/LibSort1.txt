@@ -1,0 +1,84 @@
+## LibSort Smart Contract Functionalities Explained
+
+This smart contract library, `LibSort`, provides a collection of optimized sorting and array manipulation functions for `uint256`, `int256`, and `address` arrays. Let's break down each functionality:
+
+**Sorting Functions:**
+
+* **`insertionSort(uint256[] memory a)`:**
+    - **Functionality:** Sorts an array of unsigned integers (`uint256`) in ascending order using the Insertion Sort algorithm.
+    - **Details:**
+        - Efficient for small arrays (32 elements or less) and almost sorted arrays.
+        - Operates in-place, modifying the original array.
+        - Uses assembly for gas optimization.
+* **`insertionSort(int256[] memory a)`:**
+    - **Functionality:** Sorts an array of signed integers (`int256`) in ascending order using Insertion Sort.
+    - **Details:**
+        - Leverages the `insertionSort` function for `uint256` by converting signed integers to their unsigned representation, sorting, and then converting back.
+* **`insertionSort(address[] memory a)`:**
+    - **Functionality:** Sorts an array of Ethereum addresses (`address`) in ascending order using Insertion Sort.
+    - **Details:**
+        - Similar to `insertionSort` for `int256`, it treats addresses as `uint160` for comparison and utilizes the `uint256` version of the function.
+* **`sort(uint256[] memory a)`:**
+    - **Functionality:** Sorts an array of unsigned integers (`uint256`) in ascending order using Intro-Quicksort.
+    - **Details:**
+        - Efficient for larger arrays (more than 32 elements).
+        - Offers robust performance across various input distributions.
+        - Employs a hybrid approach, switching to Insertion Sort for smaller sub-arrays to optimize performance.
+* **`sort(int256[] memory a)` and `sort(address[] memory a)`:**
+    - **Functionality:** Similar to their `insertionSort` counterparts, these functions sort `int256` and `address` arrays using Intro-Quicksort after appropriate type casting.
+
+**Array Manipulation Functions:**
+
+* **`uniquifySorted(uint256[] memory a)`, `uniquifySorted(int256[] memory a)`, and `uniquifySorted(address[] memory a)`:**
+    - **Functionality:** Removes consecutive duplicate elements from a sorted array (ascending order).
+    - **Details:**
+        - Works for `uint256`, `int256`, and `address` arrays.
+        - Does not guarantee complete uniqueness if the input array is not sorted.
+* **`searchSorted(uint256[] memory a, uint256 needle)`, `searchSorted(int256[] memory a, int256 needle)`, and `searchSorted(address[] memory a, address needle)`:**
+    - **Functionality:** Searches for a specific element (`needle`) within a sorted array.
+    - **Details:**
+        - Returns a boolean indicating whether the element is found (`found`) and its index (`index`).
+        - Prioritizes finding an exact match. If not found, it returns the index of the nearest element (precedence: equal to > nearest before > nearest after).
+* **`reverse(uint256[] memory a)`, `reverse(int256[] memory a)`, and `reverse(address[] memory a)`:**
+    - **Functionality:** Reverses the order of elements within an array.
+    - **Details:**
+        - Operates in-place, modifying the original array.
+* **`copy(uint256[] memory a)`, `copy(int256[] memory a)`, and `copy(address[] memory a)`:**
+    - **Functionality:** Creates a new array containing a copy of the elements from the input array.
+    - **Details:**
+        - Useful for creating independent copies of arrays without modifying the original.
+
+**Array Property Check Functions:**
+
+* **`isSorted(uint256[] memory a)`, `isSorted(int256[] memory a)`, and `isSorted(address[] memory a)`:**
+    - **Functionality:** Checks if an array is sorted in ascending order.
+    - **Details:**
+        - Returns `true` if the array is sorted, `false` otherwise.
+* **`isSortedAndUniquified(uint256[] memory a)`, `isSortedAndUniquified(int256[] memory a)`, and `isSortedAndUniquified(address[] memory a)`:**
+    - **Functionality:** Checks if an array is both sorted in ascending order and contains no consecutive duplicate elements.
+    - **Details:**
+        - Returns `true` if the array is strictly ascending, `false` otherwise.
+
+**Set Operations Functions:**
+
+* **`difference(uint256[] memory a, uint256[] memory b)`, `difference(int256[] memory a, int256[] memory b)`, and `difference(address[] memory a, address[] memory b)`:**
+    - **Functionality:** Computes the set difference between two sorted arrays (`a - b`).
+    - **Details:**
+        - Returns a new array containing elements present in `a` but not in `b`.
+        - Assumes input arrays are sorted and uniquified; behavior is undefined otherwise.
+* **`intersection(uint256[] memory a, uint256[] memory b)`, `intersection(int256[] memory a, int256[] memory b)`, and `intersection(address[] memory a, address[] memory b)`:**
+    - **Functionality:** Computes the set intersection between two sorted arrays (`a ∩ b`).
+    - **Details:**
+        - Returns a new array containing elements present in both `a` and `b`.
+        - Assumes input arrays are sorted and uniquified; behavior is undefined otherwise.
+* **`union(uint256[] memory a, uint256[] memory b)`, `union(int256[] memory a, int256[] memory b)`, and `union(address[] memory a, address[] memory b)`:**
+    - **Functionality:** Computes the set union between two sorted arrays (`a ∪ b`).
+    - **Details:**
+        - Returns a new array containing all unique elements from both `a` and `b`.
+        - Assumes input arrays are sorted and uniquified; behavior is undefined otherwise.
+
+**Private Helper Functions:**
+
+The contract also includes several private helper functions like `_toUints`, `_toInts`, `_toAddresses`, `_flipSign`, `_searchSorted`, `_difference`, `_intersection`, and `_union`. These functions are primarily used internally for type casting, sign manipulation, and implementing the core logic of the public functions.
+
+**Overall, the `LibSort` library provides a comprehensive set of optimized functions for working with sorted arrays in Solidity, offering functionalities for sorting, searching, manipulating, and performing set operations.**

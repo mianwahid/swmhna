@@ -1,0 +1,55 @@
+## Test Invariants for `Clone` Contract
+
+This list outlines test invariants for the provided `Clone` contract, focusing on edge cases and functionality:
+
+**General Invariants:**
+
+- **Offset Calculation:** `_getImmutableArgsOffset()` should always return a value less than `calldatasize()`.
+- **Empty Arguments:** When no immutable arguments are provided, `_getImmutableArgsOffset()` should return `calldatasize()`, and all other `_getArg` functions should revert (or return zero values for numeric types).
+
+**`_getArgBytes()`:**
+
+- **Zero Length:** Calling with `length` as 0 should return an empty `bytes` array.
+- **Full Length:** Calling with `length` equal to the actual length of immutable arguments should return all arguments.
+- **Partial Length:** Calling with `length` less than the actual length should return only the specified number of bytes.
+- **Out-of-Bounds:** Calling with `argOffset + length` exceeding the actual length of arguments should revert.
+
+**`_getArgBytes(uint256 argOffset, uint256 length)`:**
+
+- **Zero Length:** Calling with `length` as 0 should return an empty `bytes` array.
+- **Exact Length:** Calling with `length` equal to the size of the desired `bytes` argument should return the correct value.
+- **Partial Length:** Calling with `length` less than the size of the `bytes` argument should return only the specified number of bytes.
+- **Out-of-Bounds:** Calling with `argOffset + length` exceeding the end of the desired `bytes` argument should revert.
+
+**`_getArgAddress()`:**
+
+- **Valid Address:** Calling with a valid `argOffset` pointing to an address should return the correct address.
+- **Misaligned Offset:** Calling with an `argOffset` not aligned to 20 bytes (size of an address) should revert.
+- **Out-of-Bounds:** Calling with `argOffset + 20` exceeding the length of arguments should revert.
+
+**`_getArgUint256Array()` and `_getArgBytes32Array()`:**
+
+- **Zero Length:** Calling with `length` as 0 should return an empty array.
+- **Exact Length:** Calling with `length` equal to the actual array length should return all elements.
+- **Partial Length:** Calling with `length` less than the actual array length should return only the specified number of elements.
+- **Out-of-Bounds:** Calling with `argOffset + length * 32` (for `uint256` and `bytes32`) exceeding the length of arguments should revert.
+
+**`_getArgBytes32()`:**
+
+- **Valid Offset:** Calling with a valid `argOffset` pointing to a `bytes32` value should return the correct value.
+- **Misaligned Offset:** Calling with an `argOffset` not aligned to 32 bytes (size of `bytes32`) should revert.
+- **Out-of-Bounds:** Calling with `argOffset + 32` exceeding the length of arguments should revert.
+
+**`_getArgUint256()` to `_getArgUint8()`:**
+
+- **Valid Offset:** Calling with a valid `argOffset` should return the correct value for the respective unsigned integer type.
+- **Misaligned Offset:** Calling with an `argOffset` not aligned to the size of the respective type should revert.
+- **Out-of-Bounds:** Calling with `argOffset + size` (size depends on the type) exceeding the length of arguments should revert.
+
+**Testing Methodology:**
+
+- Use Foundry's fuzzing capabilities to generate random calldata with varying argument lengths, offsets, and data types.
+- Test edge cases explicitly, such as zero lengths, out-of-bounds offsets, and misaligned offsets.
+- Consider using a combination of unit tests and property-based tests to ensure comprehensive coverage.
+
+By thoroughly testing these invariants, you can gain confidence in the correctness and reliability of the `Clone` contract's functionality. 

@@ -1,0 +1,52 @@
+The provided smart contract, `Multicallable`, is designed to enable a single call to execute multiple methods on itself. This is achieved through the `multicall` function, which uses `DELEGATECALL` to call multiple methods within the same contract. Below is a detailed explanation of the functionalities and the key aspects of this contract:
+
+### Contract Overview
+- **Purpose**: The contract allows for multiple method calls to be executed in a single transaction, which can save on gas costs and improve efficiency.
+- **Author**: The contract is authored by Solady and is modified from Solmate.
+- **Warning**: The contract is not designed to be used with ERC2771 out-of-the-box due to potential vulnerabilities related to arbitrary address spoofing. The authors recommend using an alternative pattern for more flexibility and safety.
+
+### Functionality
+
+#### `multicall` Function
+- **Signature**: `function multicall(bytes[] calldata data) public virtual returns (bytes[] memory)`
+- **Purpose**: This function takes an array of calldata (`data`), each representing a method call, and executes them sequentially using `DELEGATECALL`. The results of each call are stored and returned as an array of bytes.
+- **Non-Payable**: The function is deliberately made non-payable to guard against double-spending vulnerabilities.
+- **Reversion Handling**: If any of the `DELEGATECALL`s revert, the entire transaction is reverted, and the error is bubbled up.
+
+#### Detailed Steps in `multicall`
+1. **Initial Setup**:
+   - The function starts by setting up memory for storing the results.
+   - It checks if the `data` array is empty and returns early if it is.
+
+2. **Memory Allocation**:
+   - The function calculates the end of the `data` array and copies the offsets from calldata into memory.
+   - It sets up pointers for the results and the end of the results array.
+
+3. **Loop Through Calls**:
+   - The function enters a loop to process each method call in the `data` array.
+   - For each call, it calculates the offset and length of the current bytes in calldata.
+   - It copies the current bytes from calldata to memory.
+
+4. **Delegate Call Execution**:
+   - The function performs a `DELEGATECALL` to the current contract with the copied calldata.
+   - If the `DELEGATECALL` fails, it bubbles up the revert reason and reverts the entire transaction.
+
+5. **Store Results**:
+   - If the `DELEGATECALL` succeeds, the function stores the results, including the return data size and the actual return data.
+   - It advances the results offset to accommodate the next call's results.
+
+6. **Return Results**:
+   - After processing all calls, the function returns the results array, which contains the encoded results of each `DELEGATECALL`.
+
+### Assembly Code Explanation
+- **Memory Management**: The function uses inline assembly to manage memory efficiently. It sets up memory locations for storing results and uses `calldatacopy` to copy data from calldata to memory.
+- **Delegate Call**: The `delegatecall` opcode is used to execute the method calls. This opcode allows the called method to execute in the context of the calling contract, preserving the state and storage.
+- **Error Handling**: The function uses `returndatacopy` and `revert` to handle errors and revert the transaction if any `DELEGATECALL` fails.
+- **Efficiency**: The use of inline assembly and direct memory manipulation ensures that the function is efficient and minimizes gas costs.
+
+### Security Considerations
+- **ERC2771 Compatibility**: The contract is not compatible with ERC2771 out-of-the-box due to potential vulnerabilities. Users are advised to use alternative patterns for better security.
+- **Double-Spending**: The function is non-payable to prevent double-spending issues, as highlighted in the referenced Paradigm blog post.
+
+### Conclusion
+The `Multicallable` contract provides a powerful mechanism to batch multiple method calls into a single transaction, improving efficiency and reducing gas costs. However, it comes with security considerations that must be addressed, especially regarding compatibility with certain ERC standards.

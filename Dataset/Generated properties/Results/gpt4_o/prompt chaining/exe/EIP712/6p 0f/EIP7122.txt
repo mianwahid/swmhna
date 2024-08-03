@@ -1,0 +1,80 @@
+To ensure the correctness and robustness of the provided EIP-712 smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for the functionalities of the given contract:
+
+### 1. Domain Separator Invariants
+
+#### Invariant 1: Cached Domain Separator Consistency
+- **Description**: The cached domain separator should remain consistent if the domain name and version do not change and the chain ID remains the same.
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainSeparator()` and store the result.
+  - Call `_domainSeparator()` again and ensure the result matches the stored value.
+
+#### Invariant 2: Domain Separator Recalculation on Chain ID Change
+- **Description**: The domain separator should be recalculated if the chain ID changes.
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainSeparator()` and store the result.
+  - Simulate a chain ID change (this might require a mock or a test framework that allows chain ID manipulation).
+  - Call `_domainSeparator()` again and ensure the result is different from the stored value.
+
+#### Invariant 3: Domain Separator Recalculation on Contract Address Change
+- **Description**: The domain separator should be recalculated if the contract address changes (e.g., in a proxy pattern).
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainSeparator()` and store the result.
+  - Simulate a contract address change (this might require a mock or a test framework that allows address manipulation).
+  - Call `_domainSeparator()` again and ensure the result is different from the stored value.
+
+### 2. Hashing Operations Invariants
+
+#### Invariant 4: Typed Data Hash Consistency
+- **Description**: The hash of the fully encoded EIP-712 message should remain consistent for the same input.
+- **Test**:
+  - Deploy the contract.
+  - Call `_hashTypedData(bytes32 structHash)` with a specific `structHash` and store the result.
+  - Call `_hashTypedData(bytes32 structHash)` again with the same `structHash` and ensure the result matches the stored value.
+
+#### Invariant 5: Typed Data Hash Recalculation on Domain Separator Change
+- **Description**: The hash of the fully encoded EIP-712 message should change if the domain separator changes.
+- **Test**:
+  - Deploy the contract.
+  - Call `_hashTypedData(bytes32 structHash)` with a specific `structHash` and store the result.
+  - Simulate a domain separator change (e.g., by changing the chain ID or contract address).
+  - Call `_hashTypedData(bytes32 structHash)` again with the same `structHash` and ensure the result is different from the stored value.
+
+### 3. EIP-5267 Operations Invariants
+
+#### Invariant 6: EIP-712 Domain Details Consistency
+- **Description**: The EIP-712 domain details should remain consistent if the domain name and version do not change.
+- **Test**:
+  - Deploy the contract.
+  - Call `eip712Domain()` and store the result.
+  - Call `eip712Domain()` again and ensure the result matches the stored value.
+
+### 4. Private Helpers Invariants
+
+#### Invariant 7: Cached Domain Separator Invalidated Correctly
+- **Description**: The cached domain separator should be invalidated correctly if the chain ID or contract address changes.
+- **Test**:
+  - Deploy the contract.
+  - Call `_cachedDomainSeparatorInvalidated()` and ensure it returns `false`.
+  - Simulate a chain ID change or contract address change.
+  - Call `_cachedDomainSeparatorInvalidated()` again and ensure it returns `true`.
+
+### 5. Override Functions Invariants
+
+#### Invariant 8: Domain Name and Version Override
+- **Description**: The domain name and version should be correctly overridden by the derived contract.
+- **Test**:
+  - Create a derived contract that overrides `_domainNameAndVersion()` to return specific values.
+  - Deploy the derived contract.
+  - Call `_domainNameAndVersion()` and ensure it returns the overridden values.
+
+#### Invariant 9: Domain Name and Version Changeability
+- **Description**: The domain name and version changeability should be correctly indicated by `_domainNameAndVersionMayChange()`.
+- **Test**:
+  - Create a derived contract that overrides `_domainNameAndVersionMayChange()` to return `true`.
+  - Deploy the derived contract.
+  - Call `_domainNameAndVersionMayChange()` and ensure it returns `true`.
+
+By implementing these test invariants, we can ensure that the EIP-712 smart contract behaves correctly under various conditions and edge cases.

@@ -1,0 +1,60 @@
+## Test Invariants for `SignatureCheckerLib`
+
+This list outlines test invariants for the `SignatureCheckerLib` contract, focusing on edge cases and different functionalities:
+
+**I. `isValidSignatureNow` (All Variants)**
+
+**A. General Cases:**
+
+1. **Valid Signature:** Given a valid signature, hash, and signer (EOA or ERC1271 contract), the function returns `true`.
+2. **Invalid Signature:** Given an invalid signature (e.g., tampered with), the function returns `false`, regardless of the signer type.
+3. **Incorrect Hash:** Given a valid signature for a different hash, the function returns `false`.
+4. **Incorrect Signer:** Given a valid signature from a different signer, the function returns `false`.
+
+**B. Edge Cases:**
+
+5. **Zero Address Signer:** Given a zero address as the signer, the function returns `false`.
+6. **Empty Signature:** Given an empty signature (`bytes('')` or `bytes calldata('')`), the function returns `false`.
+7. **Signature Length:**
+    - For `bytes memory signature`: Accepts both 64-byte (EIP-2098) and 65-byte signatures.
+    - For `bytes32 r, bytes32 vs`: Only accepts signatures in this format.
+    - For `uint8 v, bytes32 r, bytes32 s`: Only accepts signatures in this format.
+8. **Signature Malleability:** The function does NOT check for signature malleability (e.g., different `v` values for the same signature).
+9. **Gas Consumption:** Verify that the gas consumption is within reasonable limits for both successful and unsuccessful validations.
+
+**C. ERC1271 Specific:**
+
+10. **Contract Does Not Implement ERC1271:** If the signer is a contract that does not implement ERC1271, the function should revert (due to calling an undefined function).
+11. **ERC1271 Contract Returns Invalid:** If the ERC1271 contract's `isValidSignature` function returns an invalid magic value or reverts, the function should return `false`.
+
+**II. `isValidERC1271SignatureNow` (All Variants)**
+
+**A. General Cases:**
+
+1. **Valid ERC1271 Signature:** Given a valid signature from an ERC1271 contract, the function returns `true`.
+2. **Invalid ERC1271 Signature:** Given an invalid signature, the function returns `false`.
+
+**B. Edge Cases:**
+
+3. **Non-Contract Signer:** If the signer is an EOA, the function should revert (due to calling a non-existent function).
+4. **Empty Signature:** Given an empty signature, the function returns `false`.
+5. **Signature Length:** Same as `isValidSignatureNow`.
+
+**III. `toEthSignedMessageHash`**
+
+1. **Correct Hash:** Given a hash or bytes array, the function returns the correct Ethereum Signed Message hash according to EIP-191.
+2. **Empty Bytes Array:** Given an empty bytes array (`bytes('')`), the function returns the correct hash for an empty message.
+3. **Long Bytes Array:** Test with a bytes array longer than 32 bytes to ensure correct handling.
+
+**IV. `emptySignature`**
+
+1. **Zero Length:** The returned `bytes calldata` should have a length of 0.
+
+**Additional Considerations:**
+
+- **Test Setup:** Use a testing framework like Foundry or Hardhat to write comprehensive tests.
+- **Signature Generation:** Generate valid and invalid signatures using both EOAs and ERC1271 contracts for testing.
+- **Gas Reporting:** Track and analyze gas consumption for different functions and scenarios.
+- **Code Coverage:** Aim for high code coverage to ensure all branches and edge cases are tested.
+
+By adhering to these invariants and testing methodologies, you can build a robust test suite for the `SignatureCheckerLib` contract, ensuring its reliability and security. 

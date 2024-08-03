@@ -1,0 +1,66 @@
+## Test Invariants for Initializable Contract
+
+This list outlines test invariants for the provided `Initializable` contract, focusing on edge cases and ensuring robust functionality.
+
+**General Invariants:**
+
+- **Slot Immutability:** The `_initializableSlot()` function should always return the same value, ensuring consistent storage access.
+- **Error Message Consistency:** Verify that the revert messages for `InvalidInitialization` and `NotInitializing` errors match the defined error strings.
+
+**Initializer Modifier:**
+
+- **Single Initialization:**
+    - Calling an `initializer` modified function twice on the same contract instance should revert with `InvalidInitialization`.
+    - This should be tested both within a single transaction and across multiple transactions.
+- **Initialization Flag:**
+    - After successful execution of an `initializer` modified function, `_isInitializing()` should return `false`.
+    - Before entering the `initializer` modified function, `_isInitializing()` should return `true`.
+- **Version Tracking:**
+    - After successful execution of an `initializer` modified function, `_getInitializedVersion()` should return `1`.
+- **Event Emission:**
+    - A successful `initializer` call should emit the `Initialized` event with `version` as `1`.
+- **Constructor Behavior:**
+    - Test that multiple calls to `initializer` modified functions within the constructor behave as expected (allowed in testing).
+
+**Reinitializer Modifier:**
+
+- **Version Enforcement:**
+    - Calling `reinitializer` with a version less than or equal to the current `_getInitializedVersion()` should revert with `InvalidInitialization`.
+    - Calling `reinitializer` with a version greater than the current `_getInitializedVersion()` should succeed.
+- **Initialization Flag:**
+    - Behavior of `_isInitializing()` should be consistent with the `initializer` modifier (true within, false outside).
+- **Version Updates:**
+    - After a successful `reinitializer` call, `_getInitializedVersion()` should return the new version.
+- **Event Emission:**
+    - A successful `reinitializer` call should emit the `Initialized` event with the correct new `version`.
+
+**OnlyInitializing Modifier:**
+
+- **Restricted Access:**
+    - Calling a function guarded with `onlyInitializing` outside the scope of an `initializer` or `reinitializer` should revert with `NotInitializing`.
+- **Allowed Access:**
+    - Calling a function guarded with `onlyInitializing` within the scope of an `initializer` or `reinitializer` should succeed.
+
+**_disableInitializers Function:**
+
+- **Permanent Locking:**
+    - After calling `_disableInitializers()`, any subsequent calls to `initializer` or `reinitializer` modified functions should revert with `InvalidInitialization`.
+- **Version Saturation:**
+    - After calling `_disableInitializers()`, `_getInitializedVersion()` should return the maximum possible uint64 value (`2**64 - 1`).
+- **Event Emission:**
+    - The first successful call to `_disableInitializers()` should emit the `Initialized` event with the maximum uint64 value.
+- **Idempotency:**
+    - Multiple calls to `_disableInitializers()` after the first should have no effect and not revert.
+
+**Edge Cases:**
+
+- **Zero Version:** Test `reinitializer` with a version of `0`. It should revert as 0 represents an uninitialized state.
+- **Overflow Protection:** Test `reinitializer` with the maximum uint64 value to ensure there are no overflow vulnerabilities.
+- **Gas Usage:** Compare the gas costs of using `initializer`, `reinitializer`, and `_disableInitializers` to evaluate their efficiency.
+
+**Additional Considerations:**
+
+- **Inheritance:** If the `Initializable` contract is inherited, ensure that overriding functions like `_initializableSlot()` do not introduce unexpected behavior.
+- **Upgradeable Context:** Test the `Initializable` contract within the context of a larger upgradeable system to ensure seamless integration and version management.
+
+These test invariants provide a comprehensive framework for testing the `Initializable` contract. By covering various scenarios and edge cases, you can ensure the contract's reliability and security in managing the initialization of upgradeable contracts. 

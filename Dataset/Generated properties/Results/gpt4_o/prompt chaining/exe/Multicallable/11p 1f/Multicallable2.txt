@@ -1,0 +1,112 @@
+To ensure the robustness and correctness of the `Multicallable` contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for the `multicall` function:
+
+### Test Invariants
+
+1. **Empty Data Array**:
+   - **Invariant**: When the `data` array is empty, the function should return an empty array.
+   - **Edge Case**: Call `multicall` with an empty `data` array.
+
+2. **Single Call Success**:
+   - **Invariant**: When the `data` array contains a single valid call, the function should return the result of that call.
+   - **Edge Case**: Call `multicall` with a single valid method call in the `data` array.
+
+3. **Multiple Calls Success**:
+   - **Invariant**: When the `data` array contains multiple valid calls, the function should return the results of all calls in the correct order.
+   - **Edge Case**: Call `multicall` with multiple valid method calls in the `data` array.
+
+4. **Single Call Revert**:
+   - **Invariant**: When the `data` array contains a single call that reverts, the entire `multicall` should revert with the same error.
+   - **Edge Case**: Call `multicall` with a single method call that is designed to revert.
+
+5. **Multiple Calls with One Revert**:
+   - **Invariant**: When the `data` array contains multiple calls and one of them reverts, the entire `multicall` should revert with the error from the failing call.
+   - **Edge Case**: Call `multicall` with multiple method calls where one of the calls is designed to revert.
+
+6. **Gas Consumption**:
+   - **Invariant**: The gas consumption should be reasonable and not exceed the block gas limit for a reasonable number of calls.
+   - **Edge Case**: Call `multicall` with a large number of valid method calls to ensure it does not exceed the block gas limit.
+
+7. **Non-Payable**:
+   - **Invariant**: The `multicall` function should revert if called with any ether.
+   - **Edge Case**: Call `multicall` with a non-zero value of ether.
+
+8. **Return Data Integrity**:
+   - **Invariant**: The return data should correctly reflect the results of the `DELEGATECALL` operations, including the size and content of the return data.
+   - **Edge Case**: Call `multicall` with method calls that return varying sizes of data.
+
+9. **Delegatecall Context**:
+   - **Invariant**: The `DELEGATECALL` should execute in the context of the current contract, meaning any state changes should affect the current contract.
+   - **Edge Case**: Call `multicall` with method calls that modify the state of the contract and verify the state changes.
+
+10. **Reentrancy**:
+    - **Invariant**: The `multicall` function should not be vulnerable to reentrancy attacks.
+    - **Edge Case**: Call `multicall` with method calls that attempt to reenter the `multicall` function.
+
+11. **Invalid Calldata**:
+    - **Invariant**: The function should handle invalid calldata gracefully, either by reverting or by returning an appropriate error.
+    - **Edge Case**: Call `multicall` with malformed or invalid calldata.
+
+12. **Boundary Conditions**:
+    - **Invariant**: The function should handle boundary conditions such as maximum calldata size and maximum number of calls.
+    - **Edge Case**: Call `multicall` with the maximum possible size of calldata and the maximum number of method calls.
+
+### Example Test Cases
+
+1. **Test Empty Data Array**:
+   ```solidity
+   function testEmptyDataArray() public {
+       bytes[] memory data = new bytes[](0);
+       bytes[] memory results = multicall(data);
+       assert(results.length == 0);
+   }
+   ```
+
+2. **Test Single Call Success**:
+   ```solidity
+   function testSingleCallSuccess() public {
+       bytes[] memory data = new bytes[](1);
+       data[0] = abi.encodeWithSignature("someMethod()");
+       bytes[] memory results = multicall(data);
+       // Add assertions to verify the result of someMethod()
+   }
+   ```
+
+3. **Test Multiple Calls Success**:
+   ```solidity
+   function testMultipleCallsSuccess() public {
+       bytes[] memory data = new bytes[](2);
+       data[0] = abi.encodeWithSignature("methodOne()");
+       data[1] = abi.encodeWithSignature("methodTwo()");
+       bytes[] memory results = multicall(data);
+       // Add assertions to verify the results of methodOne() and methodTwo()
+   }
+   ```
+
+4. **Test Single Call Revert**:
+   ```solidity
+   function testSingleCallRevert() public {
+       bytes[] memory data = new bytes[](1);
+       data[0] = abi.encodeWithSignature("revertingMethod()");
+       try this.multicall(data) {
+           assert(false); // Should not reach here
+       } catch (bytes memory reason) {
+           // Add assertions to verify the revert reason
+       }
+   }
+   ```
+
+5. **Test Multiple Calls with One Revert**:
+   ```solidity
+   function testMultipleCallsWithOneRevert() public {
+       bytes[] memory data = new bytes[](2);
+       data[0] = abi.encodeWithSignature("methodOne()");
+       data[1] = abi.encodeWithSignature("revertingMethod()");
+       try this.multicall(data) {
+           assert(false); // Should not reach here
+       } catch (bytes memory reason) {
+           // Add assertions to verify the revert reason
+       }
+   }
+   ```
+
+By defining and implementing these test invariants, we can ensure that the `Multicallable` contract behaves correctly and securely under various conditions.

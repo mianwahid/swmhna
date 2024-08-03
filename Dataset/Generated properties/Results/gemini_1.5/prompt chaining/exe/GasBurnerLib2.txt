@@ -1,0 +1,42 @@
+## Test Invariants for GasBurnerLib
+
+While this contract is simple, we can still define some useful test invariants to ensure its functionality:
+
+**1. Gas Consumption Invariant:**
+
+* **Description:** Verify that calling `burn(x)` consumes a significant amount of gas, and this consumption increases proportionally with larger values of `x`.
+* **Edge Cases:**
+    * **Zero Input:** Test with `x = 0`. Ensure minimal gas is consumed, as the loop should not execute.
+    * **Small Input:** Test with small values of `x` (e.g., 1, 10, 100). Observe the gas consumption trend.
+    * **Large Input:** Test with large values of `x` (e.g., 10^6, 10^9). Ensure the gas consumption remains proportional and doesn't hit block gas limits unexpectedly.
+* **Test Implementation:**
+    * Measure gas consumption using `gasleft()` before and after calling `burn(x)`.
+    * Assert that the difference in gas consumed is above a certain threshold and increases proportionally with `x`.
+
+**2. Non-Reverting Invariant:**
+
+* **Description:** Verify that calling `burn(x)` never reverts, even if it consumes all remaining gas.
+* **Edge Cases:**
+    * **Gas Limit:** Test with different gas limits for the transaction, including cases where the provided gas is barely enough to execute the function.
+    * **Nested Calls:** Test calling `burn(x)` within another function that also consumes gas. Ensure no reverts occur even when approaching the gas limit.
+* **Test Implementation:**
+    * Use `try/catch` blocks in Solidity to handle potential reverts.
+    * Assert that the `catch` block is never executed, regardless of the input `x` and available gas.
+
+**3. Memory Safety Invariant:**
+
+* **Description:** Verify that the assembly code within `burn(x)` doesn't corrupt memory outside its designated area.
+* **Edge Cases:**
+    * **Consecutive Calls:** Call `burn(x)` multiple times consecutively with different values of `x`. Ensure no unexpected behavior occurs due to memory corruption.
+    * **Interleaved Calls:** Call `burn(x)` interleaved with other functions that also manipulate memory. Ensure no interference or data corruption occurs.
+* **Test Implementation:**
+    * This invariant is harder to test directly within Solidity. Consider using tools like Manticore or Echidna for fuzzing and symbolic execution to detect potential memory safety issues.
+
+**4. Dynamic Value Recommendation:**
+
+* **Description:** While not a strict invariant, it's crucial to test the recommended usage of providing a dynamic, admin-controlled value for `x`.
+* **Test Implementation:**
+    * Create a wrapper contract that allows an admin to set the value of `x` dynamically.
+    * Test calling `burn(x)` through this wrapper contract, verifying that the gas consumption adjusts accordingly based on the admin-set value.
+
+These test invariants cover the core functionality and potential edge cases of the `GasBurnerLib` contract. By thoroughly testing these invariants, you can gain confidence in the contract's reliability and security. 

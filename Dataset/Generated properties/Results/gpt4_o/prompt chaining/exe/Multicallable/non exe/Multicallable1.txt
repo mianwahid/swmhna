@@ -1,0 +1,48 @@
+The provided smart contract, `Multicallable`, is designed to enable a single call to execute multiple methods on itself using the `DELEGATECALL` opcode. This can be useful for batching multiple operations into a single transaction, which can save on gas fees and improve efficiency. Below is a detailed explanation of the functionalities of this contract:
+
+### Contract Overview
+- **Purpose**: The contract allows multiple method calls to be executed in a single transaction.
+- **Author**: The contract is authored by Solady and is modified from Solmate.
+- **Warning**: The contract is not designed to be used with ERC2771 out-of-the-box due to potential vulnerabilities related to arbitrary address spoofing. The authors recommend using an alternative pattern for more flexibility and safety.
+
+### Functionality
+
+#### `multicall(bytes[] calldata data) public virtual returns (bytes[] memory)`
+This is the primary function of the contract. It takes an array of calldata (each representing a method call) and executes each one using `DELEGATECALL`. The results of each call are stored and returned as an array of bytes.
+
+**Detailed Steps**:
+1. **Initial Setup**:
+   - The function starts by setting up memory for storing the results.
+   - It checks if the `data` array is empty and returns early if it is.
+
+2. **Memory Allocation**:
+   - The function calculates the end of the `data` array and copies the offsets from calldata into memory.
+   - It sets up pointers for the results and the end of the results array.
+
+3. **Loop Through Calls**:
+   - The function enters a loop to process each method call in the `data` array.
+   - For each call:
+     - It calculates the offset of the current bytes in calldata.
+     - It copies the current bytes from calldata to memory.
+     - It performs a `DELEGATECALL` to the current contract with the copied calldata.
+     - If the `DELEGATECALL` fails, it bubbles up the revert error.
+     - It appends the current results offset into the results array.
+     - It appends the return data size and the return data itself.
+     - It advances the results offset by the size of the return data, rounded up to the next multiple of 32.
+
+4. **Return Results**:
+   - After processing all calls, the function returns the results array.
+
+**Assembly Code Explanation**:
+- **Memory Management**: The function uses inline assembly to manage memory efficiently. It sets up memory locations for storing the results and uses `calldatacopy` to copy data from calldata to memory.
+- **DELEGATECALL**: The function uses the `DELEGATECALL` opcode to execute each method call. This opcode allows the called method to execute in the context of the calling contract, preserving the state and storage of the calling contract.
+- **Error Handling**: If any `DELEGATECALL` fails, the function uses `returndatacopy` and `revert` to bubble up the error, ensuring that the entire transaction is reverted.
+- **Result Storage**: The function stores the results of each call in a structured format, including the size of the return data and the return data itself.
+
+### Important Considerations
+- **Non-Payable**: The function is deliberately made non-payable to guard against double-spending vulnerabilities.
+- **Efficiency**: The function is designed to be efficient, directly returning the results and terminating the context.
+- **Usage Warning**: The contract is not designed to be used with ERC2771 out-of-the-box due to potential vulnerabilities. The authors recommend using an alternative pattern for more safety and flexibility.
+
+### Summary
+The `Multicallable` contract provides a mechanism to batch multiple method calls into a single transaction using `DELEGATECALL`. It efficiently manages memory and handles errors, ensuring that the entire transaction is reverted if any call fails. However, it is not designed to be used with ERC2771 out-of-the-box, and users are advised to consider alternative patterns for more safety and flexibility.

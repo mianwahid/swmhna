@@ -1,0 +1,48 @@
+The provided smart contract is a library named `CREATE3` that allows for the deterministic deployment of contracts using a custom method. This library is inspired by and modified from other implementations such as Solmate and 0xSequence. Below, I will explain each functionality of the contract in detail:
+
+### Custom Errors
+1. **`DeploymentFailed`**: This error is thrown when the deployment of a contract fails.
+2. **`InitializationFailed`**: This error is thrown when the initialization of a contract fails.
+
+### Bytecode Constants
+1. **`_PROXY_BYTECODE`**: This is a constant that holds the bytecode for a proxy contract. The proxy contract is used to deploy the actual contract deterministically.
+2. **`_PROXY_BYTECODE_HASH`**: This is the keccak256 hash of the `_PROXY_BYTECODE`. It is used in the calculation of the deterministic address.
+
+### CREATE3 Operations
+1. **`deploy` Function**:
+   - **Purpose**: Deploys a contract deterministically using a given `salt`, `creationCode`, and `value`.
+   - **Parameters**:
+     - `bytes32 salt`: A unique value used to ensure the deterministic address.
+     - `bytes memory creationCode`: The bytecode of the contract to be deployed.
+     - `uint256 value`: The amount of ETH to fund the deployed contract.
+   - **Returns**: The deterministic address of the deployed contract.
+   - **Process**:
+     - The `_PROXY_BYTECODE` is stored in memory.
+     - A proxy contract is deployed using `create2` with the given `salt`.
+     - If the deployment of the proxy contract fails, it reverts with `DeploymentFailed`.
+     - The address of the proxy contract is stored.
+     - The deterministic address of the deployed contract is calculated using the proxy's address and a nonce of 1.
+     - The actual contract is deployed by calling the proxy contract with the `creationCode` and `value`.
+     - If the call to the proxy contract fails or the deployed contract's code size is zero, it reverts with `InitializationFailed`.
+
+2. **`getDeployed` Function (with deployer parameter)**:
+   - **Purpose**: Returns the deterministic address for a given `salt` and `deployer`.
+   - **Parameters**:
+     - `bytes32 salt`: A unique value used to ensure the deterministic address.
+     - `address deployer`: The address of the deployer.
+   - **Returns**: The deterministic address of the contract.
+   - **Process**:
+     - The deployer's address, a prefix, the salt, and the `_PROXY_BYTECODE_HASH` are stored in memory.
+     - The proxy's address is calculated using `keccak256`.
+     - The deterministic address of the deployed contract is calculated using the proxy's address and a nonce of 1.
+
+3. **`getDeployed` Function (without deployer parameter)**:
+   - **Purpose**: Returns the deterministic address for a given `salt` using the current contract's address as the deployer.
+   - **Parameters**:
+     - `bytes32 salt`: A unique value used to ensure the deterministic address.
+   - **Returns**: The deterministic address of the contract.
+   - **Process**:
+     - Calls the `getDeployed` function with the `salt` and the current contract's address (`address(this)`).
+
+### Summary
+The `CREATE3` library provides a way to deploy contracts deterministically using a proxy contract and a unique salt. It ensures that the deployed contract's address can be predicted and calculated beforehand, which is useful for various applications where deterministic addresses are required. The library also includes custom error handling to manage deployment and initialization failures.

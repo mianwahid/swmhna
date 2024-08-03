@@ -1,0 +1,60 @@
+To create test invariants for the `ERC1967FactoryConstants` library, we need to ensure that the constants and bytecode provided in the library are correctly defined and behave as expected. Here are the test invariants that cover specific edge cases for each functionality of the given contract:
+
+### 1. Address Invariant
+**Invariant:** The canonical ERC1967Factory address should always be `0x0000000000006396FF2a80c067f99B3d2Ab4Df24`.
+
+**Test Cases:**
+- Verify that the `ADDRESS` constant is equal to `0x0000000000006396FF2a80c067f99B3d2Ab4Df24`.
+- Ensure that the address is not modified during any operation.
+
+### 2. Bytecode Invariant
+**Invariant:** The canonical ERC1967Factory bytecode should match the provided hexadecimal string.
+
+**Test Cases:**
+- Verify that the `BYTECODE` constant matches the provided hexadecimal string.
+- Ensure that the bytecode is not altered during any operation.
+
+### 3. Initcode Invariant
+**Invariant:** The initcode used to deploy the canonical ERC1967Factory should be correctly concatenated from the prefix and the `BYTECODE`.
+
+**Test Cases:**
+- Verify that the `INITCODE` constant is correctly formed by concatenating the prefix `hex"608060405234801561001057600080fd5b506107f6806100206000396000f3fe"` with the `BYTECODE`.
+- Ensure that the initcode is not altered during any operation.
+
+### 4. Salt Invariant
+**Invariant:** The salt value for deterministic deployment should always be `0x0000000000000000000000000000000000000000e75e4f228818c80007508f33`.
+
+**Test Cases:**
+- Verify that the `SALT` constant is equal to `0x0000000000000000000000000000000000000000e75e4f228818c80007508f33`.
+- Ensure that the salt value is not modified during any operation.
+
+### 5. Deployment Invariant
+**Invariant:** The deployment of the canonical ERC1967Factory using the `INITCODE` and `SALT` should result in the correct address.
+
+**Test Cases:**
+- Verify that deploying the `INITCODE` with the `SALT` using a Create2 factory results in the `ADDRESS` constant.
+- Ensure that the deployment process does not alter the expected address.
+
+### 6. Bytecode Integrity Invariant
+**Invariant:** The bytecode should not be corrupted or altered during any operation.
+
+**Test Cases:**
+- Verify that the bytecode remains unchanged after any operation that involves the `BYTECODE` constant.
+- Ensure that the bytecode integrity is maintained when used in different contexts (e.g., deployment, storage).
+
+### 7. Initcode Integrity Invariant
+**Invariant:** The initcode should not be corrupted or altered during any operation.
+
+**Test Cases:**
+- Verify that the initcode remains unchanged after any operation that involves the `INITCODE` constant.
+- Ensure that the initcode integrity is maintained when used in different contexts (e.g., deployment, storage).
+
+### 8. Salt Integrity Invariant
+**Invariant:** The salt value should not be corrupted or altered during any operation.
+
+**Test Cases:**
+- Verify that the salt value remains unchanged after any operation that involves the `SALT` constant.
+- Ensure that the salt integrity is maintained when used in different contexts (e.g., deployment, storage).
+
+### Summary
+These test invariants ensure that the constants and bytecode provided in the `ERC1967FactoryConstants` library are correctly defined and behave as expected. They cover edge cases such as verifying the integrity of the address, bytecode, initcode, and salt, as well as ensuring that the deployment process results in the correct address.

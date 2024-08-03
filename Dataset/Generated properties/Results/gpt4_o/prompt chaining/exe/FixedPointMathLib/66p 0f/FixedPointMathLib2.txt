@@ -1,0 +1,183 @@
+To ensure the correctness and robustness of the `FixedPointMathLib` library, we need to define test invariants for each function. These invariants will cover various edge cases, including overflow, underflow, division by zero, and other potential issues. Below is a list of test invariants for each function in the library:
+
+### Custom Errors
+1. **ExpOverflow**: Ensure that `expWad` throws `ExpOverflow` when the input exceeds the maximum allowable value.
+2. **FactorialOverflow**: Ensure that `factorial` throws `FactorialOverflow` when the input exceeds 57.
+3. **RPowOverflow**: Ensure that `rpow` throws `RPowOverflow` when the result overflows.
+4. **MantissaOverflow**: Ensure that `packSci` throws `MantissaOverflow` when the mantissa is too large.
+5. **MulWadFailed**: Ensure that `mulWad` and `mulWadUp` throw `MulWadFailed` when the multiplication overflows.
+6. **SMulWadFailed**: Ensure that `sMulWad` throws `SMulWadFailed` when the signed multiplication overflows.
+7. **DivWadFailed**: Ensure that `divWad` and `divWadUp` throw `DivWadFailed` when the division overflows or the denominator is zero.
+8. **SDivWadFailed**: Ensure that `sDivWad` throws `SDivWadFailed` when the signed division overflows or the denominator is zero.
+9. **MulDivFailed**: Ensure that `mulDiv` and `mulDivUp` throw `MulDivFailed` when the multiplication followed by division overflows or the denominator is zero.
+10. **DivFailed**: Ensure that `divUp` throws `DivFailed` when the denominator is zero.
+11. **FullMulDivFailed**: Ensure that `fullMulDiv` and `fullMulDivUp` throw `FullMulDivFailed` when the result overflows or the denominator is zero.
+12. **LnWadUndefined**: Ensure that `lnWad` throws `LnWadUndefined` when the input is less than or equal to zero.
+13. **OutOfDomain**: Ensure that `lambertW0Wad` throws `OutOfDomain` when the input is less than `-1/e`.
+
+### Simplified Fixed Point Operations
+1. **mulWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `MulWadFailed` on overflow.
+2. **sMulWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `SMulWadFailed` on overflow.
+3. **rawMulWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow.
+4. **rawSMulWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow.
+5. **mulWadUp**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `MulWadFailed` on overflow.
+6. **rawMulWadUp**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow.
+7. **divWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `DivWadFailed` on overflow or division by zero.
+8. **sDivWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `SDivWadFailed` on overflow or division by zero.
+9. **rawDivWad**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow or division by zero.
+10. **rawSDivWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it does not check for overflow or division by zero.
+11. **divWadUp**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `DivWadFailed` on overflow or division by zero.
+12. **rawDivWadUp**:
+    - Ensure correct result for typical inputs.
+    - Ensure it does not check for overflow or division by zero.
+13. **powWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0` and `y = 0`.
+14. **expWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `ExpOverflow` on overflow.
+15. **lnWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `LnWadUndefined` for inputs <= 0.
+16. **lambertW0Wad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `OutOfDomain` for inputs < `-1/e`.
+
+### General Number Utilities
+1. **fullMulDiv**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `FullMulDivFailed` on overflow or division by zero.
+2. **fullMulDivUp**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `FullMulDivFailed` on overflow or division by zero.
+3. **mulDiv**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `MulDivFailed` on overflow or division by zero.
+4. **mulDivUp**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `MulDivFailed` on overflow or division by zero.
+5. **divUp**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `DivFailed` on division by zero.
+6. **zeroFloorSub**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `x < y`.
+7. **rpow**:
+   - Ensure correct result for typical inputs.
+   - Ensure it throws `RPowOverflow` on overflow.
+8. **sqrt**:
+   - Ensure correct result for typical inputs.
+   - Ensure it handles edge cases like `x = 0`.
+9. **cbrt**:
+   - Ensure correct result for typical inputs.
+   - Ensure it handles edge cases like `x = 0`.
+10. **sqrtWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+11. **cbrtWad**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+12. **factorial**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `FactorialOverflow` for inputs >= 58.
+13. **log2**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+14. **log2Up**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+15. **log10**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+16. **log10Up**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+17. **log256**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+18. **log256Up**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+19. **sci**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+20. **packSci**:
+    - Ensure correct result for typical inputs.
+    - Ensure it throws `MantissaOverflow` when the mantissa is too large.
+21. **unpackSci**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `packed = 0`.
+22. **avg**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = y`.
+23. **abs**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0`.
+24. **dist**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = y`.
+25. **min**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = y`.
+26. **max**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = y`.
+27. **clamp**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = minValue` and `x = maxValue`.
+28. **gcd**:
+    - Ensure correct result for typical inputs.
+    - Ensure it handles edge cases like `x = 0` or `y = 0`.
+
+### Raw Number Operations
+1. **rawAdd**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow.
+2. **rawSub**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for underflow.
+3. **rawMul**:
+   - Ensure correct result for typical inputs.
+   - Ensure it does not check for overflow.
+4. **rawDiv**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `y = 0`.
+5. **rawSDiv**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `y = 0`.
+6. **rawMod**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `y = 0`.
+7. **rawSMod**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `y = 0`.
+8. **rawAddMod**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `d = 0`.
+9. **rawMulMod**:
+   - Ensure correct result for typical inputs.
+   - Ensure it returns 0 when `d = 0`.
+
+These test invariants will help ensure that the `FixedPointMathLib` library functions correctly and handles edge cases appropriately.

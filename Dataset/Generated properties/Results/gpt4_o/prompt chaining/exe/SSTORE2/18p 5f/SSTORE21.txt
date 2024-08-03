@@ -1,0 +1,49 @@
+The provided smart contract is a library named `SSTORE2` that allows for efficient storage and retrieval of data on the Ethereum blockchain. It achieves this by deploying small contracts that store the data in their bytecode, which can be read later. Below is a detailed explanation of each functionality provided by the contract:
+
+### Constants
+- **DATA_OFFSET**: This constant is set to 1. It is used to skip the first byte of the contract's bytecode, which is a STOP opcode. This ensures that the contract cannot be called.
+
+### Custom Errors
+- **DeploymentFailed**: This error is thrown when the deployment of a storage contract fails.
+- **InvalidPointer**: This error is thrown when an invalid storage contract address is provided.
+- **ReadOutOfBounds**: This error is thrown when an attempt is made to read outside the bounds of the storage contract's bytecode.
+
+### Write Logic
+1. **write(bytes memory data) -> address pointer**:
+   - This function writes the provided `data` into the bytecode of a new storage contract and returns its address.
+   - It prefixes the data with a STOP opcode to ensure the contract cannot be called.
+   - It uses inline assembly to create the contract and handle potential errors.
+
+2. **writeDeterministic(bytes memory data, bytes32 salt) -> address pointer**:
+   - This function writes the provided `data` into the bytecode of a new storage contract using a deterministic address derived from the provided `salt`.
+   - It uses the `create2` opcode to deploy the contract, ensuring the address is deterministic.
+   - It handles potential errors similarly to the `write` function.
+
+3. **initCodeHash(bytes memory data) -> bytes32 hash**:
+   - This function returns the initialization code hash of the storage contract for the provided `data`.
+   - It is useful for mining vanity addresses with tools like `create2crunch`.
+   - It uses inline assembly to compute the hash.
+
+4. **predictDeterministicAddress(bytes memory data, bytes32 salt, address deployer) -> address predicted**:
+   - This function returns the address of the storage contract for the provided `data` that would be deployed with the given `salt` by the specified `deployer`.
+   - The result has dirty upper 96 bits, which should be cleaned if used in assembly.
+   - It uses inline assembly to compute the predicted address.
+
+### Read Logic
+1. **read(address pointer) -> bytes memory data**:
+   - This function returns all the `data` from the bytecode of the storage contract at the specified `pointer`.
+   - It checks if the contract exists and handles potential errors.
+   - It uses inline assembly to read the bytecode and return the data.
+
+2. **read(address pointer, uint256 start) -> bytes memory data**:
+   - This function returns the `data` from the bytecode of the storage contract at the specified `pointer`, starting from the byte at `start` to the end of the data.
+   - It checks if the contract exists and if the `start` index is within bounds, handling potential errors.
+   - It uses inline assembly to read the bytecode and return the data.
+
+3. **read(address pointer, uint256 start, uint256 end) -> bytes memory data**:
+   - This function returns the `data` from the bytecode of the storage contract at the specified `pointer`, from the byte at `start` to the byte at `end` (exclusive).
+   - It checks if the contract exists and if the `start` and `end` indices are within bounds, handling potential errors.
+   - It uses inline assembly to read the bytecode and return the data.
+
+### Summary
+The `SSTORE2` library provides a cost-efficient way to store and retrieve data on the Ethereum blockchain by leveraging the bytecode of small contracts. It includes functions for writing data to new contracts, predicting deterministic addresses, and reading data from these contracts. The library uses inline assembly extensively to optimize gas usage and handle potential errors.

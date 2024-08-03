@@ -1,0 +1,848 @@
+Writing Tests
+Tests are written in Solidity. If the test function reverts, the test fails, otherwise it passes.
+
+Let’s go over the most common way of writing tests, using the Forge Standard Library’s Test contract, which is the preferred way of writing tests with Forge.
+
+In this section, we’ll go over the basics using the functions from the Forge Std’s Test contract, which is itself a superset of DSTest. You will learn how to use more advanced stuff from the Forge Standard Library soon.
+
+DSTest provides basic logging and assertion functionality. To get access to the functions, import forge-std/Test.sol and inherit from Test in your test contract:
+
+import "forge-std/Test.sol";
+Let’s examine a basic test:
+
+pragma solidity 0.8.10;
+
+import "forge-std/Test.sol";
+
+contract ContractBTest is Test {
+    uint256 testNumber;
+
+    function setUp() public {
+        testNumber = 42;
+    }
+
+    function test_NumberIs42() public {
+        assertEq(testNumber, 42);
+    }
+
+    function testFail_Subtract43() public {
+        testNumber -= 43;
+    }
+}
+Forge uses the following keywords in tests:
+
+setUp: An optional function invoked before each test case is run.
+    function setUp() public {
+        testNumber = 42;
+    }
+test: Functions prefixed with test are run as a test case.
+    function test_NumberIs42() public {
+        assertEq(testNumber, 42);
+    }
+testFail: The inverse of the test prefix - if the function does not revert, the test fails.
+    function testFail_Subtract43() public {
+        testNumber -= 43;
+    }
+A good practice is to use the pattern test_Revert[If|When]_Condition in combination with the expectRevert cheatcode (cheatcodes are explained in greater detail in the following section). Also, other testing practices can be found in the Tutorials section. Now, instead of using testFail, you know exactly what reverted and with which error:
+
+    function test_CannotSubtract43() public {
+        vm.expectRevert(stdError.arithmeticError);
+        testNumber -= 43;
+    }
+
+Tests are deployed to 0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84. If you deploy a contract within your test, then 0xb4c...7e84 will be its deployer. If the contract deployed within a test gives special permissions to its deployer, such as Ownable.sol’s onlyOwner modifier, then the test contract 0xb4c...7e84 will have those permissions.
+
+⚠️ Note
+
+Test functions must have either external or public visibility. Functions declared as internal or private won’t be picked up by Forge, even if they are prefixed with test.
+
+Shared setups
+It is possible to use shared setups by creating helper abstract contracts and inheriting them in your test contracts:
+
+abstract contract HelperContract {
+    address constant IMPORTANT_ADDRESS = 0x543d...;
+    SomeContract someContract;
+    constructor() {...}
+}
+
+contract MyContractTest is Test, HelperContract {
+    function setUp() public {
+        someContract = new SomeContract(0, IMPORTANT_ADDRESS);
+        ...
+    }
+}
+
+contract MyOtherContractTest is Test, HelperContract {
+    function setUp() public {
+        someContract = new SomeContract(1000, IMPORTANT_ADDRESS);
+        ...
+    }
+}
+
+Cheatcodes
+Most of the time, simply testing your smart contracts outputs isn’t enough. To manipulate the state of the blockchain, as well as test for specific reverts and events, Foundry is shipped with a set of cheatcodes.
+
+Cheatcodes allow you to change the block number, your identity, and more. They are invoked by calling specific functions on a specially designated address: 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D.
+
+You can access cheatcodes easily via the vm instance available in Forge Standard Library’s Test contract. Forge Standard Library is explained in greater detail in the following section.
+
+Let’s write a test for a smart contract that is only callable by its owner.
+
+pragma solidity 0.8.10;
+
+import "forge-std/Test.sol";
+
+error Unauthorized();
+
+contract OwnerUpOnly {
+    address public immutable owner;
+    uint256 public count;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function increment() external {
+        if (msg.sender != owner) {
+            revert Unauthorized();
+        }
+        count++;
+    }
+}
+
+contract OwnerUpOnlyTest is Test {
+    OwnerUpOnly upOnly;
+
+    function setUp() public {
+        upOnly = new OwnerUpOnly();
+    }
+
+    function test_IncrementAsOwner() public {
+        assertEq(upOnly.count(), 0);
+        upOnly.increment();
+        assertEq(upOnly.count(), 1);
+    }
+}
+If we run forge test now, we will see that the test passes, since OwnerUpOnlyTest is the owner of OwnerUpOnly.
+
+$ forge test
+Compiling 24 files with 0.8.10
+Solc 0.8.10 finished in 1.16s
+Compiler run successful!
+
+Ran 1 test for test/OwnerUpOnly.t.sol:OwnerUpOnlyTest
+[PASS] test_IncrementAsOwner() (gas: 29161)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 338.38µs (53.44µs CPU time)
+
+Ran 1 test suite in 2.61ms (338.38µs CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+Let’s make sure that someone who is definitely not the owner can’t increment the count:
+
+contract OwnerUpOnlyTest is Test {
+    OwnerUpOnly upOnly;
+
+    // ...
+
+    function testFail_IncrementAsNotOwner() public {
+        vm.prank(address(0));
+        upOnly.increment();
+    }
+}
+If we run forge test now, we will see that all the test pass.
+
+$ forge test
+No files changed, compilation skipped
+
+Ran 2 tests for test/OwnerUpOnly.t.sol:OwnerUpOnlyTest
+[PASS] testFail_IncrementAsNotOwner() (gas: 8314)
+[PASS] test_IncrementAsOwner() (gas: 29161)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 463.17µs (144.91µs CPU time)
+
+Ran 1 test suite in 2.46ms (463.17µs CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
+The test passed because the prank cheatcode changed our identity to the zero address for the next call (upOnly.increment()). The test case passed since we used the testFail prefix, however, using testFail is considered an anti-pattern since it does not tell us anything about why upOnly.increment() reverted.
+
+If we run the tests again with traces turned on, we can see that we reverted with the correct error message.
+
+$ forge test -vvvv --match-test testFail_IncrementAsNotOwner
+No files changed, compilation skipped
+
+Ran 1 test for test/OwnerUpOnly.t.sol:OwnerUpOnlyTest
+[PASS] testFail_IncrementAsNotOwner() (gas: 8314)
+Traces:
+  [8314] OwnerUpOnlyTest::testFail_IncrementAsNotOwner()
+    ├─ [0] VM::prank(0x0000000000000000000000000000000000000000)
+    │   └─ ← [Return]
+    ├─ [247] OwnerUpOnly::increment()
+    │   └─ ← [Revert] Unauthorized()
+    └─ ← [Revert] Unauthorized()
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 311.78µs (29.82µs CPU time)
+
+Ran 1 test suite in 2.71ms (311.78µs CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+To be sure in the future, let’s make sure that we reverted because we are not the owner using the expectRevert cheatcode:
+
+contract OwnerUpOnlyTest is Test {
+    OwnerUpOnly upOnly;
+
+    // ...
+
+    // Notice that we replaced `testFail` with `test`
+    function test_RevertWhen_CallerIsNotOwner() public {
+        vm.expectRevert(Unauthorized.selector);
+        vm.prank(address(0));
+        upOnly.increment();
+    }
+}
+If we run forge test one last time, we see that the test still passes, but this time we are sure that it will always fail if we revert for any other reason.
+
+$ forge test
+No files changed, compilation skipped
+
+Ran 1 test for test/OwnerUpOnly.t.sol:OwnerUpOnlyTest
+[PASS] test_IncrementAsOwner() (gas: 29161)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 341.90µs (56.66µs CPU time)
+
+Ran 1 test suite in 2.39ms (341.90µs CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+Another cheatcode that is perhaps not so intuitive is the expectEmit function. Before looking at expectEmit, we need to understand what an event is.
+
+Events are inheritable members of contracts. When you emit an event, the arguments are stored on the blockchain. The indexed attribute can be added to a maximum of three parameters of an event to form a data structure known as a “topic.” Topics allow users to search for events on the blockchain.
+
+pragma solidity 0.8.10;
+
+import "forge-std/Test.sol";
+
+contract EmitContractTest is Test {
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+
+    function test_ExpectEmit() public {
+        ExpectEmit emitter = new ExpectEmit();
+        // Check that topic 1, topic 2, and data are the same as the following emitted event.
+        // Checking topic 3 here doesn't matter, because `Transfer` only has 2 indexed topics.
+        vm.expectEmit(true, true, false, true);
+        // The event we expect
+        emit Transfer(address(this), address(1337), 1337);
+        // The event we get
+        emitter.t();
+    }
+
+    function test_ExpectEmit_DoNotCheckData() public {
+        ExpectEmit emitter = new ExpectEmit();
+        // Check topic 1 and topic 2, but do not check data
+        vm.expectEmit(true, true, false, false);
+        // The event we expect
+        emit Transfer(address(this), address(1337), 1338);
+        // The event we get
+        emitter.t();
+    }
+}
+
+contract ExpectEmit {
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+
+    function t() public {
+        emit Transfer(msg.sender, address(1337), 1337);
+    }
+}
+When we call vm.expectEmit(true, true, false, true);, we want to check the 1st and 2nd indexed topic for the next event.
+
+The expected Transfer event in test_ExpectEmit() means we are expecting that from is address(this), and to is address(1337). This is compared against the event emitted from emitter.t().
+
+In other words, we are checking that the first topic from emitter.t() is equal to address(this). The 3rd argument in expectEmit is set to false because there is no need to check the third topic in the Transfer event, since there are only two. It does not matter even if we set to true.
+
+The 4th argument in expectEmit is set to true, which means that we want to check “non-indexed topics”, also known as data.
+
+For example, we want the data from the expected event in test_ExpectEmit - which is amount - to equal to the data in the actual emitted event. In other words, we are asserting that amount emitted by emitter.t() is equal to 1337. If the fourth argument in expectEmit was set to false, we would not check amount.
+
+In other words, test_ExpectEmit_DoNotCheckData is a valid test case, even though the amounts differ, since we do not check the data.
+
+Forge Standard Library Overview
+Forge Standard Library (Forge Std for short) is a collection of helpful contracts that make writing tests easier, faster, and more user-friendly.
+
+Using Forge Std is the preferred way of writing tests with Foundry.
+
+It provides all the essential functionality you need to get started writing tests:
+
+Vm.sol: Up-to-date cheatcodes interface
+console.sol and console2.sol: Hardhat-style logging functionality
+Script.sol: Basic utilities for Solidity scripting
+Test.sol: A superset of DSTest containing standard libraries, a cheatcodes instance (vm), and Hardhat console
+Simply import Test.sol and inherit from Test in your test contract:
+
+import "forge-std/Test.sol";
+
+contract ContractTest is Test { ...
+Now, you can:
+
+// Access Hevm via the `vm` instance
+vm.startPrank(alice);
+
+// Assert and log using Dappsys Test
+assertEq(dai.balanceOf(alice), 10000e18);
+
+// Log with the Hardhat `console` (`console2`)
+console.log(alice.balance);
+
+// Use anything from the Forge Std std-libraries
+deal(address(dai), alice, 10000e18);
+To import the Vm interface or the console library individually:
+
+import "forge-std/Vm.sol";
+import "forge-std/console.sol";
+Note: console2.sol contains patches to console.sol that allows Forge to decode traces for calls to the console, but it is not compatible with Hardhat.
+
+import "forge-std/console2.sol";
+Standard libraries
+Forge Std currently consists of six standard libraries.
+
+Std Logs
+Std Logs expand upon the logging events from the DSTest library.
+
+Std Assertions
+Std Assertions expand upon the assertion functions from the DSTest library.
+
+Std Cheats
+Std Cheats are wrappers around Forge cheatcodes that make them safer to use and improve the DX.
+
+You can access Std Cheats by simply calling them inside your test contract, as you would any other internal function:
+
+// set up a prank as Alice with 100 ETH balance
+hoax(alice, 100 ether);
+Std Errors
+Std Errors provide wrappers around common internal Solidity errors and reverts.
+
+Std Errors are most useful in combination with the expectRevert cheatcode, as you do not need to remember the internal Solidity panic codes yourself. Note that you have to access them through stdError, as this is a library.
+
+// expect an arithmetic error on the next call (e.g. underflow)
+vm.expectRevert(stdError.arithmeticError);
+Std Storage
+Std Storage makes manipulating contract storage easy. It can find and write to the storage slot(s) associated with a particular variable.
+
+The Test contract already provides a StdStorage instance stdstore through which you can access any std-storage functionality. Note that you must add using stdStorage for StdStorage in your test contract first.
+
+// find the variable `score` in the contract `game`
+// and change its value to 10
+stdstore
+    .target(address(game))
+    .sig(game.score.selector)
+    .checked_write(10);
+Std Math
+Std Math is a library with useful mathematical functions that are not provided in Solidity.
+
+Note that you have to access them through stdMath, as this is a library.
+
+// get the absolute value of -10
+uint256 ten = stdMath.abs(-10)
+
+
+Best Practices
+This guide documents the suggested best practices when developing with Foundry. In general, it’s recommended to handle as much as possible with forge fmt, and anything this doesn’t handle is below.
+
+Best Practices
+General Contract Guidance
+Tests
+General Test Guidance
+Fork Tests
+Test Harnesses
+Internal Functions
+Private Functions
+Workaround Functions
+Best practices
+Taint Analysis
+Scripts
+Private Key Management
+Comments
+Resources
+General Contract Guidance
+Always use named import syntax, don’t import full files. This restricts what is being imported to just the named items, not everything in the file. Importing full files can result in solc complaining about duplicate definitions and slither erroring, especially as repos grow and have more dependencies with overlapping names.
+
+Good: import {MyContract} from "src/MyContract.sol" to only import MyContract.
+Bad: import "src/MyContract.sol" imports everything in MyContract.sol. (Importing forge-std/Test or Script can be an exception here, so you get the console library, etc).
+Note the tradeoffs between absolute and relative paths for imports (where absolute paths are relative to the repo root, e.g. "src/interfaces/IERC20.sol"), and choose the best approach for your project:
+
+Absolute paths make it easier to see where files are from and reduce churn when moving files around.
+Relative paths make it more likely your editor can provide features like linting and autocomplete, since editors/extensions may not understand your remappings.
+If copying a library from a dependency (instead of importing it), use the ignore = [] option in the config file to avoid formatting that file. This makes diffing it against the original simpler for reviewers and auditors.
+
+Similarly, feel free to use the // forgefmt: disable-* comment directives to ignore lines/sections of code that look better with manual formatting. Supported values for * are:
+
+disable-line
+disable-next-line
+disable-next-item
+disable-start
+disable-end
+Additional best practices from samsczun’s How Do You Even Write Secure Code Anyways talk:
+
+Use descriptive variable names.
+Limit the number of active variables.
+No redundant logic.
+Early exit as much as possible to reduce mental load when seeing the code.
+Related code should be placed near each other.
+Delete unused code.
+Tests
+General Test Guidance
+For testing MyContract.sol, the test file should be MyContract.t.sol. For testing MyScript.s.sol, the test file should be MyScript.t.sol.
+
+If the contract is big and you want to split it over multiple files, group them logically like MyContract.owner.t.sol, MyContract.deposits.t.sol, etc.
+Never make assertions in the setUp function, instead use a dedicated test like test_SetUpState() if you need to ensure your setUp function does what you expected. More info on why in foundry-rs/foundry#1291
+
+For unit tests, there are two major ways to organize the tests:
+
+Treat contracts as describe blocks:
+
+contract Add holds all unit tests for the add method of MyContract.
+contract Supply holds all tests for the supply method.
+contract Constructor hold all tests for the constructor.
+A benefit of this approach is that smaller contracts should compile faster than large ones, so this approach of many small contracts should save time as test suites get large.
+Have a Test contract per contract-under-test, with as many utilities and fixtures as you want:
+
+contract MyContractTest holds all unit tests for MyContract.
+function test_add_AddsTwoNumbers() lives within MyContractTest to test the add method.
+function test_supply_UsersCanSupplyTokens() also lives within MyContractTest to test the supply method.
+A benefit of this approach is that test output is grouped by contract-under-test, which makes it easier to quickly see where failures are.
+Some general guidance for all tests:
+
+Test contracts/functions should be written in the same order as the original functions in the contract-under-test.
+All unit tests that test the same function should live serially in the test file.
+Test contracts can inherit from any helper contracts you want. For example contract MyContractTest tests MyContract, but may inherit from forge-std’s Test, as well as e.g. your own TestUtilities helper contract.
+Integration tests should live in the same test directory, with a clear naming convention. These may be in dedicated files, or they may live next to related unit tests in existing test files.
+
+Be consistent with test naming, as it’s helpful for filtering tests (e.g. for gas reports you might want to filter out revert tests). When combining naming conventions, keep them alphabetical. Below is a sample of valid names. A comprehensive list of valid and invalid examples can be found here.
+
+test_Description for standard tests.
+testFuzz_Description for fuzz tests.
+test_Revert[If|When]_Condition for tests expecting a revert.
+testFork_Description for tests that fork from a network.
+testForkFuzz_Revert[If|When]_Condition for a fuzz test that forks and expects a revert.
+Name your constants and immutables using ALL_CAPS_WITH_UNDERSCORES, to make it easier to distinguish them from variables and functions.
+
+When using assertions like assertEq, consider leveraging the last string param to make it easier to identify failures. These can be kept brief, or even just be numbers—they basically serve as a replacement for showing line numbers of the revert, e.g. assertEq(x, y, "1") or assertEq(x, y, "sum1"). (Note: foundry-rs/foundry#2328 tracks integrating this natively).
+
+When testing events, prefer setting all expectEmit arguments to true, i.e. vm.expectEmit(true, true, true, true) or vm.expectEmit(). Benefits:
+
+This ensures you test everything in your event.
+If you add a topic (i.e. a new indexed parameter), it’s now tested by default.
+Even if you only have 1 topic, the extra true arguments don’t hurt.
+Remember to write invariant tests! For the assertion string, use a verbose english description of the invariant: assertEq(x + y, z, "Invariant violated: the sum of x and y must always equal z"). For more info on this, check out the Invariant Testing tutorial.
+
+Fork Tests
+Don’t feel like you need to give forks tests special treatment, and use them liberally:
+
+Mocks are required in closed-source web2 development—you have to mock API responses because the code for that API isn’t open source so you cannot just run it locally. But for blockchains that’s not true: any code you’re interacting with that’s already deployed can be locally executed and even modified for free. So why introduce the risk of a wrong mock if you don’t need to?
+A common reason to avoid fork tests and prefer mocks is that fork tests are slow. But this is not always true. By pinning to a block number, forge caches RPC responses so only the first run is slower, and subsequent runs are significantly faster. See this benchmark, where it took forge 7 minutes for the first run with a remote RPC, but only half a second once data was cached. Alchemy, Infura and Tenderly offer free archive data, so pinning to a block shouldn’t be problematic.
+Note that the foundry-toolchain GitHub Action will cache RPC responses in CI by default, and it will also update the cache when you update your fork tests.
+Be careful with fuzz tests on a fork to avoid burning through RPC requests with non-deterministic fuzzing. If the input to your fork fuzz test is some parameter which is used in an RPC call to fetch data (e.g. querying the token balance of an address), each run of a fuzz test uses at least 1 RPC request, so you’ll quickly hit rate limits or usage limits. Solutions to consider:
+
+Replace multiple RPC calls with a single multicall.
+Specify a fuzz/invariant seed: this makes sure each forge test invocation uses the same fuzz inputs. RPC results are cached locally, so you’ll only query the node the first time.
+In CI, consider setting the fuzz seed using a computed environment variable so it changes every day or every week. This gives flexibility on the tradeoff between increasing randomness to find more bugs vs. using a seed to reduce RPC requests.
+Structure your tests so the data you are fuzzing over is computed locally by your contract, and not data that is used in an RPC call (may or may not be feasible based on what you’re doing).
+Lastly, you can of course always run a local node or bump your RPC plan.
+When writing fork tests, do not use the --fork-url flag. Instead, prefer the following approach for its improved flexibility:
+
+Define [rpc_endpoints] in the foundry.toml config file and use the forking cheatcodes.
+Access the RPC URL endpoint in your test with forge-std’s stdChains.ChainName.rpcUrl. See the list of supported chains and expected config file aliases here.
+Always pin to a block so tests are deterministic and RPC responses are cached.
+More info on this fork test approach can be found here (this predates StdChains so that aspect is a bit out of date).
+Test Harnesses
+Internal Functions
+To test internal functions, write a harness contract that inherits from the contract under test (CuT). Harness contracts that inherit from the CuT expose the internal functions as external ones.
+
+Each internal function that is tested should be exposed via an external one with a name that follows the pattern exposed_<function_name>. For example:
+
+// file: src/MyContract.sol
+contract MyContract {
+  function myInternalMethod() internal returns (uint) {
+    return 42;
+  }
+}
+
+// file: test/MyContract.t.sol
+import {MyContract} from "src/MyContract.sol";
+
+contract MyContractHarness is MyContract {
+  // Deploy this contract then call this method to test `myInternalMethod`.
+  function exposed_myInternalMethod() external returns (uint) {
+    return myInternalMethod();
+  }
+}
+Private Functions
+Unfortunately there is currently no good way to unit test private methods since they cannot be accessed by any other contracts. Options include:
+
+Converting private functions to internal.
+Copy/pasting the logic into your test contract and writing a script that runs in CI check to ensure both functions are identical.
+Workaround Functions
+Harnesses can also be used to expose functionality or information otherwise unavailable in the original smart contract. The most straightforward example is when we want to test the length of a public array. The functions should follow the pattern: workaround_<function_name>, such as workaround_queueLength().
+
+Another use case for this is tracking data that you would not track in production to help test invariants. For example, you might store a list of all token holders to simplify validation of the invariant “sum of all balances must equal total supply”. These are often known as “ghost variables”. You can learn more about this in Rikard Hjort’s Formal Methods for the Working DeFi Dev talk.
+
+Best practices
+Thanks to @samsczun’s How Do You Even Write Secure Code Anyways talk for the tips in this section and the following section.
+
+Don’t optimize for coverage, optimize for well thought-out tests.
+Write positive and negative unit tests.
+Write positive unit tests for things that the code should handle. Validate all state that changes from these tests.
+Write negative unit tests for things that the code should not handle. It’s helpful to follow up (as an adjacent test) with the positive test and make the change that it needs to pass.
+Each code path should have its own unit test.
+Write integration tests to test entire features.
+Write fork tests to verify the correct behavior with existing deployed contract.
+Taint Analysis
+When testing, you should prioritize functions that an attacker can affect, that means functions that accept some kind of user input. These are called sources.
+
+Consider that input data as tainted until it has been checked by the code, at which point it’s considered clean.
+
+A sink is a part of the code where some important operation is happening. For example, in MakerDAO that would be vat.sol.
+
+You should ensure that no tainted data ever reaches a sink. That means that all data that find themselves in the sink, should, at some point, have been checked by you. So, you need to define what the data should be and then make sure your checks ensure that the data will be how you expect it to be.
+
+Scripts
+Stick with run as the default function name for clarity.
+
+Any methods that are not intended to be called directly in the script should be internal or private. Generally the only public method should be run, as it’s easier to read/understand when each script file just does one thing.
+
+Consider prefixing scripts with a number based on the order they’re intended to be run over the protocol’s lifecycle. For example, 01_Deploy.s.sol, 02_TransferOwnership.s.sol. This makes things more self-documenting. This may not always apply depending on your project.
+
+Test your scripts.
+
+Unit test them like you would test normal contracts, by writing tests that assert on the state changes made from running the script.
+Write your deploy script and scaffold tests by running that script. Then, run all tests against the state resulting from your production deployment script. This is a great way to gain confidence in a deploy script.
+Within your script itself, use require statements (or the if (condition) revert() pattern if you prefer) to stop execution of your script if something is wrong. For example, require(computedAddress == deployedAddress, "address mismatch"). Using the assertEq helpers instead will not stop execution.
+Carefully audit which transactions are broadcast. Transactions not broadcast are still executed in the context of a test, so missing broadcasts or extra broadcasts are easy sources of error in the previous step.
+
+Watch out for frontrunning. Forge simulates your script, generates transaction data from the simulation results, then broadcasts the transactions. Make sure your script is robust against chain-state changing between the simulation and broadcast. A sample script vulnerable to this is below:
+
+// Pseudo-code, may not compile.
+contract VulnerableScript is Script {
+   function run() public {
+      vm.startBroadcast();
+
+      // Transaction 1: Deploy a new Gnosis Safe with CREATE.
+      // Because we're using CREATE instead of CREATE2, the address of the new
+      // Safe is a function of the nonce of the gnosisSafeProxyFactory.
+      address mySafe = gnosisSafeProxyFactory.createProxy(singleton, data);
+
+      // Transaction 2: Send tokens to the new Safe.
+      // We know the address of mySafe is a function of the nonce of the
+      // gnosisSafeProxyFactory. If someone else deploys a Gnosis Safe between
+      // the simulation and broadcast, the address of mySafe will be different,
+      // and this script will send 1000 DAI to the other person's Safe. In this
+      // case, we can protect ourselves from this by using CREATE2 instead of
+      // CREATE, but every situation may have different solutions.
+      dai.transfer(mySafe, 1000e18);
+
+      vm.stopBroadcast();
+   }
+}
+For scripts that read from JSON input files, put the input files in script/input/<chainID>/<description>.json. Then have run(string memory input) (or take multiple string inputs if you need to read from multiple files) as the script’s signature, and use the below method to read the JSON file.
+
+function readInput(string memory input) internal returns (string memory) {
+  string memory inputDir = string.concat(vm.projectRoot(), "/script/input/");
+  string memory chainDir = string.concat(vm.toString(block.chainid), "/");
+  string memory file = string.concat(input, ".json");
+  return vm.readFile(string.concat(inputDir, chainDir, file));
+}
+Private Key Management
+Script execution requires a private key to send transactions. This key controls all funds in the account, so it must be protected carefully. There are a few options for securely broadcasting transactions through a script:
+
+Use a hardware wallet. Hardware wallets such as Ledger and Trezor store seed phrases in a secure enclave. Forge can send a raw transaction to the wallet, and the wallet will sign the transaction. The signed transaction is returned to forge and broadcaster. This way, private keys never leave the hardware wallet, making this a very secure approach. To use a hardware wallet with scripts, see the --ledger and --trezor flags.
+
+Use a private key directly. With this approach you expose a private key on your machine, making it riskier than the above option. Therefore the suggested way to directly use a private key is to generate a new wallet for executing the script, and only send that wallet enough funds to run the script. Then, stop using the key after the script is complete. This way, if the key is compromised, only the funds on this throwaway key are lost, as opposed to losing everything in your wallet.
+
+With this approach, it’s very important that your scripts or contracts don’t rely on msg.sender since the sender will not be an account that’s meant to be used again. For example, if a deploy script configures a contract owner, ensure the owner a constructor argument and not set to msg.sender.
+To use this approach, you can either store the private key in an environment variable and use cheat codes to read it in, or use the --private-key flag to directly provide the key.
+Use a keystore. This can be thought of as a middle ground between the above two approaches. With cast wallet import you import a private key and encrypt it with a password. This still temporarily exposes your private key on your machine, but it becomes encrypted and you’ll provide the password to decrypt it to run a script.
+
+Additional security precautions when using scripts:
+
+Use a separate wallet for testing and development, instead of using your main wallet with real funds. Diversifying minimizes the risk of losing funds if your development wallet is compromised.
+If you accidentally push a private key or seed phrase to GitHub, or expose it online via other means—even momentarily—treat it as compromised. Act immediately to transfer your funds to a safer destination.
+When in doubt about whether a wallet contains real funds or not, assume it does. Always be certain about a wallet’s balances and status when using it for development purposes. Use blockscan to easily check many chains to see where the address has been used.
+Remember that adding an account in wallets like Metamask generates a new private key. However, that private key is derived from the same mnemonic as the other accounts generated in that wallet. Therefore, never expose the mnemonic as it may compromise all of your accounts.
+This was section was inspired by The Pledge from Patrick Collins.
+
+Comments
+For public or external methods and variables, use NatSpec comments.
+
+forge doc will parse these to autogenerate documentation.
+Etherscan will display them in the contract UI.
+For simple NatSpec comments, consider just documenting params in the docstring, such as /// @notice Returns the sum of `x` and `y`., instead of using @param tags.
+
+For complex NatSpec comments, consider using a tool like PlantUML to generate ASCII art diagrams to help explain complex aspects of the codebase.
+
+Any markdown in your comments will carry over properly when generating docs with forge doc, so structure comments with markdown when useful.
+
+Good: /// @notice Returns the sum of `x` and `y`.
+Bad: /// @notice Returns the sum of x and y.
+
+Here are some references for assertions:
+expectRevert
+Signature
+function expectRevert() external;
+function expectRevert(bytes4 message) external;
+function expectRevert(bytes calldata message) external;
+Description
+If the next call does not revert with the expected data message, then expectRevert will.
+
+After calling expectRevert, calls to other cheatcodes before the reverting call are ignored.
+
+This means, for example, we can call prank immediately before the reverting call.
+
+There are 3 signatures:
+
+Without parameters: Asserts that the next call reverts, regardless of the message.
+With bytes4: Asserts that the next call reverts with the specified 4 bytes.
+With bytes: Asserts that the next call reverts with the specified bytes.
+⚠️ Gotcha: Usage with low-level calls
+
+Normally, a call that succeeds returns a status of true (along with any return data) and a call that reverts returns false.
+
+The Solidity compiler will insert checks that ensures that the call succeeded, and revert if it did not.
+
+On low level calls, the expectRevert cheatcode works by making the status boolean returned by the low level call correspond to whether the expectRevert succeeded or not, NOT whether or not the low-level call succeeds. Therefore, status being false corresponds to the cheatcode failing.
+
+Apart from this, expectRevert also mangles return data on low level calls, and is not usable.
+
+See the following example. For clarity, status has been renamed to revertsAsExpected:
+
+function testLowLevelCallRevert() public {
+    vm.expectRevert(bytes("error message"));
+    (bool revertsAsExpected, ) = address(myContract).call(myCalldata);
+    assertTrue(revertsAsExpected, "expectRevert: call did not revert");
+}
+Examples
+To use expectRevert with a string, pass it as a string literal.
+
+vm.expectRevert("error message");
+To use expectRevert with a custom error type without parameters, use its selector.
+
+vm.expectRevert(CustomError.selector);
+To use expectRevert with a custom error type with parameters, ABI encode the error type.
+
+vm.expectRevert(
+    abi.encodeWithSelector(CustomError.selector, 1, 2)
+);
+If you need to assert that a function reverts without a message, you can do so with expectRevert(bytes("")).
+
+function testExpectRevertNoReason() public {
+    Reverter reverter = new Reverter();
+    vm.expectRevert(bytes(""));
+    reverter.revertWithoutReason();
+}
+Message-less reverts happen when there is an EVM error, such as when the transaction consumes more than the block’s gas limit.
+
+If you need to assert that a function reverts a four character message, e.g. AAAA, you can do so with:
+
+function testFourLetterMessage() public {
+    vm.expectRevert(bytes("AAAA"));
+}
+If used expectRevert("AAAA"), the compiler would throw an error because it wouldn’t know which overload to use.
+
+Finally, you can also have multiple expectRevert() checks in a single test.
+
+
+function testMultipleExpectReverts() public {
+    vm.expectRevert("INVALID_AMOUNT");
+    vault.send(user, 0);
+
+    vm.expectRevert("INVALID_ADDRESS");
+    vault.send(address(0), 200);
+}
+
+expectEmit
+Signature
+function expectEmit() external;
+function expectEmit(
+    bool checkTopic1,
+    bool checkTopic2,
+    bool checkTopic3,
+    bool checkData
+) external;
+function expectEmit(address emitter) external;
+function expectEmit(
+    bool checkTopic1,
+    bool checkTopic2,
+    bool checkTopic3,
+    bool checkData,
+    address emitter
+) external;
+Description
+Assert a specific log is emitted during the next call.
+
+Call the cheat code, specifying whether we should check the first, second or third topic, and the log data (expectEmit() checks them all). Topic 0 is always checked.
+Emit the event we are supposed to see during the next call.
+Perform the call.
+You can perform steps 1 and 2 multiple times to match a sequence of events in the next call.
+
+If the event is not available in the current scope (e.g. if we are using an interface, or an external smart contract), we can define the event ourselves with an identical event signature.
+
+There are 2 varieties of expectEmit:
+
+Without checking the emitter address: Asserts the topics match without checking the emitting address.
+With address: Asserts the topics match and that the emitting address matches.
+ℹ️ Matching sequences
+
+In functions that emit a lot of events, it’s possible to “skip” events and only match a specific sequence, but this sequence must always be in order. As an example, let’s say a function emits events: A, B, C, D, E, F, F, G.
+
+expectEmit will be able to match ranges with and without skipping events in between:
+
+[A, B, C] is valid.
+[B, D, F] is valid.
+[G] or any other single event combination is valid.
+[B, A] or similar out-of-order combinations are invalid (events must be in order).
+[C, F, F] is valid.
+[F, F, C] is invalid (out of order).
+Examples
+This does not check the emitting address.
+
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+function testERC20EmitsTransfer() public {
+    vm.expectEmit();
+
+    // We emit the event we expect to see.
+    emit MyToken.Transfer(address(this), address(1), 10);
+
+    // We perform the call.
+    myToken.transfer(address(1), 10);
+}
+This does check the emitting address.
+
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+function testERC20EmitsTransfer() public {
+    // We check that the token is the event emitter by passing the address.
+    vm.expectEmit(address(myToken));
+    emit MyToken.Transfer(address(this), address(1), 10);
+
+    // We perform the call.
+    myToken.transfer(address(1), 10);
+}
+We can also assert that multiple events are emitted in a single call.
+
+function testERC20EmitsBatchTransfer() public {
+    // We declare multiple expected transfer events
+    for (uint256 i = 0; i < users.length; i++) {
+        // Here we use the longer signature for demonstration purposes. This call checks
+        // topic0 (always checked), topic1 (true), topic2 (true), NOT topic3 (false), and data (true).
+        vm.expectEmit(true, true, false, true);
+        emit Transfer(address(this), users[i], 10);
+    }
+
+    // We also expect a custom `BatchTransfer(uint256 numberOfTransfers)` event.
+    vm.expectEmit(false, false, false, true);
+    emit BatchTransfer(users.length);
+
+    // We perform the call.
+    myToken.batchTransfer(users, 10);
+}
+This example fails, as the expected event is not emitted on the next call.
+
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+function testERC20EmitsTransfer() public {
+    // We check that the token is the event emitter by passing the address as the fifth argument.
+    vm.expectEmit(true, true, false, true, address(myToken));
+    emit MyToken.Transfer(address(this), address(1), 10);
+
+    // We perform an unrelated call that won't emit the intended event,
+    // making the cheatcode fail.
+    myToken.approve(address(this), 1e18);
+    // We perform the call, but it will have no effect as the cheatcode has already failed.
+    myToken.transfer(address(1), 10);
+}
+
+expectCall
+function expectCall(address callee, bytes calldata data) external;
+function expectCall(address callee, bytes calldata data, uint64 count) external;
+function expectCall(
+    address callee,
+    uint256 value,
+    bytes calldata data
+) external;
+function expectCall(
+    address callee,
+    uint256 value,
+    bytes calldata data,
+    uint64 count
+) external;
+Description
+Expects that a call to a specified address callee, where the call data either strictly or loosely matches data. The cheatcode can be called in two ways:
+
+If no count parameter is specified, the call will be expected to be made at least the amount of times the cheatcode was called. For the same calldata, you cannot call the cheatcode with no count and then pass in a count parameter.
+If count is specified, the call will be expected to be made strictly count times. For the same calldata, the count value cannot be overwritten with another cheatcode call, nor it can be increment by calling the cheatcode without a count parameter.
+count can also be set to 0 to assert that a call is not made.
+
+When a call is made to callee the call data is first checked to see if it matches in its entirety with data. If not, the call data is checked to see if there is a partial match, with the match starting at the first byte of the call data.
+
+Using the second signature we can also check if the call was made with the expected msg.value.
+
+If the test terminates without the call being made, the test fails.
+
+ℹ️ Internal calls
+
+This cheatcode does not currently work on internal calls. See issue #432.
+
+Examples
+Expect that transfer is called on a token MyToken one time:
+
+address alice = makeAddr("alice");
+emit log_address(alice);
+vm.expectCall(
+  address(token), abi.encodeCall(token.transfer, (alice, 10))
+);
+token.transfer(alice, 10);
+// [PASS]
+Expect that transfer is called on a token MyToken at least two times:
+
+address alice = makeAddr("alice");
+emit log_address(alice);
+vm.expectCall(
+  address(token), abi.encodeCall(token.transfer, (alice, 10))
+);
+vm.expectCall(
+  address(token), abi.encodeCall(token.transfer, (alice, 10))
+);
+token.transfer(alice, 10);
+token.transfer(alice, 10);
+token.transfer(alice, 10);
+// [PASS]
+Expect that transfer is not called on a token MyToken:
+
+address alice = makeAddr("alice");
+emit log_address(alice);
+vm.expectCall(
+  address(token), abi.encodeCall(token.transfer, (alice, 10)), 0
+);
+token.transferFrom(alice, address(0), 10);
+// [PASS]
+Expect that transfer with any calldata is called on a token MyToken 2 times:
+
+address alice = makeAddr("alice");
+emit log_address(alice);
+vm.expectCall(
+  address(token), abi.encodeWithSelector(token.transfer.selector), 2
+);
+token.transfer(alice, 10);
+token.transfer(alice, 10);
+// [PASS]
+Expect that pay is called on a Contract with a specific msg.value and calldata:
+
+Contract target = new Contract();
+vm.expectCall(
+            address(target),
+            1,
+            abi.encodeWithSelector(target.pay.selector, 2)
+        );
+target.pay{value: 1}(2);
+// [PASS]
+Expect that pay is called on a Contract with a specific msg.value and calldata 3 times:
+
+
+Contract target = new Contract();
+vm.expectCall(
+            address(target),
+            1,
+            abi.encodeWithSelector(target.pay.selector, 2),
+            3
+        );
+target.pay{value: 1}(2);
+target.pay{value: 1}(2);
+target.pay{value: 1}(2);

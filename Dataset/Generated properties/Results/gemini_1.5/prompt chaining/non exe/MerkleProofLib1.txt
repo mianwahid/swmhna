@@ -1,0 +1,74 @@
+## MerkleProofLib Contract Functionalities Explained
+
+This contract, `MerkleProofLib`, is a library designed for gas-optimized verification of Merkle tree proofs. It provides several functions to verify the inclusion of single or multiple leaves within a Merkle tree, handling both memory and calldata efficiently.
+
+Here's a breakdown of each function:
+
+**1. `verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) internal pure returns (bool isValid)`**
+
+- **Purpose:** Verifies if a given `leaf` exists in the Merkle tree with the specified `root` using the provided `proof`.
+- **Parameters:**
+    - `proof`: A `bytes32[]` array representing the Merkle proof for the leaf.
+    - `root`: The `bytes32` value representing the Merkle tree's root hash.
+    - `leaf`: The `bytes32` value representing the leaf to verify.
+- **Returns:**
+    - `isValid`: A `bool` indicating whether the leaf exists in the tree (true) or not (false).
+- **Explanation:** This function iterates through the `proof` array, hashing pairs of nodes (including the provided `leaf`) until it reaches the root. It then compares the computed root with the provided `root`. If they match, the leaf is considered valid.
+
+**2. `verifyCalldata(bytes32[] calldata proof, bytes32 root, bytes32 leaf) internal pure returns (bool isValid)`**
+
+- **Purpose:** Similar to `verify`, but optimized for calldata `proof` arrays.
+- **Parameters:**
+    - `proof`: A `bytes32[]` array (passed as calldata) representing the Merkle proof.
+    - `root`: The `bytes32` value representing the Merkle tree's root hash.
+    - `leaf`: The `bytes32` value representing the leaf to verify.
+- **Returns:**
+    - `isValid`: A `bool` indicating whether the leaf exists in the tree (true) or not (false).
+- **Explanation:** This function performs the same verification as `verify` but directly accesses the calldata `proof` array, saving gas compared to copying it to memory.
+
+**3. `verifyMultiProof(bytes32[] memory proof, bytes32 root, bytes32[] memory leaves, bool[] memory flags) internal pure returns (bool isValid)`**
+
+- **Purpose:** Verifies the inclusion of multiple `leaves` in the Merkle tree with the specified `root` using the provided `proof` and `flags`.
+- **Parameters:**
+    - `proof`: A `bytes32[]` array representing the combined Merkle proof for all leaves.
+    - `root`: The `bytes32` value representing the Merkle tree's root hash.
+    - `leaves`: A `bytes32[]` array containing all the leaves to verify.
+    - `flags`: A `bool[]` array indicating whether to use a proof element or a previously computed hash for each step of the verification.
+- **Returns:**
+    - `isValid`: A `bool` indicating whether all leaves exist in the tree (true) or not (false).
+- **Explanation:** This function efficiently verifies multiple leaves by reconstructing the Merkle root using a queue-based approach. The `flags` array guides the process, determining whether to pull the next element from the `proof` array or the queue of previously computed hashes.
+
+**4. `verifyMultiProofCalldata(bytes32[] calldata proof, bytes32 root, bytes32[] calldata leaves, bool[] calldata flags) internal pure returns (bool isValid)`**
+
+- **Purpose:** Similar to `verifyMultiProof`, but optimized for calldata `proof`, `leaves`, and `flags` arrays.
+- **Parameters:**
+    - `proof`: A `bytes32[]` array (passed as calldata) representing the combined Merkle proof.
+    - `root`: The `bytes32` value representing the Merkle tree's root hash.
+    - `leaves`: A `bytes32[]` array (passed as calldata) containing all the leaves to verify.
+    - `flags`: A `bool[]` array (passed as calldata) guiding the verification process.
+- **Returns:**
+    - `isValid`: A `bool` indicating whether all leaves exist in the tree (true) or not (false).
+- **Explanation:** This function performs the same multi-leaf verification as `verifyMultiProof` but directly accesses the calldata arrays, saving gas compared to copying them to memory.
+
+**5. `emptyProof() internal pure returns (bytes32[] calldata proof)`**
+
+- **Purpose:** Returns an empty `bytes32[]` calldata array.
+- **Returns:**
+    - `proof`: An empty `bytes32[]` calldata array.
+- **Explanation:** This helper function simplifies the creation of empty proof arrays, which can be useful in specific scenarios.
+
+**6. `emptyLeaves() internal pure returns (bytes32[] calldata leaves)`**
+
+- **Purpose:** Returns an empty `bytes32[]` calldata array.
+- **Returns:**
+    - `leaves`: An empty `bytes32[]` calldata array.
+- **Explanation:** This helper function simplifies the creation of empty leaves arrays.
+
+**7. `emptyFlags() internal pure returns (bool[] calldata flags)`**
+
+- **Purpose:** Returns an empty `bool[]` calldata array.
+- **Returns:**
+    - `flags`: An empty `bool[]` calldata array.
+- **Explanation:** This helper function simplifies the creation of empty flags arrays.
+
+**Overall, this `MerkleProofLib` contract provides a comprehensive set of gas-optimized functions for verifying Merkle tree proofs, catering to various scenarios involving single and multiple leaves, and efficiently handling both memory and calldata data.**

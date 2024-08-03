@@ -1,0 +1,59 @@
+To ensure the robustness and correctness of the `UUPSUpgradeable` contract, we need to define a set of test invariants that cover various edge cases for all its functionalities. Here are the test invariants for each functionality:
+
+### Custom Errors
+1. **`UpgradeFailed`**:
+   - **Invariant**: Ensure that the `UpgradeFailed` error is thrown when the new implementation does not correctly implement `proxiableUUID`.
+   - **Edge Case**: Test with a new implementation that returns an incorrect value for `proxiableUUID`.
+
+2. **`UnauthorizedCallContext`**:
+   - **Invariant**: Ensure that the `UnauthorizedCallContext` error is thrown when a function with the `onlyProxy` modifier is called directly.
+   - **Edge Case**: Call a function with the `onlyProxy` modifier directly from the contract itself.
+
+### Immutables
+3. **`__self`**:
+   - **Invariant**: Ensure that the `__self` variable correctly stores the contract's address.
+   - **Edge Case**: Verify that `__self` is immutable and matches the contract's address.
+
+### Events
+4. **`Upgraded`**:
+   - **Invariant**: Ensure that the `Upgraded` event is emitted with the correct new implementation address when an upgrade occurs.
+   - **Edge Case**: Perform an upgrade and verify the event emission with the correct address.
+
+5. **`_UPGRADED_EVENT_SIGNATURE`**:
+   - **Invariant**: Ensure that the `_UPGRADED_EVENT_SIGNATURE` constant matches the `keccak256` hash of the `Upgraded(address)` event signature.
+   - **Edge Case**: Verify the constant value against the expected hash.
+
+### Storage
+6. **`_ERC1967_IMPLEMENTATION_SLOT`**:
+   - **Invariant**: Ensure that the `_ERC1967_IMPLEMENTATION_SLOT` constant is correctly calculated.
+   - **Edge Case**: Verify the constant value against the expected calculation.
+
+### UUPS Operations
+7. **`_authorizeUpgrade`**:
+   - **Invariant**: Ensure that the `_authorizeUpgrade` function is called and behaves as expected.
+   - **Edge Case**: Override `_authorizeUpgrade` in a derived contract and test with authorized and unauthorized addresses.
+
+8. **`proxiableUUID`**:
+   - **Invariant**: Ensure that the `proxiableUUID` function returns `_ERC1967_IMPLEMENTATION_SLOT`.
+   - **Edge Case**: Call `proxiableUUID` and verify the returned value.
+
+9. **`upgradeToAndCall`**:
+   - **Invariant**: Ensure that the `upgradeToAndCall` function correctly upgrades the implementation and optionally calls a function on the new implementation.
+   - **Edge Cases**:
+     - Test with an authorized address and verify the upgrade.
+     - Test with an unauthorized address and ensure the upgrade fails.
+     - Test with valid `data` and ensure the delegate call is performed.
+     - Test with empty `data` and ensure the delegate call is skipped.
+     - Test with a new implementation that does not implement `proxiableUUID` correctly and ensure the upgrade fails.
+
+### Modifiers
+10. **`onlyProxy`**:
+    - **Invariant**: Ensure that functions with the `onlyProxy` modifier can only be called through a proxy.
+    - **Edge Case**: Call a function with the `onlyProxy` modifier directly and ensure it reverts with `UnauthorizedCallContext`.
+
+11. **`notDelegated`**:
+    - **Invariant**: Ensure that functions with the `notDelegated` modifier are not called via delegate call.
+    - **Edge Case**: Call a function with the `notDelegated` modifier via delegate call and ensure it reverts with `UnauthorizedCallContext`.
+
+### Summary
+These test invariants cover the critical functionalities and edge cases of the `UUPSUpgradeable` contract. By implementing these tests, we can ensure that the contract behaves as expected under various conditions and edge cases.

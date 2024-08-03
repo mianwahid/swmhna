@@ -1,0 +1,141 @@
+The provided smart contract is a Solidity library named `LibMap` that facilitates the storage and manipulation of packed unsigned integers in various bit-widths. Below is a detailed explanation of its functionalities:
+
+### Struct Definitions
+
+1. **Uint8Map**
+   - **Description**: A map for storing `uint8` values.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint8` values.
+
+2. **Uint16Map**
+   - **Description**: A map for storing `uint16` values.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint16` values.
+
+3. **Uint32Map**
+   - **Description**: A map for storing `uint32` values.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint32` values.
+
+4. **Uint40Map**
+   - **Description**: A map for storing `uint40` values, useful for timestamps up to 34841 A.D.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint40` values.
+
+5. **Uint64Map**
+   - **Description**: A map for storing `uint64` values.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint64` values.
+
+6. **Uint128Map**
+   - **Description**: A map for storing `uint128` values.
+   - **Storage**: Uses a `mapping(uint256 => uint256)` to store the packed `uint128` values.
+
+### Getters and Setters
+
+#### Uint8Map
+
+1. **get(Uint8Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint8` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to extract the value from the packed storage.
+
+2. **set(Uint8Map storage map, uint256 index, uint8 value)**
+   - **Description**: Updates the `uint8` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Uint16Map
+
+1. **get(Uint16Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint16` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(Uint16Map storage map, uint256 index, uint16 value)**
+   - **Description**: Updates the `uint16` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Uint32Map
+
+1. **get(Uint32Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint32` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(Uint32Map storage map, uint256 index, uint32 value)**
+   - **Description**: Updates the `uint32` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Uint40Map
+
+1. **get(Uint40Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint40` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(Uint40Map storage map, uint256 index, uint40 value)**
+   - **Description**: Updates the `uint40` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Uint64Map
+
+1. **get(Uint64Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint64` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(Uint64Map storage map, uint256 index, uint64 value)**
+   - **Description**: Updates the `uint64` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Uint128Map
+
+1. **get(Uint128Map storage map, uint256 index)**
+   - **Description**: Retrieves the `uint128` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(Uint128Map storage map, uint256 index, uint128 value)**
+   - **Description**: Updates the `uint128` value at the specified `index`.
+   - **Implementation**: Uses bitwise operations and assembly to update the value in the packed storage.
+
+#### Generic Mapping
+
+1. **get(mapping(uint256 => uint256) storage map, uint256 index, uint256 bitWidth)**
+   - **Description**: Retrieves a value of specified `bitWidth` at the given `index`.
+   - **Implementation**: Uses bitwise operations to extract the value from the packed storage.
+
+2. **set(mapping(uint256 => uint256) storage map, uint256 index, uint256 value, uint256 bitWidth)**
+   - **Description**: Updates a value of specified `bitWidth` at the given `index`.
+   - **Implementation**: Uses bitwise operations to update the value in the packed storage.
+
+### Binary Search
+
+1. **searchSorted(Uint8Map storage map, uint8 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint8Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+2. **searchSorted(Uint16Map storage map, uint16 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint16Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+3. **searchSorted(Uint32Map storage map, uint32 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint32Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+4. **searchSorted(Uint40Map storage map, uint40 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint40Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+5. **searchSorted(Uint64Map storage map, uint64 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint64Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+6. **searchSorted(Uint128Map storage map, uint128 needle, uint256 start, uint256 end)**
+   - **Description**: Searches for `needle` in a sorted `Uint128Map` within the range `[start, end)`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+7. **searchSorted(mapping(uint256 => uint256) storage map, uint256 needle, uint256 start, uint256 end, uint256 bitWidth)**
+   - **Description**: Searches for `needle` in a sorted generic map within the range `[start, end)` and specified `bitWidth`.
+   - **Returns**: A tuple `(found, index)` indicating whether the `needle` was found and its index.
+
+### Private Helpers
+
+1. **_rawDiv(uint256 x, uint256 y)**
+   - **Description**: Returns `x / y`, returning 0 if `y` is zero.
+   - **Implementation**: Uses assembly for division.
+
+2. **_rawMod(uint256 x, uint256 y)**
+   - **Description**: Returns `x % y`, returning 0 if `y` is zero.
+   - **Implementation**: Uses assembly for modulus operation.
+
+This library is designed to efficiently store and manipulate packed unsigned integers of various bit-widths, providing both getter and setter functions, as well as binary search capabilities for sorted maps. The use of bitwise operations and assembly ensures optimal performance and storage efficiency.

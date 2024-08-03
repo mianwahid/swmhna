@@ -1,0 +1,245 @@
+To ensure the correctness and robustness of the `DateTimeLib` smart contract, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and functionalities provided by the library. Below is a list of test invariants for each functionality:
+
+### Date Time Operations
+
+1. **dateToEpochDay**
+   - Invariant: The function should return the correct epoch day for a given date.
+   - Edge Cases:
+     - Minimum supported date: `dateToEpochDay(1970, 1, 1)`
+     - Leap year date: `dateToEpochDay(2020, 2, 29)`
+     - End of year: `dateToEpochDay(2023, 12, 31)`
+     - Invalid date (should revert or handle gracefully): `dateToEpochDay(2023, 13, 1)`
+
+2. **epochDayToDate**
+   - Invariant: The function should return the correct date for a given epoch day.
+   - Edge Cases:
+     - Minimum supported epoch day: `epochDayToDate(0)`
+     - Maximum supported epoch day: `epochDayToDate(MAX_SUPPORTED_EPOCH_DAY)`
+     - Invalid epoch day (should revert or handle gracefully): `epochDayToDate(MAX_SUPPORTED_EPOCH_DAY + 1)`
+
+3. **dateToTimestamp**
+   - Invariant: The function should return the correct Unix timestamp for a given date.
+   - Edge Cases:
+     - Minimum supported date: `dateToTimestamp(1970, 1, 1)`
+     - Leap year date: `dateToTimestamp(2020, 2, 29)`
+     - End of year: `dateToTimestamp(2023, 12, 31)`
+     - Invalid date (should revert or handle gracefully): `dateToTimestamp(2023, 13, 1)`
+
+4. **timestampToDate**
+   - Invariant: The function should return the correct date for a given Unix timestamp.
+   - Edge Cases:
+     - Minimum supported timestamp: `timestampToDate(0)`
+     - Maximum supported timestamp: `timestampToDate(MAX_SUPPORTED_TIMESTAMP)`
+     - Invalid timestamp (should revert or handle gracefully): `timestampToDate(MAX_SUPPORTED_TIMESTAMP + 1)`
+
+5. **dateTimeToTimestamp**
+   - Invariant: The function should return the correct Unix timestamp for a given date and time.
+   - Edge Cases:
+     - Minimum supported date and time: `dateTimeToTimestamp(1970, 1, 1, 0, 0, 0)`
+     - Leap year date and time: `dateTimeToTimestamp(2020, 2, 29, 23, 59, 59)`
+     - End of year: `dateTimeToTimestamp(2023, 12, 31, 23, 59, 59)`
+     - Invalid date and time (should revert or handle gracefully): `dateTimeToTimestamp(2023, 13, 1, 25, 61, 61)`
+
+6. **timestampToDateTime**
+   - Invariant: The function should return the correct date and time for a given Unix timestamp.
+   - Edge Cases:
+     - Minimum supported timestamp: `timestampToDateTime(0)`
+     - Maximum supported timestamp: `timestampToDateTime(MAX_SUPPORTED_TIMESTAMP)`
+     - Invalid timestamp (should revert or handle gracefully): `timestampToDateTime(MAX_SUPPORTED_TIMESTAMP + 1)`
+
+7. **isLeapYear**
+   - Invariant: The function should correctly identify leap years.
+   - Edge Cases:
+     - Leap year: `isLeapYear(2020)`
+     - Non-leap year: `isLeapYear(2021)`
+     - Century year not a leap year: `isLeapYear(1900)`
+     - Century year that is a leap year: `isLeapYear(2000)`
+
+8. **daysInMonth**
+   - Invariant: The function should return the correct number of days in a given month of a given year.
+   - Edge Cases:
+     - February in a leap year: `daysInMonth(2020, 2)`
+     - February in a non-leap year: `daysInMonth(2021, 2)`
+     - Months with 30 days: `daysInMonth(2023, 4)`
+     - Months with 31 days: `daysInMonth(2023, 1)`
+
+9. **weekday**
+   - Invariant: The function should return the correct weekday for a given Unix timestamp.
+   - Edge Cases:
+     - Minimum supported timestamp: `weekday(0)`
+     - Maximum supported timestamp: `weekday(MAX_SUPPORTED_TIMESTAMP)`
+     - Specific known dates: `weekday(dateToTimestamp(2023, 10, 10))` (Tuesday)
+
+10. **isSupportedDate**
+    - Invariant: The function should correctly identify supported dates.
+    - Edge Cases:
+      - Minimum supported date: `isSupportedDate(1970, 1, 1)`
+      - Maximum supported date: `isSupportedDate(MAX_SUPPORTED_YEAR, 12, 31)`
+      - Invalid date: `isSupportedDate(2023, 13, 1)`
+
+11. **isSupportedDateTime**
+    - Invariant: The function should correctly identify supported date and time.
+    - Edge Cases:
+      - Minimum supported date and time: `isSupportedDateTime(1970, 1, 1, 0, 0, 0)`
+      - Maximum supported date and time: `isSupportedDateTime(MAX_SUPPORTED_YEAR, 12, 31, 23, 59, 59)`
+      - Invalid date and time: `isSupportedDateTime(2023, 13, 1, 25, 61, 61)`
+
+12. **isSupportedEpochDay**
+    - Invariant: The function should correctly identify supported epoch days.
+    - Edge Cases:
+      - Minimum supported epoch day: `isSupportedEpochDay(0)`
+      - Maximum supported epoch day: `isSupportedEpochDay(MAX_SUPPORTED_EPOCH_DAY)`
+      - Invalid epoch day: `isSupportedEpochDay(MAX_SUPPORTED_EPOCH_DAY + 1)`
+
+13. **isSupportedTimestamp**
+    - Invariant: The function should correctly identify supported Unix timestamps.
+    - Edge Cases:
+      - Minimum supported timestamp: `isSupportedTimestamp(0)`
+      - Maximum supported timestamp: `isSupportedTimestamp(MAX_SUPPORTED_TIMESTAMP)`
+      - Invalid timestamp: `isSupportedTimestamp(MAX_SUPPORTED_TIMESTAMP + 1)`
+
+14. **nthWeekdayInMonthOfYearTimestamp**
+    - Invariant: The function should return the correct Unix timestamp for the nth weekday in a given month of a given year.
+    - Edge Cases:
+      - 1st Monday of January 2023: `nthWeekdayInMonthOfYearTimestamp(2023, 1, 1, MON)`
+      - 3rd Friday of February 2023: `nthWeekdayInMonthOfYearTimestamp(2023, 2, 3, FRI)`
+      - Invalid weekday: `nthWeekdayInMonthOfYearTimestamp(2023, 2, 3, 8)`
+
+15. **mondayTimestamp**
+    - Invariant: The function should return the Unix timestamp of the most recent Monday.
+    - Edge Cases:
+      - Specific known dates: `mondayTimestamp(dateToTimestamp(2023, 10, 10))` (Tuesday)
+      - Minimum supported timestamp: `mondayTimestamp(0)`
+      - Maximum supported timestamp: `mondayTimestamp(MAX_SUPPORTED_TIMESTAMP)`
+
+16. **isWeekEnd**
+    - Invariant: The function should correctly identify if a given Unix timestamp falls on a weekend.
+    - Edge Cases:
+      - Specific known dates: `isWeekEnd(dateToTimestamp(2023, 10, 7))` (Saturday)
+      - Minimum supported timestamp: `isWeekEnd(0)`
+      - Maximum supported timestamp: `isWeekEnd(MAX_SUPPORTED_TIMESTAMP)`
+
+### Date Time Arithmetic Operations
+
+1. **addYears**
+   - Invariant: The function should correctly add a specified number of years to a Unix timestamp.
+   - Edge Cases:
+     - Adding years to a leap year date: `addYears(dateToTimestamp(2020, 2, 29), 1)`
+     - Adding years to the end of the year: `addYears(dateToTimestamp(2023, 12, 31), 1)`
+
+2. **addMonths**
+   - Invariant: The function should correctly add a specified number of months to a Unix timestamp.
+   - Edge Cases:
+     - Adding months to a leap year date: `addMonths(dateToTimestamp(2020, 2, 29), 1)`
+     - Adding months to the end of the year: `addMonths(dateToTimestamp(2023, 12, 31), 1)`
+
+3. **addDays**
+   - Invariant: The function should correctly add a specified number of days to a Unix timestamp.
+   - Edge Cases:
+     - Adding days to a leap year date: `addDays(dateToTimestamp(2020, 2, 28), 1)`
+     - Adding days to the end of the year: `addDays(dateToTimestamp(2023, 12, 31), 1)`
+
+4. **addHours**
+   - Invariant: The function should correctly add a specified number of hours to a Unix timestamp.
+   - Edge Cases:
+     - Adding hours to the end of the day: `addHours(dateTimeToTimestamp(2023, 10, 10, 23, 0, 0), 1)`
+
+5. **addMinutes**
+   - Invariant: The function should correctly add a specified number of minutes to a Unix timestamp.
+   - Edge Cases:
+     - Adding minutes to the end of the hour: `addMinutes(dateTimeToTimestamp(2023, 10, 10, 23, 59, 0), 1)`
+
+6. **addSeconds**
+   - Invariant: The function should correctly add a specified number of seconds to a Unix timestamp.
+   - Edge Cases:
+     - Adding seconds to the end of the minute: `addSeconds(dateTimeToTimestamp(2023, 10, 10, 23, 59, 59), 1)`
+
+7. **subYears**
+   - Invariant: The function should correctly subtract a specified number of years from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting years from a leap year date: `subYears(dateToTimestamp(2020, 2, 29), 1)`
+     - Subtracting years from the end of the year: `subYears(dateToTimestamp(2023, 12, 31), 1)`
+
+8. **subMonths**
+   - Invariant: The function should correctly subtract a specified number of months from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting months from a leap year date: `subMonths(dateToTimestamp(2020, 2, 29), 1)`
+     - Subtracting months from the end of the year: `subMonths(dateToTimestamp(2023, 12, 31), 1)`
+
+9. **subDays**
+   - Invariant: The function should correctly subtract a specified number of days from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting days from a leap year date: `subDays(dateToTimestamp(2020, 2, 29), 1)`
+     - Subtracting days from the end of the year: `subDays(dateToTimestamp(2023, 12, 31), 1)`
+
+10. **subHours**
+    - Invariant: The function should correctly subtract a specified number of hours from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting hours from the start of the day: `subHours(dateTimeToTimestamp(2023, 10, 10, 0, 0, 0), 1)`
+
+11. **subMinutes**
+    - Invariant: The function should correctly subtract a specified number of minutes from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting minutes from the start of the hour: `subMinutes(dateTimeToTimestamp(2023, 10, 10, 0, 0, 0), 1)`
+
+12. **subSeconds**
+    - Invariant: The function should correctly subtract a specified number of seconds from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting seconds from the start of the minute: `subSeconds(dateTimeToTimestamp(2023, 10, 10, 0, 0, 0), 1)`
+
+13. **diffYears**
+    - Invariant: The function should correctly return the difference in years between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year and non-leap year: `diffYears(dateToTimestamp(2020, 2, 29), dateToTimestamp(2021, 2, 28))`
+
+14. **diffMonths**
+    - Invariant: The function should correctly return the difference in months between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year and non-leap year: `diffMonths(dateToTimestamp(2020, 2, 29), dateToTimestamp(2021, 2, 28))`
+
+15. **diffDays**
+    - Invariant: The function should correctly return the difference in days between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year and non-leap year: `diffDays(dateToTimestamp(2020, 2, 29), dateToTimestamp(2021, 2, 28))`
+
+16. **diffHours**
+    - Invariant: The function should correctly return the difference in hours between two Unix timestamps.
+    - Edge Cases:
+      - Difference between end of day and start of next day: `diffHours(dateTimeToTimestamp(2023, 10, 10, 23, 0, 0), dateTimeToTimestamp(2023, 10, 11, 0, 0, 0))`
+
+17. **diffMinutes**
+    - Invariant: The function should correctly return the difference in minutes between two Unix timestamps.
+    - Edge Cases:
+      - Difference between end of hour and start of next hour: `diffMinutes(dateTimeToTimestamp(2023, 10, 10, 23, 59, 0), dateTimeToTimestamp(2023, 10, 11, 0, 0, 0))`
+
+18. **diffSeconds**
+    - Invariant: The function should correctly return the difference in seconds between two Unix timestamps.
+    - Edge Cases:
+      - Difference between end of minute and start of next minute: `diffSeconds(dateTimeToTimestamp(2023, 10, 10, 23, 59, 59), dateTimeToTimestamp(2023, 10, 11, 0, 0, 0))`
+
+### Private Helpers
+1. **_totalMonths**
+   - Invariant: The function should correctly compute the total number of months given years and months.
+   - Edge Cases:
+     - Minimum input values: `_totalMonths(0, 0)`
+     - Maximum input values: `_totalMonths(MAX_SUPPORTED_YEAR, 12)`
+
+2. **_add**
+   - Invariant: The function should correctly add two numbers.
+   - Edge Cases:
+     - Minimum input values: `_add(0, 0)`
+     - Maximum input values: `_add(MAX_SUPPORTED_YEAR, 12)`
+
+3. **_sub**
+   - Invariant: The function should correctly subtract two numbers.
+   - Edge Cases:
+     - Minimum input values: `_sub(0, 0)`
+     - Maximum input values: `_sub(MAX_SUPPORTED_YEAR, 12)`
+
+4. **_offsetted**
+   - Invariant: The function should correctly return the offsetted timestamp.
+   - Edge Cases:
+     - Minimum input values: `_offsetted(1970, 1, 1, 0)`
+     - Maximum input values: `_offsetted(MAX_SUPPORTED_YEAR, 12, 31, MAX_SUPPORTED_TIMESTAMP)`
+
+These test invariants cover a wide range of edge cases and ensure that the `DateTimeLib` smart contract functions correctly under various conditions.

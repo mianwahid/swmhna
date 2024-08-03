@@ -1,0 +1,147 @@
+## LibString Smart Contract Functionalities Explained
+
+This smart contract, `LibString`, provides a comprehensive set of functionalities for manipulating strings within Solidity. It's designed with performance and gas efficiency in mind, primarily focusing on byte strings (7-bit ASCII) for compactness. 
+
+Here's a breakdown of its functionalities:
+
+**I. Decimal Operations:**
+
+* **`toString(uint256 value)` & `toString(int256 value)`:**
+    - **Functionality:** Converts unsigned and signed integers (`uint256`, `int256`) into their base 10 decimal string representations.
+    - **Example:** `toString(123)` returns "123", `toString(-123)` returns "-123".
+
+**II. Hexadecimal Operations:**
+
+* **`toHexString(uint256 value, uint256 length)`:**
+    - **Functionality:** Converts an unsigned integer (`uint256`) into its hexadecimal string representation, left-padded to a specified `length` in bytes. The output is prefixed with "0x".
+    - **Example:** `toHexString(255, 2)` returns "0x00ff".
+
+* **`toHexStringNoPrefix(uint256 value, uint256 length)`:**
+    - **Functionality:** Similar to `toHexString`, but without the "0x" prefix.
+    - **Example:** `toHexStringNoPrefix(255, 2)` returns "00ff".
+
+* **`toHexString(uint256 value)` & `toHexStringNoPrefix(uint256 value)`:**
+    - **Functionality:** Converts an unsigned integer (`uint256`) into its hexadecimal string representation, assuming a length suitable for Ethereum addresses (20 bytes). The former includes the "0x" prefix, while the latter doesn't.
+    - **Example:** `toHexString(1234567890)` returns "0x00000000000000000000000000000000075bcd15".
+
+* **`toMinimalHexString(uint256 value)` & `toMinimalHexStringNoPrefix(uint256 value)`:**
+    - **Functionality:** Converts an unsigned integer (`uint256`) into its hexadecimal string representation, excluding leading zeros. The former includes the "0x" prefix, while the latter doesn't.
+    - **Example:** `toMinimalHexString(12)` returns "0xc", `toMinimalHexStringNoPrefix(12)` returns "c".
+
+* **`toHexStringChecksummed(address value)`:**
+    - **Functionality:** Converts an Ethereum address (`address`) into its hexadecimal string representation with checksum, adhering to EIP-55. The output is prefixed with "0x".
+    - **Example:** `toHexStringChecksummed(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4)` returns "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4".
+
+* **`toHexString(address value)` & `toHexStringNoPrefix(address value)`:**
+    - **Functionality:** Converts an Ethereum address (`address`) into its hexadecimal string representation. The former includes the "0x" prefix, while the latter doesn't.
+    - **Example:** `toHexString(0x5B38Da6a701c568545dCfcB03FcB875f56beddC4)` returns "0x5b38da6a701c568545dcfcb03fcb875f56beddc4".
+
+* **`toHexString(bytes memory raw)` & `toHexStringNoPrefix(bytes memory raw)`:**
+    - **Functionality:** Converts a byte array (`bytes`) into its hexadecimal string representation. The former includes the "0x" prefix, while the latter doesn't.
+    - **Example:** `toHexString("hello")` returns "0x68656c6c6f".
+
+**III. Rune String Operations:**
+
+* **`runeCount(string memory s)`:**
+    - **Functionality:** Counts and returns the number of UTF characters (runes) in a string.
+    - **Example:** `runeCount("Hello, world!")` returns 13.
+
+* **`is7BitASCII(string memory s)`:**
+    - **Functionality:** Checks if a string consists solely of 7-bit ASCII characters (character codes between 0 and 127).
+    - **Example:** `is7BitASCII("Hello")` returns true, `is7BitASCII("你好")` returns false.
+
+**IV. Byte String Operations:**
+
+* **`replace(string memory subject, string memory search, string memory replacement)`:**
+    - **Functionality:** Replaces all occurrences of a `search` string with a `replacement` string within a `subject` string.
+    - **Example:** `replace("Hello, world!", "world", "Solidity")` returns "Hello, Solidity!".
+
+* **`indexOf(string memory subject, string memory search, uint256 from)` & `indexOf(string memory subject, string memory search)`:**
+    - **Functionality:** Finds and returns the byte index of the first occurrence of a `search` string within a `subject` string, starting from an optional `from` index. Returns `NOT_FOUND` if not found.
+    - **Example:** `indexOf("Hello, world!", "world")` returns 7.
+
+* **`lastIndexOf(string memory subject, string memory search, uint256 from)` & `lastIndexOf(string memory subject, string memory search)`:**
+    - **Functionality:** Finds and returns the byte index of the last occurrence of a `search` string within a `subject` string, starting from an optional `from` index (searching backwards). Returns `NOT_FOUND` if not found.
+    - **Example:** `lastIndexOf("Hello, world, world!", "world")` returns 18.
+
+* **`contains(string memory subject, string memory search)`:**
+    - **Functionality:** Checks if a `subject` string contains a `search` string.
+    - **Example:** `contains("Hello, world!", "world")` returns true.
+
+* **`startsWith(string memory subject, string memory search)`:**
+    - **Functionality:** Checks if a `subject` string starts with a `search` string.
+    - **Example:** `startsWith("Hello, world!", "Hello")` returns true.
+
+* **`endsWith(string memory subject, string memory search)`:**
+    - **Functionality:** Checks if a `subject` string ends with a `search` string.
+    - **Example:** `endsWith("Hello, world!", "world!")` returns true.
+
+* **`repeat(string memory subject, uint256 times)`:**
+    - **Functionality:** Repeats a `subject` string a specified number of `times`.
+    - **Example:** `repeat("Hello", 3)` returns "HelloHelloHello".
+
+* **`slice(string memory subject, uint256 start, uint256 end)` & `slice(string memory subject, uint256 start)`:**
+    - **Functionality:** Extracts a substring from a `subject` string, starting from a `start` byte index and ending at an optional `end` byte index (exclusive).
+    - **Example:** `slice("Hello, world!", 7, 12)` returns "world".
+
+* **`indicesOf(string memory subject, string memory search)`:**
+    - **Functionality:** Finds and returns an array of byte indices of all occurrences of a `search` string within a `subject` string.
+    - **Example:** `indicesOf("Hello, world, world!", "world")` returns `[7, 18]`.
+
+* **`split(string memory subject, string memory delimiter)`:**
+    - **Functionality:** Splits a `subject` string into an array of substrings based on a `delimiter` string.
+    - **Example:** `split("apple,banana,cherry", ",")` returns `["apple", "banana", "cherry"]`.
+
+* **`concat(string memory a, string memory b)`:**
+    - **Functionality:** Concatenates two strings (`a` and `b`) efficiently without de-aligning memory pointers.
+    - **Example:** `concat("Hello", ", world!")` returns "Hello, world!".
+
+* **`toCase(string memory subject, bool toUpper)`:**
+    - **Functionality:** Converts a string to either lowercase or uppercase based on the `toUpper` boolean flag.
+    - **Example:** `toCase("Hello", true)` returns "HELLO", `toCase("Hello", false)` returns "hello".
+
+* **`fromSmallString(bytes32 s)`:**
+    - **Functionality:** Converts a null-terminated `bytes32` string into a `string`.
+    - **Example:** `fromSmallString(0x48656c6c6f000000000000000000000000000000000000000000000000000000)` returns "Hello".
+
+* **`normalizeSmallString(bytes32 s)`:**
+    - **Functionality:** Normalizes a `bytes32` string by zeroing all bytes after the first null byte.
+    - **Example:** `normalizeSmallString(0x48656c6c6f0078797a0000000000000000000000000000000000000000000000)` returns `0x48656c6c6f000000000000000000000000000000000000000000000000000000`.
+
+* **`toSmallString(string memory s)`:**
+    - **Functionality:** Converts a `string` into a null-terminated `bytes32` string. Reverts if the string is too long.
+    - **Example:** `toSmallString("Hello")` returns `0x48656c6c6f000000000000000000000000000000000000000000000000000000`.
+
+* **`lower(string memory subject)` & `upper(string memory subject)`:**
+    - **Functionality:** Converts a string to lowercase or uppercase, respectively.
+    - **Example:** `lower("HeLlO")` returns "hello", `upper("HeLlO")` returns "HELLO".
+
+* **`escapeHTML(string memory s)`:**
+    - **Functionality:** Escapes special characters in a string to be safely used within HTML tags.
+    - **Example:** `escapeHTML("<script>alert('XSS')</script>")` returns "&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;".
+
+* **`escapeJSON(string memory s, bool addDoubleQuotes)` & `escapeJSON(string memory s)`:**
+    - **Functionality:** Escapes special characters in a string to be safely used within double quotes in JSON format. The optional `addDoubleQuotes` flag controls whether to enclose the result in double quotes.
+    - **Example:** `escapeJSON("Hello\n\"world\"")` returns "Hello\\n\\\"world\\\"".
+
+* **`eq(string memory a, string memory b)`:**
+    - **Functionality:** Checks if two strings (`a` and `b`) are equal.
+    - **Example:** `eq("Hello", "Hello")` returns true.
+
+* **`eqs(string memory a, bytes32 b)`:**
+    - **Functionality:** Checks if a string (`a`) is equal to a null-terminated `bytes32` string (`b`).
+    - **Example:** `eqs("Hello", 0x48656c6c6f000000000000000000000000000000000000000000000000000000)` returns true.
+
+* **`packOne(string memory a)` & `unpackOne(bytes32 packed)`:**
+    - **Functionality:** `packOne` packs a single string with its length into a single `bytes32` word. `unpackOne` reverses this process.
+    - **Example:** `unpackOne(packOne("Hello"))` returns "Hello".
+
+* **`packTwo(string memory a, string memory b)` & `unpackTwo(bytes32 packed)`:**
+    - **Functionality:** `packTwo` packs two strings with their lengths into a single `bytes32` word. `unpackTwo` reverses this process.
+    - **Example:** `unpackTwo(packTwo("Hello", "world"))` returns ("Hello", "world").
+
+* **`directReturn(string memory a)`:**
+    - **Functionality:** Directly returns a string without copying it, optimizing gas usage.
+    - **Note:** This function assumes the string doesn't originate from the scratch space.
+
+This comprehensive library equips Solidity developers with a powerful toolkit for string manipulation, enabling them to build more feature-rich and efficient smart contracts.

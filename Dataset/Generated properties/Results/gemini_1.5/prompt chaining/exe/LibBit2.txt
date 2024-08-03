@@ -1,0 +1,91 @@
+## Test Invariants for LibBit Smart Contract
+
+Here are the test invariants for the `LibBit` smart contract, covering edge cases and various functionalities:
+
+**1. `fls(uint256 x)` (Find Last Set):**
+
+* **Invariant 1:** For any `x > 0`, `fls(x)` should return the correct index (0-based) of the most significant bit set to 1.
+    - **Test Cases:**
+        - `fls(1) == 0`
+        - `fls(2) == 1`
+        - `fls(16) == 4`
+        - `fls(2**255) == 255`
+* **Invariant 2:** For `x = 0`, `fls(x)` should return 256.
+    - **Test Case:**
+        - `fls(0) == 256`
+* **Invariant 3:** For all possible powers of 2 (2^0 to 2^255), `fls(x)` should return the correct index.
+
+**2. `clz(uint256 x)` (Count Leading Zeros):**
+
+* **Invariant 1:** For any `x > 0`, `clz(x)` should return the correct count of leading zeros before the most significant set bit.
+    - **Test Cases:**
+        - `clz(1) == 255`
+        - `clz(2) == 254`
+        - `clz(16) == 251`
+        - `clz(2**255) == 0`
+* **Invariant 2:** For `x = 0`, `clz(x)` should return 256.
+    - **Test Case:**
+        - `clz(0) == 256`
+* **Invariant 3:** For all possible powers of 2 (2^0 to 2^255), `clz(x)` should return the correct count of leading zeros.
+
+**3. `ffs(uint256 x)` (Find First Set):**
+
+* **Invariant 1:** For any `x > 0`, `ffs(x)` should return the correct index (0-based) of the least significant bit set to 1.
+    - **Test Cases:**
+        - `ffs(1) == 0`
+        - `ffs(2) == 1`
+        - `ffs(8) == 3`
+        - `ffs(2**255) == 255`
+* **Invariant 2:** For `x = 0`, `ffs(x)` should return 256.
+    - **Test Case:**
+        - `ffs(0) == 256`
+* **Invariant 3:** For numbers with only one bit set (powers of 2), `ffs(x)` should return the correct index.
+
+**4. `popCount(uint256 x)` (Population Count):**
+
+* **Invariant 1:** For any `x`, `popCount(x)` should return the correct number of bits set to 1.
+    - **Test Cases:**
+        - `popCount(0) == 0`
+        - `popCount(1) == 1`
+        - `popCount(7) == 3` 
+        - `popCount(2**255) == 1`
+        - `popCount(uint256(-1)) == 256`
+* **Invariant 2:** For edge cases like `x = 0` and `x = 2**255 - 1`, `popCount(x)` should return the correct count.
+
+**5. `isPo2(uint256 x)` (Is Power of 2):**
+
+* **Invariant 1:** For any power of 2 (2^0 to 2^255), `isPo2(x)` should return `true`.
+* **Invariant 2:** For any number that is not a power of 2, `isPo2(x)` should return `false`.
+    - **Test Cases:**
+        - `isPo2(0) == false`
+        - `isPo2(3) == false`
+        - `isPo2(15) == false`
+* **Invariant 3:** For edge cases like `x = 0` and `x = 1`, `isPo2(x)` should return the correct boolean value.
+
+**6. `reverseBits(uint256 x)` (Reverse Bits):**
+
+* **Invariant 1:** For any `x`, `reverseBits(reverseBits(x))` should be equal to `x`.
+* **Invariant 2:** Test with various bit patterns, including:
+    - All zeros
+    - All ones
+    - Alternating 0s and 1s
+    - Specific patterns like `0b11001100...`
+* **Invariant 3:** For edge cases like `x = 0` and `x = 2**255 - 1`, `reverseBits(x)` should return the correctly reversed value.
+
+**7. `reverseBytes(uint256 x)` (Reverse Bytes):**
+
+* **Invariant 1:** For any `x`, `reverseBytes(reverseBytes(x))` should be equal to `x`.
+* **Invariant 2:** Test with various byte patterns, including:
+    - All zeros
+    - All ones
+    - Increasing byte values
+    - Specific patterns like `0x12345678`
+* **Invariant 3:** For edge cases like `x = 0` and `x = 2**256 - 1`, `reverseBytes(x)` should return the correctly reversed value.
+
+**8. Boolean Operations (`rawAnd`, `and`, `rawOr`, `or`, `rawToUint`, `toUint`):**
+
+* **Invariant 1:** Test all combinations of `true` and `false` inputs for each function to ensure they produce the expected boolean or uint256 output.
+* **Invariant 2:** For `raw` functions, ensure that inputs are indeed clean booleans (0 or 1) to avoid unexpected behavior.
+* **Invariant 3:** For non-`raw` functions, test with both clean and non-clean boolean inputs to ensure they are handled correctly.
+
+These test invariants provide a comprehensive framework for testing the `LibBit` smart contract. By covering various edge cases and functionalities, you can ensure the reliability and correctness of this library for bit manipulation and boolean operations. Remember to use a testing framework like Foundry or Hardhat to implement these invariants and thoroughly test your smart contract. 

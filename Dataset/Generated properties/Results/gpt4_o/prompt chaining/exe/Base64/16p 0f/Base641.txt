@@ -1,0 +1,70 @@
+The provided smart contract is a Solidity library named `Base64` that provides functionalities for encoding and decoding data using the Base64 encoding scheme. Below is a detailed explanation of each functionality provided by this library:
+
+### 1. `encode(bytes memory data, bool fileSafe, bool noPadding)`
+
+#### Description:
+This function encodes the given `data` using the Base64 encoding scheme as described in RFC 4648. It provides options to make the encoding file-safe and to remove padding.
+
+#### Parameters:
+- `data`: The input data to be encoded.
+- `fileSafe`: A boolean flag indicating whether to replace '+' with '-' and '/' with '_'.
+- `noPadding`: A boolean flag indicating whether to strip away the padding.
+
+#### Returns:
+- `result`: The Base64 encoded string.
+
+#### Implementation Details:
+- The function calculates the length of the encoded data.
+- It uses inline assembly for efficient memory manipulation and encoding.
+- It stores the Base64 character table in memory and processes the input data in chunks of 3 bytes.
+- Depending on the `fileSafe` and `noPadding` flags, it adjusts the encoded output accordingly.
+
+### 2. `encode(bytes memory data)`
+
+#### Description:
+This function encodes the given `data` using the Base64 encoding scheme with default settings (not file-safe and with padding).
+
+#### Parameters:
+- `data`: The input data to be encoded.
+
+#### Returns:
+- `result`: The Base64 encoded string.
+
+#### Implementation Details:
+- This function is a wrapper around the main `encode` function with `fileSafe` and `noPadding` set to `false`.
+
+### 3. `encode(bytes memory data, bool fileSafe)`
+
+#### Description:
+This function encodes the given `data` using the Base64 encoding scheme with an option to make the encoding file-safe.
+
+#### Parameters:
+- `data`: The input data to be encoded.
+- `fileSafe`: A boolean flag indicating whether to replace '+' with '-' and '/' with '_'.
+
+#### Returns:
+- `result`: The Base64 encoded string.
+
+#### Implementation Details:
+- This function is a wrapper around the main `encode` function with `noPadding` set to `false`.
+
+### 4. `decode(string memory data)`
+
+#### Description:
+This function decodes a Base64 encoded string back into its original byte representation.
+
+#### Parameters:
+- `data`: The Base64 encoded string to be decoded.
+
+#### Returns:
+- `result`: The decoded byte array.
+
+#### Implementation Details:
+- The function calculates the length of the decoded data.
+- It uses inline assembly for efficient memory manipulation and decoding.
+- It processes the input data in chunks of 4 bytes and converts them back to the original byte representation.
+- It supports both standard and file-safe Base64 encoding as well as RFC 3501 (where 63 is ',').
+- The function does not handle invalid inputs and assumes the input is a valid Base64 encoded string.
+
+### Summary
+The `Base64` library provides efficient and flexible functions for encoding and decoding data using the Base64 scheme. It supports standard and file-safe encoding, with options to include or exclude padding. The library uses inline assembly for optimized performance, making it suitable for use in Ethereum smart contracts where gas efficiency is crucial.

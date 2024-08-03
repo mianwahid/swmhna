@@ -1,0 +1,45 @@
+The provided smart contract, `DeploylessPredeployQueryer`, is designed to be used in a deployless manner, meaning it is not intended to be deployed on the blockchain but rather used via a static `eth_call`. This contract is useful for querying predeploys and generating ERC-6492 compliant signatures. Below is a detailed explanation of its functionalities:
+
+### 1. Custom Errors
+The contract defines a custom error:
+- **ReturnedAddressMismatch**: This error is thrown when the address returned by the factory does not match the provided address.
+
+### 2. Constructor
+The constructor is the core of this contract. It performs several key functions:
+
+#### Parameters:
+- **address target**: The address of the target contract to query.
+- **bytes[] memory targetQueryCalldata**: An array of calldata to be used for querying the target contract.
+- **address factory**: The address of the factory contract responsible for deploying the target contract if it does not exist.
+- **bytes memory factoryCalldata**: The calldata to be used for calling the factory contract to deploy the target contract.
+
+#### Functionality:
+1. **Check if Target Exists**:
+   - The constructor first checks if the target contract already exists using `extcodesize(target)`.
+   - If the target contract does not exist, it calls the factory contract to deploy it using the provided `factoryCalldata`.
+
+2. **Deploy Target Contract**:
+   - If the call to the factory contract fails, it reverts with the returned data.
+   - If the call succeeds, it checks if the address returned by the factory matches the provided target address. If not, it reverts with the `ReturnedAddressMismatch` error.
+
+3. **Query Target Contract**:
+   - The constructor then iterates over the `targetQueryCalldata` array.
+   - For each calldata entry, it calls the target contract with the provided calldata.
+   - If the call fails, it reverts with the returned data.
+   - If the call succeeds, it stores the returned data in memory.
+
+4. **Return Aggregated Results**:
+   - After all calls are made, it aggregates the results and returns them as a single bytes array.
+   - The returned data can be decoded to retrieve the results of each individual call.
+
+#### Memory Management:
+- The constructor uses inline assembly for efficient memory management and to handle the low-level calls.
+- It dynamically allocates memory for storing the results of each call and ensures proper alignment and padding.
+
+### Summary
+The `DeploylessPredeployQueryer` contract is a utility for querying predeploys without actually deploying the contract. It:
+- Checks if a target contract exists and deploys it if necessary using a factory contract.
+- Executes a series of queries on the target contract.
+- Aggregates and returns the results of these queries.
+
+This contract is particularly useful for scenarios where you need to interact with contracts that may not yet be deployed, and it ensures that the target contract is deployed and queried in a single atomic operation.

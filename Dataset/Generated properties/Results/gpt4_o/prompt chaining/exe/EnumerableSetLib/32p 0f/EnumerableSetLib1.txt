@@ -1,0 +1,86 @@
+The provided smart contract is a Solidity library named `EnumerableSetLib` that provides functionalities for managing enumerable sets in storage. This library supports sets of different types: `address`, `bytes32`, `uint256`, and `int256`. Below is a detailed explanation of each functionality provided by the library:
+
+### Custom Errors
+1. **`IndexOutOfBounds`**: Thrown when an index is out of the valid range.
+2. **`ValueIsZeroSentinel`**: Thrown when a value is equal to the zero sentinel value, which is not allowed.
+
+### Constants
+1. **`_ZERO_SENTINEL`**: A sentinel value used to denote the zero value in storage. No elements in the set can be equal to this value.
+2. **`_ENUMERABLE_ADDRESS_SET_SLOT_SEED`**: A constant used for calculating the storage slot for `AddressSet`.
+3. **`_ENUMERABLE_WORD_SET_SLOT_SEED`**: A constant used for calculating the storage slot for `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+### Structs
+1. **`AddressSet`**: Represents an enumerable set of `address` values.
+2. **`Bytes32Set`**: Represents an enumerable set of `bytes32` values.
+3. **`Uint256Set`**: Represents an enumerable set of `uint256` values.
+4. **`Int256Set`**: Represents an enumerable set of `int256` values.
+
+### Getters / Setters
+1. **`length`**: Returns the number of elements in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+2. **`contains`**: Checks if a value is in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+3. **`add`**: Adds a value to the set. Returns `true` if the value was not already in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+4. **`remove`**: Removes a value from the set. Returns `true` if the value was in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+5. **`values`**: Returns all the values in the set as an array.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+6. **`at`**: Returns the element at a specific index in the set.
+   - Overloaded for `AddressSet`, `Bytes32Set`, `Uint256Set`, and `Int256Set`.
+
+### Private Helpers
+1. **`_rootSlot`**: Calculates the root storage slot for a given set.
+   - Overloaded for `AddressSet` and `Bytes32Set`.
+
+2. **`_toBytes32Set`**: Casts a `Uint256Set` or `Int256Set` to a `Bytes32Set`.
+   - Overloaded for `Uint256Set` and `Int256Set`.
+
+3. **`_toUints`**: Casts a `bytes32` array to a `uint256` array.
+4. **`_toInts`**: Casts a `bytes32` array to an `int256` array.
+
+### Detailed Functionality
+
+#### Length Functions
+- **`length(AddressSet storage set)`**: Calculates the number of elements in an `AddressSet`.
+- **`length(Bytes32Set storage set)`**: Calculates the number of elements in a `Bytes32Set`.
+- **`length(Uint256Set storage set)`**: Calculates the number of elements in a `Uint256Set` by casting it to a `Bytes32Set`.
+- **`length(Int256Set storage set)`**: Calculates the number of elements in an `Int256Set` by casting it to a `Bytes32Set`.
+
+#### Contains Functions
+- **`contains(AddressSet storage set, address value)`**: Checks if an `address` value is in the `AddressSet`.
+- **`contains(Bytes32Set storage set, bytes32 value)`**: Checks if a `bytes32` value is in the `Bytes32Set`.
+- **`contains(Uint256Set storage set, uint256 value)`**: Checks if a `uint256` value is in the `Uint256Set` by casting it to a `Bytes32Set`.
+- **`contains(Int256Set storage set, int256 value)`**: Checks if an `int256` value is in the `Int256Set` by casting it to a `Bytes32Set`.
+
+#### Add Functions
+- **`add(AddressSet storage set, address value)`**: Adds an `address` value to the `AddressSet`.
+- **`add(Bytes32Set storage set, bytes32 value)`**: Adds a `bytes32` value to the `Bytes32Set`.
+- **`add(Uint256Set storage set, uint256 value)`**: Adds a `uint256` value to the `Uint256Set` by casting it to a `Bytes32Set`.
+- **`add(Int256Set storage set, int256 value)`**: Adds an `int256` value to the `Int256Set` by casting it to a `Bytes32Set`.
+
+#### Remove Functions
+- **`remove(AddressSet storage set, address value)`**: Removes an `address` value from the `AddressSet`.
+- **`remove(Bytes32Set storage set, bytes32 value)`**: Removes a `bytes32` value from the `Bytes32Set`.
+- **`remove(Uint256Set storage set, uint256 value)`**: Removes a `uint256` value from the `Uint256Set` by casting it to a `Bytes32Set`.
+- **`remove(Int256Set storage set, int256 value)`**: Removes an `int256` value from the `Int256Set` by casting it to a `Bytes32Set`.
+
+#### Values Functions
+- **`values(AddressSet storage set)`**: Returns all `address` values in the `AddressSet`.
+- **`values(Bytes32Set storage set)`**: Returns all `bytes32` values in the `Bytes32Set`.
+- **`values(Uint256Set storage set)`**: Returns all `uint256` values in the `Uint256Set` by casting the result from a `Bytes32Set`.
+- **`values(Int256Set storage set)`**: Returns all `int256` values in the `Int256Set` by casting the result from a `Bytes32Set`.
+
+#### At Functions
+- **`at(AddressSet storage set, uint256 i)`**: Returns the `address` value at index `i` in the `AddressSet`.
+- **`at(Bytes32Set storage set, uint256 i)`**: Returns the `bytes32` value at index `i` in the `Bytes32Set`.
+- **`at(Uint256Set storage set, uint256 i)`**: Returns the `uint256` value at index `i` in the `Uint256Set` by casting it from a `Bytes32Set`.
+- **`at(Int256Set storage set, uint256 i)`**: Returns the `int256` value at index `i` in the `Int256Set` by casting it from a `Bytes32Set`.
+
+### Summary
+The `EnumerableSetLib` library provides a comprehensive set of functionalities for managing enumerable sets of different types in Solidity. It includes methods for adding, removing, checking for existence, retrieving values, and getting the length of the sets. The library uses efficient storage techniques to handle small sets without storing length and indices, and it initializes these only when the set size exceeds three elements.

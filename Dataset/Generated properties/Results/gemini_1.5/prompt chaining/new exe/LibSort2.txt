@@ -1,0 +1,88 @@
+## LibSort Test Invariants
+
+Here are test invariants for the `LibSort` contract, covering edge cases and functionalities:
+
+**1. `insertionSort` Function:**
+
+* **Invariant 1:** For an empty array, the function should not modify the array.
+    * **Test Case:** `insertionSort([])` should result in `[]`.
+* **Invariant 2:** For an array with a single element, the function should not modify the array.
+    * **Test Case:** `insertionSort([1])` should result in `[1]`.
+* **Invariant 3:** For an already sorted array, the function should not modify the array.
+    * **Test Case:** `insertionSort([1, 2, 3, 4, 5])` should result in `[1, 2, 3, 4, 5]`.
+* **Invariant 4:** For a reverse sorted array, the function should correctly sort the array in ascending order.
+    * **Test Case:** `insertionSort([5, 4, 3, 2, 1])` should result in `[1, 2, 3, 4, 5]`.
+* **Invariant 5:** For an array with duplicate elements, the function should maintain the order of duplicate elements (stable sort).
+    * **Test Case:** `insertionSort([3, 2, 1, 2, 3])` should result in `[1, 2, 2, 3, 3]`.
+* **Invariant 6:** The function should work correctly for arrays containing the minimum and maximum values of the data type.
+    * **Test Case (uint256):** `insertionSort([0, 2**256 - 1, 1])` should result in `[0, 1, 2**256 - 1]`.
+    * **Test Case (int256):** `insertionSort([-2**255, 2**255 - 1, -1])` should result in `[-2**255, -1, 2**255 - 1]`.
+
+**2. `sort` Function (Intro-Quicksort):**
+
+* **Invariants 1-6:** Same as `insertionSort`, but with larger test arrays to highlight the efficiency of Intro-Quicksort.
+* **Invariant 7:** The function should handle arrays with a large number of elements efficiently.
+    * **Test Case:** `sort(largeArray)` where `largeArray` contains thousands of elements.
+* **Invariant 8:** The function should demonstrate robust performance for arrays with different distributions (random, almost sorted, few unique elements).
+    * **Test Cases:** Use arrays with various distributions to test the sorting efficiency.
+
+**3. `uniquifySorted` Function:**
+
+* **Invariant 1:** For an empty array, the function should not modify the array.
+* **Invariant 2:** For an array with a single element, the function should not modify the array.
+* **Invariant 3:** For an array with all unique elements, the function should not modify the array.
+    * **Test Case:** `uniquifySorted([1, 2, 3, 4, 5])` should result in `[1, 2, 3, 4, 5]`.
+* **Invariant 4:** For an array with consecutive duplicate elements, the function should remove the duplicates, leaving only unique elements.
+    * **Test Case:** `uniquifySorted([1, 1, 2, 2, 3, 3])` should result in `[1, 2, 3]`.
+* **Invariant 5:** For an array with non-consecutive duplicate elements, the function should only remove consecutive duplicates.
+    * **Test Case:** `uniquifySorted([1, 2, 1, 2, 1])` should result in `[1, 2, 1, 2, 1]`.
+
+**4. `searchSorted` Function:**
+
+* **Invariant 1:** For an empty array, the function should return `(false, 0)`.
+* **Invariant 2:** For an array with a single element:
+    * If the element matches the needle, return `(true, 0)`.
+    * If the element doesn't match, return `(false, 0)`.
+* **Invariant 3:** If the needle is present in the array, the function should return `(true, index)`, where `index` is the correct index of the needle.
+* **Invariant 4:** If the needle is not present in the array:
+    * If the needle is smaller than the smallest element, return `(false, 0)`.
+    * If the needle is larger than the largest element, return `(false, array.length)`.
+    * Otherwise, return `(false, index)`, where `index` is the index of the nearest element before the needle's position.
+
+**5. `reverse` Function:**
+
+* **Invariant 1:** For an empty array, the function should not modify the array.
+* **Invariant 2:** For an array with a single element, the function should not modify the array.
+* **Invariant 3:** For an array with multiple elements, the function should reverse the order of elements.
+    * **Test Case:** `reverse([1, 2, 3, 4, 5])` should result in `[5, 4, 3, 2, 1]`.
+
+**6. `copy` Function:**
+
+* **Invariant 1:** For an empty array, the function should return an empty array.
+* **Invariant 2:** For a non-empty array, the function should return a new array with the same elements in the same order.
+* **Invariant 3:** Modifying the copied array should not affect the original array, and vice versa.
+
+**7. `isSorted` and `isSortedAndUniquified` Functions:**
+
+* **Invariant 1:** For an empty array, both functions should return `true`.
+* **Invariant 2:** For an array with a single element, both functions should return `true`.
+* **Invariant 3:** For a sorted array:
+    * `isSorted` should return `true`.
+    * `isSortedAndUniquified` should return `true` if there are no consecutive duplicates, and `false` otherwise.
+* **Invariant 4:** For an unsorted array, both functions should return `false`.
+
+**8. `difference`, `intersection`, and `union` Functions:**
+
+* **Invariant 1:** For any two arrays `a` and `b`:
+    * `difference(a, b)` should return elements present in `a` but not in `b`.
+    * `intersection(a, b)` should return elements present in both `a` and `b`.
+    * `union(a, b)` should return all unique elements from both `a` and `b`.
+* **Invariant 2:** The order of elements in the resulting array should be sorted.
+* **Invariant 3:** Handle cases where one or both input arrays are empty.
+* **Invariant 4:** Handle cases where input arrays have overlapping elements.
+
+**Important Notes:**
+
+* These invariants provide a starting point for testing the `LibSort` contract.
+* You should write comprehensive test cases for each invariant, covering various input scenarios and edge cases.
+* Use a testing framework like Foundry to automate your tests and ensure the correctness of your implementation.

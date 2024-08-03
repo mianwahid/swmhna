@@ -1,0 +1,234 @@
+To ensure the correctness and robustness of the `DateTimeLib` smart contract, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and functionalities provided by the library. Below is a list of test invariants for each functionality:
+
+### Date Time Operations
+
+1. **dateToEpochDay**
+   - Invariant: The function should return the correct epoch day for a given date.
+   - Edge Cases:
+     - Minimum supported date: `dateToEpochDay(1970, 1, 1) == 0`
+     - Leap year date: `dateToEpochDay(2020, 2, 29) == 18321`
+     - End of year: `dateToEpochDay(2023, 12, 31) == 19688`
+     - Invalid date (e.g., `dateToEpochDay(2023, 2, 30)`) should be handled gracefully.
+
+2. **epochDayToDate**
+   - Invariant: The function should return the correct date for a given epoch day.
+   - Edge Cases:
+     - Minimum supported epoch day: `epochDayToDate(0) == (1970, 1, 1)`
+     - Leap year epoch day: `epochDayToDate(18321) == (2020, 2, 29)`
+     - End of year epoch day: `epochDayToDate(19688) == (2023, 12, 31)`
+
+3. **dateToTimestamp**
+   - Invariant: The function should return the correct Unix timestamp for a given date.
+   - Edge Cases:
+     - Minimum supported date: `dateToTimestamp(1970, 1, 1) == 0`
+     - Leap year date: `dateToTimestamp(2020, 2, 29) == 1582934400`
+     - End of year: `dateToTimestamp(2023, 12, 31) == 1703980800`
+
+4. **timestampToDate**
+   - Invariant: The function should return the correct date for a given Unix timestamp.
+   - Edge Cases:
+     - Minimum supported timestamp: `timestampToDate(0) == (1970, 1, 1)`
+     - Leap year timestamp: `timestampToDate(1582934400) == (2020, 2, 29)`
+     - End of year timestamp: `timestampToDate(1703980800) == (2023, 12, 31)`
+
+5. **dateTimeToTimestamp**
+   - Invariant: The function should return the correct Unix timestamp for a given date and time.
+   - Edge Cases:
+     - Minimum supported date and time: `dateTimeToTimestamp(1970, 1, 1, 0, 0, 0) == 0`
+     - Leap year date and time: `dateTimeToTimestamp(2020, 2, 29, 12, 0, 0) == 1582977600`
+     - End of year date and time: `dateTimeToTimestamp(2023, 12, 31, 23, 59, 59) == 1704067199`
+
+6. **timestampToDateTime**
+   - Invariant: The function should return the correct date and time for a given Unix timestamp.
+   - Edge Cases:
+     - Minimum supported timestamp: `timestampToDateTime(0) == (1970, 1, 1, 0, 0, 0)`
+     - Leap year timestamp: `timestampToDateTime(1582977600) == (2020, 2, 29, 12, 0, 0)`
+     - End of year timestamp: `timestampToDateTime(1704067199) == (2023, 12, 31, 23, 59, 59)`
+
+7. **isLeapYear**
+   - Invariant: The function should correctly identify leap years.
+   - Edge Cases:
+     - Leap year: `isLeapYear(2020) == true`
+     - Non-leap year: `isLeapYear(2019) == false`
+     - Century year not a leap year: `isLeapYear(1900) == false`
+     - Century year that is a leap year: `isLeapYear(2000) == true`
+
+8. **daysInMonth**
+   - Invariant: The function should return the correct number of days in a given month of a given year.
+   - Edge Cases:
+     - February in a leap year: `daysInMonth(2020, 2) == 29`
+     - February in a non-leap year: `daysInMonth(2019, 2) == 28`
+     - Months with 30 days: `daysInMonth(2023, 4) == 30`
+     - Months with 31 days: `daysInMonth(2023, 1) == 31`
+
+9. **weekday**
+   - Invariant: The function should return the correct weekday for a given Unix timestamp.
+   - Edge Cases:
+     - Known date: `weekday(0) == 4` (Thursday)
+     - Leap year date: `weekday(1582934400) == 6` (Saturday)
+     - End of year date: `weekday(1703980800) == 7` (Sunday)
+
+10. **isSupportedDate**
+    - Invariant: The function should correctly identify supported dates.
+    - Edge Cases:
+      - Minimum supported date: `isSupportedDate(1970, 1, 1) == true`
+      - Maximum supported date: `isSupportedDate(0xffffffff, 12, 31) == true`
+      - Invalid date: `isSupportedDate(2023, 2, 30) == false`
+
+11. **isSupportedDateTime**
+    - Invariant: The function should correctly identify supported date and time.
+    - Edge Cases:
+      - Minimum supported date and time: `isSupportedDateTime(1970, 1, 1, 0, 0, 0) == true`
+      - Maximum supported date and time: `isSupportedDateTime(0xffffffff, 12, 31, 23, 59, 59) == true`
+      - Invalid date and time: `isSupportedDateTime(2023, 2, 30, 25, 61, 61) == false`
+
+12. **isSupportedEpochDay**
+    - Invariant: The function should correctly identify supported epoch days.
+    - Edge Cases:
+      - Minimum supported epoch day: `isSupportedEpochDay(0) == true`
+      - Maximum supported epoch day: `isSupportedEpochDay(0x16d3e098039) == true`
+      - Invalid epoch day: `isSupportedEpochDay(0x16d3e09803a) == false`
+
+13. **isSupportedTimestamp**
+    - Invariant: The function should correctly identify supported Unix timestamps.
+    - Edge Cases:
+      - Minimum supported timestamp: `isSupportedTimestamp(0) == true`
+      - Maximum supported timestamp: `isSupportedTimestamp(0x1e18549868c76ff) == true`
+      - Invalid timestamp: `isSupportedTimestamp(0x1e18549868c7700) == false`
+
+14. **nthWeekdayInMonthOfYearTimestamp**
+    - Invariant: The function should return the correct Unix timestamp for the nth weekday in a given month and year.
+    - Edge Cases:
+      - 1st Monday of January 2023: `nthWeekdayInMonthOfYearTimestamp(2023, 1, 1, 1) == 1672617600`
+      - 3rd Friday of February 2022: `nthWeekdayInMonthOfYearTimestamp(2022, 2, 3, 5) == 1645228800`
+      - Invalid weekday: `nthWeekdayInMonthOfYearTimestamp(2023, 1, 1, 8)` should be handled gracefully.
+
+15. **mondayTimestamp**
+    - Invariant: The function should return the Unix timestamp of the most recent Monday.
+    - Edge Cases:
+      - Known date: `mondayTimestamp(1672617600) == 1672617600` (Monday, January 2, 2023)
+      - Mid-week date: `mondayTimestamp(1672876800) == 1672617600` (Wednesday, January 4, 2023)
+
+16. **isWeekEnd**
+    - Invariant: The function should correctly identify if a given Unix timestamp falls on a weekend.
+    - Edge Cases:
+      - Known weekend date: `isWeekEnd(1672876800) == false` (Wednesday, January 4, 2023)
+      - Known weekday date: `isWeekEnd(1672876800) == false` (Wednesday, January 4, 2023)
+
+### Date Time Arithmetic Operations
+
+1. **addYears**
+   - Invariant: The function should correctly add years to a Unix timestamp.
+   - Edge Cases:
+     - Adding years to a leap year date: `addYears(1582934400, 1) == 1614470400` (February 29, 2020 + 1 year)
+     - Adding years to end of year: `addYears(1703980800, 1) == 1735516800` (December 31, 2023 + 1 year)
+
+2. **addMonths**
+   - Invariant: The function should correctly add months to a Unix timestamp.
+   - Edge Cases:
+     - Adding months to a leap year date: `addMonths(1582934400, 1) == 1585612800` (February 29, 2020 + 1 month)
+     - Adding months to end of year: `addMonths(1703980800, 1) == 1706659200` (December 31, 2023 + 1 month)
+
+3. **addDays**
+   - Invariant: The function should correctly add days to a Unix timestamp.
+   - Edge Cases:
+     - Adding days to a leap year date: `addDays(1582934400, 1) == 1583020800` (February 29, 2020 + 1 day)
+     - Adding days to end of year: `addDays(1703980800, 1) == 1704067200` (December 31, 2023 + 1 day)
+
+4. **addHours**
+   - Invariant: The function should correctly add hours to a Unix timestamp.
+   - Edge Cases:
+     - Adding hours to a leap year date: `addHours(1582934400, 1) == 1582938000` (February 29, 2020 + 1 hour)
+     - Adding hours to end of year: `addHours(1703980800, 1) == 1703984400` (December 31, 2023 + 1 hour)
+
+5. **addMinutes**
+   - Invariant: The function should correctly add minutes to a Unix timestamp.
+   - Edge Cases:
+     - Adding minutes to a leap year date: `addMinutes(1582934400, 1) == 1582934460` (February 29, 2020 + 1 minute)
+     - Adding minutes to end of year: `addMinutes(1703980800, 1) == 1703980860` (December 31, 2023 + 1 minute)
+
+6. **addSeconds**
+   - Invariant: The function should correctly add seconds to a Unix timestamp.
+   - Edge Cases:
+     - Adding seconds to a leap year date: `addSeconds(1582934400, 1) == 1582934401` (February 29, 2020 + 1 second)
+     - Adding seconds to end of year: `addSeconds(1703980800, 1) == 1703980801` (December 31, 2023 + 1 second)
+
+7. **subYears**
+   - Invariant: The function should correctly subtract years from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting years from a leap year date: `subYears(1582934400, 1) == 1551398400` (February 29, 2020 - 1 year)
+     - Subtracting years from end of year: `subYears(1703980800, 1) == 1672444800` (December 31, 2023 - 1 year)
+
+8. **subMonths**
+   - Invariant: The function should correctly subtract months from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting months from a leap year date: `subMonths(1582934400, 1) == 1577856000` (February 29, 2020 - 1 month)
+     - Subtracting months from end of year: `subMonths(1703980800, 1) == 1701302400` (December 31, 2023 - 1 month)
+
+9. **subDays**
+   - Invariant: The function should correctly subtract days from a Unix timestamp.
+   - Edge Cases:
+     - Subtracting days from a leap year date: `subDays(1582934400, 1) == 1582848000` (February 29, 2020 - 1 day)
+     - Subtracting days from end of year: `subDays(1703980800, 1) == 1703894400` (December 31, 2023 - 1 day)
+
+10. **subHours**
+    - Invariant: The function should correctly subtract hours from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting hours from a leap year date: `subHours(1582934400, 1) == 1582930800` (February 29, 2020 - 1 hour)
+      - Subtracting hours from end of year: `subHours(1703980800, 1) == 1703977200` (December 31, 2023 - 1 hour)
+
+11. **subMinutes**
+    - Invariant: The function should correctly subtract minutes from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting minutes from a leap year date: `subMinutes(1582934400, 1) == 1582934340` (February 29, 2020 - 1 minute)
+      - Subtracting minutes from end of year: `subMinutes(1703980800, 1) == 1703980740` (December 31, 2023 - 1 minute)
+
+12. **subSeconds**
+    - Invariant: The function should correctly subtract seconds from a Unix timestamp.
+    - Edge Cases:
+      - Subtracting seconds from a leap year date: `subSeconds(1582934400, 1) == 1582934399` (February 29, 2020 - 1 second)
+      - Subtracting seconds from end of year: `subSeconds(1703980800, 1) == 1703980799` (December 31, 2023 - 1 second)
+
+13. **diffYears**
+    - Invariant: The function should correctly calculate the difference in years between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffYears(1582934400, 1614470400) == 1` (February 29, 2020 to February 28, 2021)
+      - Difference between end of year dates: `diffYears(1703980800, 1735516800) == 1` (December 31, 2023 to December 31, 2024)
+
+14. **diffMonths**
+    - Invariant: The function should correctly calculate the difference in months between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffMonths(1582934400, 1585612800) == 1` (February 29, 2020 to March 29, 2020)
+      - Difference between end of year dates: `diffMonths(1703980800, 1706659200) == 1` (December 31, 2023 to January 31, 2024)
+
+15. **diffDays**
+    - Invariant: The function should correctly calculate the difference in days between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffDays(1582934400, 1583020800) == 1` (February 29, 2020 to March 1, 2020)
+      - Difference between end of year dates: `diffDays(1703980800, 1704067200) == 1` (December 31, 2023 to January 1, 2024)
+
+16. **diffHours**
+    - Invariant: The function should correctly calculate the difference in hours between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffHours(1582934400, 1582938000) == 1` (February 29, 2020, 00:00 to February 29, 2020, 01:00)
+      - Difference between end of year dates: `diffHours(1703980800, 1703984400) == 1` (December 31, 2023, 00:00 to December 31, 2023, 01:00)
+
+17. **diffMinutes**
+    - Invariant: The function should correctly calculate the difference in minutes between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffMinutes(1582934400, 1582934460) == 1` (February 29, 2020, 00:00 to February 29, 2020, 00:01)
+      - Difference between end of year dates: `diffMinutes(1703980800, 1703980860) == 1` (December 31, 2023, 00:00 to December 31, 2023, 00:01)
+
+18. **diffSeconds**
+    - Invariant: The function should correctly calculate the difference in seconds between two Unix timestamps.
+    - Edge Cases:
+      - Difference between leap year dates: `diffSeconds(1582934400, 1582934401) == 1` (February 29, 2020, 00:00:00 to February 29, 2020, 00:00:01)
+      - Difference between end of year dates: `diffSeconds(1703980800, 1703980801) == 1` (December 31, 2023, 00:00:00 to December 31, 2023, 00:00:01)
+
+### Private Helpers
+
+1. **_totalMonths**
+   - Invariant: The function should correctly calculate the total number of months given years and months.
+   - Edge Cases:
+     - Minimum input: `_totalMonths(0, 0) == 0`
+     - Maximum input: `_totalMonths(0xffffffff, 12) == 0xffffffff

@@ -1,0 +1,51 @@
+To ensure the correctness and robustness of the `EnumerableSetLib` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for the functionalities of the given smart contract:
+
+### Length Function Invariants
+1. **Initial Length**: The length of a newly created set should be 0.
+2. **Length After Additions**: Adding elements to the set should increase its length accordingly.
+3. **Length After Removals**: Removing elements from the set should decrease its length accordingly.
+4. **Length with Duplicates**: Adding duplicate elements should not increase the length of the set.
+5. **Length with Zero Sentinel**: Adding the zero sentinel value should revert and not affect the length.
+
+### Contains Function Invariants
+1. **Contains in Empty Set**: The `contains` function should return `false` for any value in an empty set.
+2. **Contains After Addition**: The `contains` function should return `true` for a value that has been added to the set.
+3. **Contains After Removal**: The `contains` function should return `false` for a value that has been removed from the set.
+4. **Contains with Zero Sentinel**: The `contains` function should revert when checking for the zero sentinel value.
+
+### Add Function Invariants
+1. **Add to Empty Set**: Adding a value to an empty set should succeed and increase the length.
+2. **Add Duplicate**: Adding a duplicate value should not change the set and should return `false`.
+3. **Add Zero Sentinel**: Adding the zero sentinel value should revert.
+4. **Add Multiple Values**: Adding multiple distinct values should succeed and increase the length accordingly.
+
+### Remove Function Invariants
+1. **Remove from Empty Set**: Removing a value from an empty set should return `false`.
+2. **Remove Existing Value**: Removing a value that exists in the set should succeed and decrease the length.
+3. **Remove Non-Existing Value**: Removing a value that does not exist in the set should return `false`.
+4. **Remove Zero Sentinel**: Removing the zero sentinel value should revert.
+
+### Values Function Invariants
+1. **Values in Empty Set**: The `values` function should return an empty array for an empty set.
+2. **Values After Additions**: The `values` function should return an array containing all added values.
+3. **Values After Removals**: The `values` function should return an array excluding removed values.
+4. **Values with Zero Sentinel**: The `values` function should not include the zero sentinel value in the returned array.
+
+### At Function Invariants
+1. **At in Empty Set**: The `at` function should revert when called on an empty set.
+2. **At with Valid Index**: The `at` function should return the correct value for a valid index.
+3. **At with Invalid Index**: The `at` function should revert when called with an index greater than or equal to the length of the set.
+4. **At with Zero Sentinel**: The `at` function should not return the zero sentinel value.
+
+### General Invariants
+1. **Idempotency of Add**: Adding the same value multiple times should not change the set after the first addition.
+2. **Idempotency of Remove**: Removing the same value multiple times should not change the set after the first removal.
+3. **Consistency Between Length and Values**: The length of the set should always match the number of elements returned by the `values` function.
+4. **Consistency Between Contains and Values**: If `contains` returns `true` for a value, that value should be present in the array returned by the `values` function.
+
+### Specific Edge Cases
+1. **Boundary Conditions**: Test the transition from 3 to 4 elements to ensure the length and indices are initialized correctly.
+2. **Zero Value Handling**: Ensure that zero values are correctly handled and do not interfere with the set's functionality.
+3. **Large Sets**: Test the library's behavior with a large number of elements to ensure it handles storage and gas limits efficiently.
+
+By covering these invariants, we can ensure that the `EnumerableSetLib` library functions correctly and handles various edge cases effectively.

@@ -1,0 +1,80 @@
+The provided smart contract is the `DateTimeLib` library, designed for handling date and time operations in Solidity. It's not a standalone contract, but a toolset for other contracts to import and utilize. Here's a breakdown of its functionalities:
+
+**1. Constants**
+
+- **Weekdays (1-indexed):** `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT`, `SUN`
+    - Represent days of the week, aligning with ISO 8601 standard.
+- **Months (1-indexed):** `JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`
+    - Represent months of the year, also following ISO 8601.
+- **Support Limits:** `MAX_SUPPORTED_YEAR`, `MAX_SUPPORTED_EPOCH_DAY`, `MAX_SUPPORTED_TIMESTAMP`
+    - Define the upper boundaries for year, epoch day, and timestamp values the library can handle safely.
+
+**2. Date & Time Conversions**
+
+- **`dateToEpochDay(year, month, day)`:**
+    - Converts a date (year, month, day) to the number of days since 1970-01-01 (epoch day).
+- **`epochDayToDate(epochDay)`:**
+    - Converts an epoch day back to its corresponding date (year, month, day).
+- **`dateToTimestamp(year, month, day)`:**
+    - Converts a date to its equivalent Unix timestamp (seconds since 1970-01-01 00:00:00 UTC).
+- **`timestampToDate(timestamp)`:**
+    - Converts a Unix timestamp to its date representation (year, month, day).
+- **`dateTimeToTimestamp(year, month, day, hour, minute, second)`:**
+    - Converts a full date and time to a Unix timestamp.
+- **`timestampToDateTime(timestamp)`:**
+    - Converts a Unix timestamp to its full date and time components (year, month, day, hour, minute, second).
+
+**3. Date & Time Information**
+
+- **`isLeapYear(year)`:**
+    - Determines if a given year is a leap year.
+- **`daysInMonth(year, month)`:**
+    - Returns the number of days in a specific month of a given year.
+- **`weekday(timestamp)`:**
+    - Calculates the day of the week (1-indexed, Monday=1) for a given Unix timestamp.
+
+**4. Input Validation**
+
+- **`isSupportedDate(year, month, day)`:**
+    - Checks if a date falls within the library's supported range.
+- **`isSupportedDateTime(year, month, day, hour, minute, second)`:**
+    - Checks if a date and time combination is supported.
+- **`isSupportedEpochDay(epochDay)`:**
+    - Checks if an epoch day is within the supported range.
+- **`isSupportedTimestamp(timestamp)`:**
+    - Checks if a Unix timestamp is within the supported range.
+
+**5. Specific Timestamp Calculations**
+
+- **`nthWeekdayInMonthOfYearTimestamp(year, month, n, wd)`:**
+    - Calculates the Unix timestamp of the nth occurrence of a specific weekday in a given month and year (e.g., 3rd Friday of February 2022).
+- **`mondayTimestamp(timestamp)`:**
+    - Determines the Unix timestamp of the most recent Monday relative to the input timestamp.
+
+**6. Weekend Check**
+
+- **`isWeekEnd(timestamp)`:**
+    - Checks if a Unix timestamp falls on a Saturday or Sunday.
+
+**7. Date & Time Arithmetic**
+
+- **`addYears(timestamp, numYears)`:**
+    - Adds years to a timestamp, handling leap years and month boundaries.
+- **`addMonths(timestamp, numMonths)`:**
+    - Adds months to a timestamp, adjusting for month lengths.
+- **`addDays(timestamp, numDays)`, `addHours(...)`, `addMinutes(...)`, `addSeconds(...)`:**
+    - Add specific time units to a timestamp.
+- **`subYears(timestamp, numYears)`, `subMonths(...)`, `subDays(...)`, `subHours(...)`, `subMinutes(...)`, `subSeconds(...)`:**
+    - Subtract specific time units from a timestamp.
+- **`diffYears(fromTimestamp, toTimestamp)`, `diffMonths(...)`, `diffDays(...)`, `diffHours(...)`, `diffMinutes(...)`, `diffSeconds(...)`:**
+    - Calculate the difference between two timestamps in terms of years, months, days, hours, minutes, or seconds.
+
+**Private Helpers**
+
+- **`_totalMonths(numYears, numMonths)`, `_add(a, b)`, `_sub(a, b)`, `_offsetted(...)`:**
+    - Internal functions used for calculations within the library.
+
+**Key Points**
+
+- **Library:** `DateTimeLib` is a library, meaning its functions are meant to be called by other contracts, not directly interacted with.
+- **Error Handling:** The library relies on unchecked arithmetic and assumes inputs are within supported ranges. It's crucial for contracts using this library to validate inputs and handle potential errors to prevent unexpected behavior. 

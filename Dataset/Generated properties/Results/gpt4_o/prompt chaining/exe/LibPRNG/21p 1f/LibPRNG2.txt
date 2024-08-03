@@ -1,0 +1,95 @@
+To ensure the robustness and correctness of the `LibPRNG` library, we need to write test invariants that cover all functionalities and edge cases. Here are the test invariants for each functionality:
+
+### Custom Errors
+1. **InvalidInitialLazyShufflerLength**
+   - Invariant: Initial length must be greater than zero and less than `2**32 - 1`.
+   - Edge Case: Initialize with `n = 0` or `n >= 2**32 - 1`.
+
+2. **InvalidNewLazyShufflerLength**
+   - Invariant: New length must not be less than the current length.
+   - Edge Case: Grow the shuffler with a new length smaller than the current length.
+
+3. **LazyShufflerNotInitialized**
+   - Invariant: Operations on the lazy shuffler must be performed only after initialization.
+   - Edge Case: Call `grow`, `restart`, `finished`, `get`, or `next` on an uninitialized shuffler.
+
+4. **LazyShufflerAlreadyInitialized**
+   - Invariant: The lazy shuffler cannot be initialized more than once.
+   - Edge Case: Call `initialize` on an already initialized shuffler.
+
+5. **LazyShuffleFinished**
+   - Invariant: Cannot shuffle more elements than available.
+   - Edge Case: Call `next` after all elements have been shuffled.
+
+6. **LazyShufflerGetOutOfBounds**
+   - Invariant: Queried index must be within the bounds of the lazy shuffler.
+   - Edge Case: Call `get` with an index greater than or equal to the length of the shuffler.
+
+### Operations
+1. **seed(PRNG memory prng, uint256 state)**
+   - Invariant: The PRNG state must be correctly set.
+   - Edge Case: Seed with various values, including edge values like `0` and `2**256 - 1`.
+
+2. **next(PRNG memory prng)**
+   - Invariant: The next pseudorandom value must be correctly generated.
+   - Edge Case: Call `next` multiple times and ensure the state changes.
+
+3. **uniform(PRNG memory prng, uint256 upper)**
+   - Invariant: The result must be uniformly distributed between `0` (inclusive) and `upper` (exclusive).
+   - Edge Case: Call with `upper = 1`, `upper = 2**256 - 1`, and other edge values.
+
+4. **shuffle(PRNG memory prng, uint256[] memory a)**
+   - Invariant: The array must be shuffled in-place.
+   - Edge Case: Shuffle arrays of different lengths, including empty arrays and arrays with one element.
+
+5. **shuffle(PRNG memory prng, bytes memory a)**
+   - Invariant: The byte array must be shuffled in-place.
+   - Edge Case: Shuffle byte arrays of different lengths, including empty arrays and arrays with one byte.
+
+6. **standardNormalWad(PRNG memory prng)**
+   - Invariant: The result must follow the standard normal distribution.
+   - Edge Case: Call multiple times and check the distribution of results.
+
+7. **exponentialWad(PRNG memory prng)**
+   - Invariant: The result must follow the unit exponential distribution.
+   - Edge Case: Call multiple times and check the distribution of results.
+
+### Storage-Based Range Lazy Shuffling Operations
+1. **initialize(LazyShuffler storage $, uint256 n)**
+   - Invariant: The shuffler must be correctly initialized.
+   - Edge Case: Initialize with `n = 0`, `n = 2**32 - 1`, and valid values.
+
+2. **grow(LazyShuffler storage $, uint256 n)**
+   - Invariant: The length must be correctly increased.
+   - Edge Case: Grow with a new length smaller than the current length, and with valid values.
+
+3. **restart(LazyShuffler storage $)**
+   - Invariant: The shuffler must be correctly restarted.
+   - Edge Case: Restart and ensure `numShuffled` is reset to zero.
+
+4. **numShuffled(LazyShuffler storage $)**
+   - Invariant: The number of shuffled elements must be correctly returned.
+   - Edge Case: Check after initialization, after some shuffles, and after all elements are shuffled.
+
+5. **length(LazyShuffler storage $)**
+   - Invariant: The length must be correctly returned.
+   - Edge Case: Check before and after initialization, and after growing.
+
+6. **initialized(LazyShuffler storage $)**
+   - Invariant: The initialization status must be correctly returned.
+   - Edge Case: Check before and after initialization.
+
+7. **finished(LazyShuffler storage $)**
+   - Invariant: The finished status must be correctly returned.
+   - Edge Case: Check before and after all elements are shuffled.
+
+8. **get(LazyShuffler storage $, uint256 index)**
+   - Invariant: The value at the given index must be correctly returned.
+   - Edge Case: Call with an index out of bounds, and with valid indices.
+
+9. **next(LazyShuffler storage $, uint256 randomness)**
+   - Invariant: The next value in the shuffled range must be correctly returned.
+   - Edge Case: Call after all elements are shuffled, and with valid randomness values.
+
+### Summary
+These test invariants ensure that all functionalities of the `LibPRNG` library are thoroughly tested, covering both normal and edge cases. This will help in identifying any potential issues and ensuring the correctness and robustness of the library.

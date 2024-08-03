@@ -1,0 +1,63 @@
+The provided smart contract is a Solidity library named `LibString` that offers a variety of string manipulation functions. Below is a detailed explanation of each functionality provided by the library:
+
+### Custom Errors
+1. **HexLengthInsufficient**: Thrown when the length of the output is too small to contain all the hex digits.
+2. **TooBigForSmallString**: Thrown when the length of the string is more than 32 bytes.
+
+### Constants
+1. **NOT_FOUND**: A constant representing the value returned when a search operation does not find the target string. It is set to the maximum value of `uint256`.
+
+### Decimal Operations
+1. **toString(uint256 value)**: Converts a `uint256` value to its base 10 decimal string representation.
+2. **toString(int256 value)**: Converts an `int256` value to its base 10 decimal string representation. Handles negative values by adding a '-' sign.
+
+### Hexadecimal Operations
+1. **toHexString(uint256 value, uint256 length)**: Converts a `uint256` value to its hexadecimal string representation, left-padded to a specified length and prefixed with "0x".
+2. **toHexStringNoPrefix(uint256 value, uint256 length)**: Converts a `uint256` value to its hexadecimal string representation, left-padded to a specified length without the "0x" prefix.
+3. **toHexString(uint256 value)**: Converts a `uint256` value to its hexadecimal string representation, prefixed with "0x".
+4. **toMinimalHexString(uint256 value)**: Converts a `uint256` value to its minimal hexadecimal string representation, prefixed with "0x" and excluding leading zeros.
+5. **toMinimalHexStringNoPrefix(uint256 value)**: Converts a `uint256` value to its minimal hexadecimal string representation without the "0x" prefix and excluding leading zeros.
+6. **toHexStringNoPrefix(uint256 value)**: Converts a `uint256` value to its hexadecimal string representation without the "0x" prefix.
+7. **toHexStringChecksummed(address value)**: Converts an `address` value to its checksummed hexadecimal string representation, prefixed with "0x".
+8. **toHexString(address value)**: Converts an `address` value to its hexadecimal string representation, prefixed with "0x".
+9. **toHexStringNoPrefix(address value)**: Converts an `address` value to its hexadecimal string representation without the "0x" prefix.
+10. **toHexString(bytes memory raw)**: Converts a `bytes` array to its hexadecimal string representation, prefixed with "0x".
+11. **toHexStringNoPrefix(bytes memory raw)**: Converts a `bytes` array to its hexadecimal string representation without the "0x" prefix.
+
+### Rune String Operations
+1. **runeCount(string memory s)**: Returns the number of UTF characters in the string.
+2. **is7BitASCII(string memory s)**: Checks if the string is a 7-bit ASCII string (i.e., all character codes are in the range [0..127]).
+
+### Byte String Operations
+1. **replace(string memory subject, string memory search, string memory replacement)**: Replaces all occurrences of `search` in `subject` with `replacement`.
+2. **indexOf(string memory subject, string memory search, uint256 from)**: Returns the byte index of the first occurrence of `search` in `subject` starting from a specified index. Returns `NOT_FOUND` if not found.
+3. **indexOf(string memory subject, string memory search)**: Returns the byte index of the first occurrence of `search` in `subject`. Returns `NOT_FOUND` if not found.
+4. **lastIndexOf(string memory subject, string memory search, uint256 from)**: Returns the byte index of the last occurrence of `search` in `subject` starting from a specified index. Returns `NOT_FOUND` if not found.
+5. **lastIndexOf(string memory subject, string memory search)**: Returns the byte index of the last occurrence of `search` in `subject`. Returns `NOT_FOUND` if not found.
+6. **contains(string memory subject, string memory search)**: Checks if `search` is found in `subject`.
+7. **startsWith(string memory subject, string memory search)**: Checks if `subject` starts with `search`.
+8. **endsWith(string memory subject, string memory search)**: Checks if `subject` ends with `search`.
+9. **repeat(string memory subject, uint256 times)**: Returns a new string that repeats `subject` a specified number of times.
+10. **slice(string memory subject, uint256 start, uint256 end)**: Returns a substring of `subject` from `start` to `end` (exclusive).
+11. **slice(string memory subject, uint256 start)**: Returns a substring of `subject` from `start` to the end of the string.
+12. **indicesOf(string memory subject, string memory search)**: Returns an array of byte indices where `search` is found in `subject`.
+13. **split(string memory subject, string memory delimiter)**: Splits `subject` into an array of strings based on the `delimiter`.
+14. **concat(string memory a, string memory b)**: Concatenates two strings `a` and `b`.
+15. **toCase(string memory subject, bool toUpper)**: Converts the string to either lowercase or uppercase based on the `toUpper` flag.
+16. **fromSmallString(bytes32 s)**: Converts a null-terminated `bytes32` string to a `string`.
+17. **normalizeSmallString(bytes32 s)**: Normalizes a `bytes32` string by zeroizing all bytes after the first null byte.
+18. **toSmallString(string memory s)**: Converts a `string` to a null-terminated `bytes32` string.
+19. **lower(string memory subject)**: Converts the string to lowercase.
+20. **upper(string memory subject)**: Converts the string to uppercase.
+21. **escapeHTML(string memory s)**: Escapes the string to be used within HTML tags.
+22. **escapeJSON(string memory s, bool addDoubleQuotes)**: Escapes the string to be used within double-quotes in a JSON. Optionally adds double quotes around the result.
+23. **escapeJSON(string memory s)**: Escapes the string to be used within double-quotes in a JSON.
+24. **eq(string memory a, string memory b)**: Checks if two strings `a` and `b` are equal.
+25. **eqs(string memory a, bytes32 b)**: Checks if a string `a` is equal to a null-terminated `bytes32` string `b`.
+26. **packOne(string memory a)**: Packs a single string with its length into a single word. Returns `bytes32(0)` if the length is zero or greater than 31.
+27. **unpackOne(bytes32 packed)**: Unpacks a string packed using `packOne`. Returns the empty string if `packed` is `bytes32(0)`.
+28. **packTwo(string memory a, string memory b)**: Packs two strings with their lengths into a single word. Returns `bytes32(0)` if the combined length is zero or greater than 30.
+29. **unpackTwo(bytes32 packed)**: Unpacks two strings packed using `packTwo`. Returns the empty strings if `packed` is `bytes32(0)`.
+30. **directReturn(string memory a)**: Directly returns the string `a` without copying.
+
+This library provides a comprehensive set of functions for string manipulation, including conversion between different formats, searching, slicing, concatenation, and more. It is designed to be efficient and memory-safe, leveraging low-level assembly code for performance.

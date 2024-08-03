@@ -1,0 +1,99 @@
+To ensure the correctness and robustness of the `SSTORE2` library, we need to write test invariants that cover all functionalities and edge cases. Here are the test invariants for each function:
+
+### Invariants for `write` Function
+
+1. **Successful Deployment**
+   - Ensure that the function returns a valid contract address.
+   - Verify that the deployed contract contains the correct data prefixed with a STOP opcode.
+
+2. **Deployment Failure**
+   - Test with data that exceeds the maximum contract size (24,576 bytes) to ensure it reverts with `DeploymentFailed`.
+
+### Invariants for `writeDeterministic` Function
+
+1. **Successful Deterministic Deployment**
+   - Ensure that the function returns a valid contract address.
+   - Verify that the deployed contract contains the correct data prefixed with a STOP opcode.
+   - Ensure that the address is deterministic based on the provided salt and deployer address.
+
+2. **Deployment Failure**
+   - Test with data that exceeds the maximum contract size (24,576 bytes) to ensure it reverts with `DeploymentFailed`.
+
+### Invariants for `initCodeHash` Function
+
+1. **Correct Hash Calculation**
+   - Verify that the function returns the correct initialization code hash for given data.
+   - Ensure that the hash is consistent for the same input data.
+
+### Invariants for `predictDeterministicAddress` Function
+
+1. **Correct Address Prediction**
+   - Verify that the function returns the correct deterministic address for given data, salt, and deployer address.
+   - Ensure that the predicted address matches the actual deployed address when using `writeDeterministic`.
+
+### Invariants for `read` Function
+
+1. **Valid Pointer**
+   - Ensure that the function returns the correct data stored in the contract.
+   - Verify that the data is correctly prefixed with a STOP opcode.
+
+2. **Invalid Pointer**
+   - Test with an invalid contract address to ensure it reverts with `InvalidPointer`.
+
+### Invariants for `read` Function (with start)
+
+1. **Valid Pointer and Start**
+   - Ensure that the function returns the correct data starting from the specified byte.
+   - Verify that the data is correctly prefixed with a STOP opcode.
+
+2. **Invalid Pointer**
+   - Test with an invalid contract address to ensure it reverts with `InvalidPointer`.
+
+3. **Out of Bounds Start**
+   - Test with a start position that exceeds the data length to ensure it reverts with `ReadOutOfBounds`.
+
+### Invariants for `read` Function (with start and end)
+
+1. **Valid Pointer, Start, and End**
+   - Ensure that the function returns the correct data from the specified start to end bytes.
+   - Verify that the data is correctly prefixed with a STOP opcode.
+
+2. **Invalid Pointer**
+   - Test with an invalid contract address to ensure it reverts with `InvalidPointer`.
+
+3. **Out of Bounds Start or End**
+   - Test with start or end positions that exceed the data length to ensure it reverts with `ReadOutOfBounds`.
+   - Test with start greater than end to ensure it reverts with `ReadOutOfBounds`.
+
+### Summary of Test Invariants
+
+1. **write Function**
+   - Valid data deployment.
+   - Data exceeding maximum contract size.
+
+2. **writeDeterministic Function**
+   - Valid deterministic data deployment.
+   - Data exceeding maximum contract size.
+
+3. **initCodeHash Function**
+   - Correct hash calculation for given data.
+
+4. **predictDeterministicAddress Function**
+   - Correct address prediction for given data, salt, and deployer.
+
+5. **read Function**
+   - Valid pointer.
+   - Invalid pointer.
+
+6. **read Function (with start)**
+   - Valid pointer and start.
+   - Invalid pointer.
+   - Out of bounds start.
+
+7. **read Function (with start and end)**
+   - Valid pointer, start, and end.
+   - Invalid pointer.
+   - Out of bounds start or end.
+   - Start greater than end.
+
+By covering these invariants, we can ensure that the `SSTORE2` library functions correctly under various scenarios and edge cases.

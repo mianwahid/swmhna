@@ -1,0 +1,76 @@
+## Test Invariants for LibClone Smart Contract
+
+This document outlines test invariants for the `LibClone` smart contract, covering edge cases and functionalities.
+
+**General Invariants:**
+
+* **Deployment Failure:** Any attempt to deploy a clone (using any method) with an invalid implementation address (e.g., address(0), non-contract address) MUST revert with the `DeploymentFailed()` error.
+* **Salt Validation:** The `checkStartsWith(bytes32 salt, address by)` function MUST revert with the `SaltDoesNotStartWith()` error if the provided `salt` does not start with either the zero address or the specified `by` address.
+
+**Minimal Proxy Operations:**
+
+* **Successful Deployment:**
+    - `clone(address implementation)` and `clone(uint256 value, address implementation)` MUST deploy a new contract at a non-zero address.
+    - The deployed contract's bytecode MUST match the bytecode returned by `initCode(address implementation)`.
+    - When `value` is greater than zero, the deployed contract MUST have a balance equal to `value`.
+* **Deterministic Deployment:**
+    - `cloneDeterministic(address implementation, bytes32 salt)` and `cloneDeterministic(uint256 value, address implementation, bytes32 salt)` MUST deploy a new contract at the address predicted by `predictDeterministicAddress(address implementation, bytes32 salt, address deployer)`.
+    - Deploying with the same `implementation` and `salt` values MUST always result in the same deployment address.
+* **Initialization Code Hash:**
+    - `initCodeHash(address implementation)` MUST return the correct keccak256 hash of the initialization code for the given `implementation`.
+    - This hash can be independently verified using the `keccak256` hash function on the bytecode returned by `initCode(address implementation)`.
+
+**Minimal Proxy Operations (PUSH0 Variant):**
+
+* **PUSH0 Compatibility:** All PUSH0 variant functions MUST be tested for compatibility with the target EVM chain. If the chain does not support PUSH0, these functions MUST revert.
+* **Successful and Deterministic Deployment:** The same invariants as the non-PUSH0 minimal proxy operations apply to the PUSH0 variants, ensuring successful and deterministic deployments.
+* **Initialization Code and Hash:** The same invariants as the non-PUSH0 minimal proxy operations apply to the PUSH0 variants, ensuring the correctness of the initialization code and its hash.
+
+**Clones with Immutable Args (CWIA) Operations:**
+
+* **Data Encoding and Validation:**
+    - The `data` argument for CWIA functions MUST be correctly encoded according to the constructor signature of the target implementation contract.
+    - Tests should cover various data types and edge cases (e.g., empty data, maximum data size).
+* **Successful and Deterministic Deployment:** The same invariants as the minimal proxy operations apply to the CWIA variants, ensuring successful and deterministic deployments with the provided `data`.
+* **Initialization Code and Hash:** The same invariants as the minimal proxy operations apply to the CWIA variants, ensuring the correctness of the initialization code and its hash, including the embedded `data`.
+
+**Minimal ERC1967 Proxy Operations:**
+
+* **ERC1967 Compliance:**
+    - The deployed ERC1967 proxies MUST adhere to the ERC1967 standard, specifically regarding the storage layout of the implementation address.
+    - The implementation address MUST be stored at the slot calculated using `keccak256(abi.encodePacked(bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1)))`.
+* **Successful and Deterministic Deployment:** The same invariants as the minimal proxy operations apply to the ERC1967 variants, ensuring successful and deterministic deployments.
+* **Initialization Code and Hash:** The same invariants as the minimal proxy operations apply to the ERC1967 variants, ensuring the correctness of the initialization code and its hash.
+
+**ERC1967I Proxy Operations:**
+
+* **ERC1967I Specific Behavior:**
+    - When `calldatasize() == 1`, the ERC1967I proxy MUST return the implementation address directly without delegatecalling.
+    - This behavior MUST be thoroughly tested to ensure the correct implementation address is returned.
+* **Successful and Deterministic Deployment:** The same invariants as the minimal proxy operations apply to the ERC1967I variants, ensuring successful and deterministic deployments.
+* **Initialization Code and Hash:** The same invariants as the minimal proxy operations apply to the ERC1967I variants, ensuring the correctness of the initialization code and its hash.
+
+**Constant ERC1967 Bootstrap Operations:**
+
+* **Bootstrap Deployment:**
+    - `constantERC1967Bootstrap()` MUST deploy the constant ERC1967 bootstrap contract if it hasn't been deployed yet.
+    - Subsequent calls to `constantERC1967Bootstrap()` MUST return the address of the already deployed bootstrap contract.
+* **Deterministic Bootstrap Address:**
+    - `constantERC1967BootstrapAddress()` MUST always return the same deterministic address for the bootstrap contract.
+    - This address can be independently calculated and verified.
+* **Implementation Replacement:**
+    - `bootstrapERC1967(address instance, address implementation)` MUST successfully replace the implementation address of the provided `instance` (which should be a bootstrap contract) with the new `implementation` address.
+
+**Edge Cases:**
+
+* **Zero Value Transfers:** Test all deployment functions with a `value` of zero to ensure they function correctly without any ETH transfers.
+* **Maximum Data Size:** For CWIA functions, test with the maximum allowed `data` size to ensure the contract handles it correctly and does not exceed gas limits.
+* **Salt Collisions:** While unlikely, attempt to generate salt collisions (different salts resulting in the same address) to verify the contract's resilience against such scenarios.
+
+**Testing Methodology:**
+
+* Use a combination of unit tests and property-based testing to cover various scenarios and edge cases.
+* Employ tools like Foundry for efficient testing and debugging.
+* Consider using fuzzing techniques to further explore potential vulnerabilities.
+
+This comprehensive list of test invariants provides a solid foundation for ensuring the correctness and security of the `LibClone` smart contract. By thoroughly testing against these invariants, developers can deploy and utilize this library with confidence in their own projects.

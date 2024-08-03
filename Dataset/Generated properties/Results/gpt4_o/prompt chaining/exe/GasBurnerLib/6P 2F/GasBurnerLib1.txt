@@ -1,0 +1,72 @@
+The provided smart contract is a library named `GasBurnerLib` written in Solidity. It contains a single function designed to burn a specified amount of gas without causing a transaction to revert. Below is a detailed explanation of the functionalities and components of this smart contract:
+
+### SPDX License Identifier
+```solidity
+// SPDX-License-Identifier: MIT
+```
+- This line specifies the license under which the smart contract is released. In this case, it is the MIT license, which is a permissive free software license.
+
+### Pragma Directive
+```solidity
+pragma solidity ^0.8.4;
+```
+- This line specifies the version of the Solidity compiler that should be used to compile the contract. The `^0.8.4` notation means that the contract is compatible with version 0.8.4 and any newer version that does not introduce breaking changes (i.e., up to but not including version 0.9.0).
+
+### Library Declaration
+```solidity
+library GasBurnerLib {
+```
+- This line declares a library named `GasBurnerLib`. Libraries in Solidity are similar to contracts but are intended to be stateless and reusable pieces of code that can be called by other contracts.
+
+### Function: `burn`
+```solidity
+function burn(uint256 x) internal pure {
+```
+- This function is the core of the library. It is an internal function, meaning it can only be called within the contract or library that defines it or within derived contracts. It is also marked as `pure`, indicating that it does not read or modify the state of the blockchain.
+
+#### Function Purpose
+- The purpose of the `burn` function is to consume approximately `x` amount of gas. This can be useful for various reasons, such as Contract Secured Revenue (CSR), where a contract might need to burn gas to meet certain requirements or to adjust to market conditions.
+
+#### Function Implementation
+```solidity
+/// @solidity memory-safe-assembly
+assembly {
+    mstore(0x10, or(1, x))
+    let n := mul(gt(x, 120), div(x, 91))
+    // We use keccak256 instead of blake2f precompile for better widespread compatibility.
+    for { let i := 0 } iszero(eq(i, n)) { i := add(i, 1) } {
+        mstore(0x10, keccak256(0x10, 0x10)) // Yes.
+    }
+    if iszero(mload(0x10)) { invalid() }
+}
+```
+- The function uses inline assembly to perform low-level operations. Inline assembly allows for more fine-grained control over the execution of the code and can be more gas-efficient.
+
+1. **Memory Store Operation**:
+    ```solidity
+    mstore(0x10, or(1, x))
+    ```
+    - This line stores the bitwise OR of `1` and `x` at memory location `0x10`.
+
+2. **Loop Counter Calculation**:
+    ```solidity
+    let n := mul(gt(x, 120), div(x, 91))
+    ```
+    - This line calculates the number of iterations `n` for the loop. It multiplies the result of `gt(x, 120)` (which is `1` if `x > 120` and `0` otherwise) by `div(x, 91)`. This ensures that the loop runs only if `x` is greater than `120`.
+
+3. **Loop for Gas Burning**:
+    ```solidity
+    for { let i := 0 } iszero(eq(i, n)) { i := add(i, 1) } {
+        mstore(0x10, keccak256(0x10, 0x10)) // Yes.
+    }
+    ```
+    - This loop runs `n` times, and in each iteration, it stores the keccak256 hash of the data at memory location `0x10` back into `0x10`. This operation consumes gas.
+
+4. **Invalid Opcode**:
+    ```solidity
+    if iszero(mload(0x10)) { invalid() }
+    ```
+    - After the loop, if the value at memory location `0x10` is zero, the `invalid` opcode is executed, which consumes all remaining gas and reverts the transaction. This ensures that the function does not exit normally if the memory location `0x10` is zero.
+
+### Summary
+- The `GasBurnerLib` library provides a single function `burn` that consumes a specified amount of gas. The function uses inline assembly to perform low-level operations, including memory storage, loop execution, and hash computation, to achieve the desired gas consumption. This can be useful for various applications, such as Contract Secured Revenue (CSR), where controlled gas consumption is required.

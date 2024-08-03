@@ -1,0 +1,92 @@
+To ensure the robustness and correctness of the `ERC1967Factory` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for each functionality of the contract:
+
+### Admin Functions
+
+1. **Invariant: `adminOf` should return the correct admin address**
+   - **Edge Cases**:
+     - Querying the admin of a non-existent proxy.
+     - Querying the admin of a proxy after the admin has been changed.
+
+2. **Invariant: Only the current admin can change the admin of a proxy**
+   - **Edge Cases**:
+     - Attempting to change the admin by a non-admin address.
+     - Changing the admin to the zero address.
+     - Changing the admin to the same address as the current admin.
+
+3. **Invariant: `AdminChanged` event should be emitted correctly**
+   - **Edge Cases**:
+     - Verifying the event is emitted with the correct parameters when the admin is changed.
+
+### Upgrade Functions
+
+4. **Invariant: Only the current admin can upgrade the proxy**
+   - **Edge Cases**:
+     - Attempting to upgrade the proxy by a non-admin address.
+     - Upgrading the proxy to the zero address.
+     - Upgrading the proxy to the same implementation address.
+
+5. **Invariant: `Upgraded` event should be emitted correctly**
+   - **Edge Cases**:
+     - Verifying the event is emitted with the correct parameters when the proxy is upgraded.
+
+6. **Invariant: Proxy should correctly delegate calls to the new implementation**
+   - **Edge Cases**:
+     - Verifying the proxy delegates calls correctly after an upgrade.
+     - Verifying the proxy reverts correctly if the upgrade fails.
+
+### Deploy Functions
+
+7. **Invariant: Proxies should be deployed correctly**
+   - **Edge Cases**:
+     - Deploying a proxy with the zero address as the implementation.
+     - Deploying a proxy with the zero address as the admin.
+     - Deploying multiple proxies and ensuring they have unique addresses.
+
+8. **Invariant: `Deployed` event should be emitted correctly**
+   - **Edge Cases**:
+     - Verifying the event is emitted with the correct parameters when a proxy is deployed.
+
+9. **Invariant: Deterministic deployment should produce the correct address**
+   - **Edge Cases**:
+     - Deploying a proxy with a specific salt and verifying the address.
+     - Deploying a proxy with a salt that does not start with the caller's address.
+
+10. **Invariant: Only the caller or zero address can use a specific salt for deterministic deployment**
+    - **Edge Cases**:
+      - Attempting to deploy with a salt that starts with a different address.
+      - Deploying with a salt that starts with the zero address.
+
+### Internal Functions
+
+11. **Invariant: `_deploy` should handle both `create` and `create2` correctly**
+    - **Edge Cases**:
+      - Deploying with and without a salt.
+      - Ensuring the proxy is correctly initialized with the implementation and admin.
+
+### View Functions
+
+12. **Invariant: `predictDeterministicAddress` should return the correct address**
+    - **Edge Cases**:
+      - Predicting the address with various salts.
+      - Predicting the address with the zero address as the salt.
+
+13. **Invariant: `initCodeHash` should return the correct hash**
+    - **Edge Cases**:
+      - Verifying the hash matches the expected initialization code hash.
+
+### Helper Functions
+
+14. **Invariant: `_emptyData` should return an empty bytes calldata**
+    - **Edge Cases**:
+      - Verifying the returned data length is zero.
+
+### General Invariants
+
+15. **Invariant: Custom errors should be thrown correctly**
+    - **Edge Cases**:
+      - Verifying `Unauthorized` error is thrown when a non-admin attempts to change the admin or upgrade the proxy.
+      - Verifying `DeploymentFailed` error is thrown when proxy deployment fails.
+      - Verifying `UpgradeFailed` error is thrown when proxy upgrade fails.
+      - Verifying `SaltDoesNotStartWithCaller` error is thrown when the salt does not start with the caller's address.
+
+By testing these invariants, we can ensure that the `ERC1967Factory` contract behaves correctly under various conditions and edge cases, providing a robust and reliable implementation for deploying and managing ERC1967 proxy contracts.

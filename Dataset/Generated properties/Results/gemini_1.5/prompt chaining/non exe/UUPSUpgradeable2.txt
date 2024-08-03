@@ -1,0 +1,54 @@
+## Test Invariants for UUPSUpgradeable Contract
+
+This list outlines test invariants for the provided `UUPSUpgradeable` contract, focusing on edge cases and covering all functionalities:
+
+**1. `upgradeToAndCall` Function:**
+
+**a) Authorization:**
+
+- **Invariant:** `upgradeToAndCall` MUST revert with `UnauthorizedCallContext` if called directly and not through a proxy.
+- **Invariant:** `upgradeToAndCall` MUST revert if `_authorizeUpgrade` reverts (e.g., unauthorized sender).
+
+**b) Implementation Validity:**
+
+- **Invariant:** `upgradeToAndCall` MUST revert with `UpgradeFailed` if `newImplementation` doesn't implement `proxiableUUID` correctly (returns incorrect slot).
+- **Invariant:** `upgradeToAndCall` MUST revert with `UpgradeFailed` if `newImplementation` is the zero address.
+
+**c) State Updates and Events:**
+
+- **Invariant:** `upgradeToAndCall` MUST update the implementation address stored at `_ERC1967_IMPLEMENTATION_SLOT` to `newImplementation` on success.
+- **Invariant:** `upgradeToAndCall` MUST emit the `Upgraded` event with `newImplementation` on success.
+
+**d) Delegatecall Behavior:**
+
+- **Invariant:** `upgradeToAndCall` MUST perform a delegatecall to `newImplementation` with the provided `data` if `data.length > 0`.
+- **Invariant:** `upgradeToAndCall` MUST NOT perform a delegatecall if `data.length == 0`.
+- **Invariant:** `upgradeToAndCall` MUST bubble up any revert from the delegatecall to `newImplementation`.
+
+**2. `proxiableUUID` Function:**
+
+- **Invariant:** `proxiableUUID` MUST always return the value of `_ERC1967_IMPLEMENTATION_SLOT`.
+- **Invariant:** `proxiableUUID` MUST revert with `UnauthorizedCallContext` if called through a delegate call.
+
+**3. Modifiers:**
+
+**a) `onlyProxy` Modifier:**
+
+- **Invariant:** Functions using `onlyProxy` MUST revert with `UnauthorizedCallContext` if called directly and not through a proxy.
+
+**b) `notDelegated` Modifier:**
+
+- **Invariant:** Functions using `notDelegated` MUST revert with `UnauthorizedCallContext` if called through a delegate call.
+
+**4. Edge Cases:**
+
+- **Zero Address:** Test with `newImplementation` as the zero address in `upgradeToAndCall`.
+- **Empty Data:** Test `upgradeToAndCall` with empty `data` to ensure no delegatecall occurs.
+- **Reverted Delegatecall:** Test `upgradeToAndCall` with `data` that causes the delegatecall to revert, ensuring the revert is bubbled up.
+- **Different Implementations:** Test upgrading to different implementations consecutively, ensuring state is updated correctly each time.
+
+**5. Security Considerations:**
+
+- **Invariant:** The `_authorizeUpgrade` function MUST be overridden in inheriting contracts to implement appropriate access control mechanisms, preventing unauthorized upgrades.
+
+**These test invariants provide a comprehensive framework for testing the `UUPSUpgradeable` contract, ensuring its functionality and security. By focusing on edge cases and potential vulnerabilities, these tests help guarantee the contract's reliability and robustness.** 

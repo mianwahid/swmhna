@@ -1,0 +1,95 @@
+## FixedPointMathLib Contract Functionalities Explained
+
+This Solidity smart contract provides a library named `FixedPointMathLib` for performing arithmetic operations on fixed-point numbers. It's particularly useful for dealing with tokens and ETH, which typically have 18 decimal places.
+
+Here's a breakdown of the functionalities:
+
+**1. Custom Errors:**
+
+The contract defines several custom errors to provide more informative error messages in case of failures:
+
+* **ExpOverflow:** Thrown when the result of an exponentiation operation exceeds the maximum value of `uint256`.
+* **FactorialOverflow:** Thrown when calculating a factorial that exceeds the maximum value of `uint256`.
+* **RPowOverflow:** Thrown when an overflow occurs during the `rpow` (recursive power) calculation.
+* **MantissaOverflow:** Thrown when the mantissa of a scientific notation representation is too large.
+* **MulWadFailed, SMulWadFailed:** Thrown when multiplication with WAD (1e18) results in an overflow.
+* **DivWadFailed, SDivWadFailed:** Thrown when division with WAD results in an overflow or division by zero.
+* **MulDivFailed:** Thrown when a multiplication followed by division operation fails due to overflow or division by zero.
+* **DivFailed:** Thrown when a division operation fails due to division by zero.
+* **FullMulDivFailed:** Thrown when a full precision multiply-divide operation fails due to overflow or division by zero.
+* **LnWadUndefined:** Thrown when attempting to calculate the natural logarithm of a non-positive number.
+* **OutOfDomain:** Thrown when an input value is outside the acceptable domain for a specific function.
+
+**2. Constants:**
+
+* **WAD:** Represents the scalar value of 1e18, commonly used for ETH and ERC20 tokens.
+
+**3. Simplified Fixed Point Operations:**
+
+These functions simplify common fixed-point arithmetic operations:
+
+* **mulWad(x, y):** Multiplies `x` and `y`, then divides by WAD, rounding down.
+* **sMulWad(x, y):** Signed version of `mulWad`, handling signed integers.
+* **rawMulWad(x, y):** Same as `mulWad` but without overflow checks, potentially unsafe.
+* **rawSMulWad(x, y):** Signed version of `rawMulWad`, handling signed integers without overflow checks.
+* **mulWadUp(x, y):** Same as `mulWad` but rounds the result up.
+* **rawMulWadUp(x, y):** Same as `mulWadUp` but without overflow checks.
+* **divWad(x, y):** Multiplies `x` by WAD, then divides by `y`, rounding down.
+* **sDivWad(x, y):** Signed version of `divWad`, handling signed integers.
+* **rawDivWad(x, y):** Same as `divWad` but without overflow and divide-by-zero checks.
+* **rawSDivWad(x, y):** Signed version of `rawDivWad`, handling signed integers without checks.
+* **divWadUp(x, y):** Same as `divWad` but rounds the result up.
+* **rawDivWadUp(x, y):** Same as `divWadUp` but without overflow and divide-by-zero checks.
+* **powWad(x, y):** Calculates `x` to the power of `y` using exponentiation and logarithms.
+* **expWad(x):** Calculates the exponential function `e^x`, denominated in WAD.
+* **lnWad(x):** Calculates the natural logarithm `ln(x)`, denominated in WAD.
+* **lambertW0Wad(x):** Calculates the principal branch of the Lambert W function `W_0(x)`, denominated in WAD.
+
+**4. General Number Utilities:**
+
+These functions provide general-purpose mathematical operations:
+
+* **fullMulDiv(x, y, d):** Calculates `floor(x * y / d)` with full precision, preventing overflows.
+* **fullMulDivUp(x, y, d):** Same as `fullMulDiv` but rounds the result up.
+* **mulDiv(x, y, d):** Calculates `floor(x * y / d)`, reverting on overflow or division by zero.
+* **mulDivUp(x, y, d):** Same as `mulDiv` but rounds the result up.
+* **divUp(x, d):** Calculates `ceil(x / d)`, reverting on division by zero.
+* **zeroFloorSub(x, y):** Calculates `max(0, x - y)`.
+* **rpow(x, y, b):** Calculates `x` to the power of `y` in base `b` using a recursive approach.
+* **sqrt(x):** Calculates the square root of `x` using the Babylonian method.
+* **cbrt(x):** Calculates the cube root of `x` using an iterative approach.
+* **sqrtWad(x):** Calculates the square root of `x`, denominated in WAD.
+* **cbrtWad(x):** Calculates the cube root of `x`, denominated in WAD.
+* **factorial(x):** Calculates the factorial of `x`.
+* **log2(x):** Calculates the logarithm base 2 of `x`.
+* **log2Up(x):** Same as `log2` but rounds the result up.
+* **log10(x):** Calculates the logarithm base 10 of `x`.
+* **log10Up(x):** Same as `log10` but rounds the result up.
+* **log256(x):** Calculates the logarithm base 256 of `x`.
+* **log256Up(x):** Same as `log256` but rounds the result up.
+* **sci(x):** Converts `x` to scientific notation format (`mantissa * 10 ** exponent`).
+* **packSci(x):** Packs a number into a smaller representation using scientific notation.
+* **unpackSci(packed):** Unpacks a number from its packed scientific notation representation.
+* **avg(x, y):** Calculates the average of `x` and `y` for both `uint256` and `int256`.
+* **abs(x):** Returns the absolute value of a signed integer `x`.
+* **dist(x, y):** Calculates the absolute distance between two signed integers `x` and `y`.
+* **min(x, y):** Returns the minimum of `x` and `y` for both `uint256` and `int256`.
+* **max(x, y):** Returns the maximum of `x` and `y` for both `uint256` and `int256`.
+* **clamp(x, minValue, maxValue):** Bounds a value `x` within the specified `minValue` and `maxValue`.
+* **gcd(x, y):** Calculates the greatest common divisor of `x` and `y`.
+
+**5. Raw Number Operations:**
+
+These functions perform basic arithmetic operations without any overflow or underflow checks, making them potentially unsafe:
+
+* **rawAdd(x, y):** Adds `x` and `y` without overflow checks.
+* **rawSub(x, y):** Subtracts `y` from `x` without underflow checks.
+* **rawMul(x, y):** Multiplies `x` and `y` without overflow checks.
+* **rawDiv(x, y):** Divides `x` by `y`, returning 0 if `y` is zero.
+* **rawSDiv(x, y):** Signed version of `rawDiv`, handling signed integers.
+* **rawMod(x, y):** Calculates the remainder of `x` divided by `y`.
+* **rawSMod(x, y):** Signed version of `rawMod`, handling signed integers.
+* **rawAddMod(x, y, d):** Calculates `(x + y) % d`.
+* **rawMulMod(x, y, d):** Calculates `(x * y) % d`.
+
+This library provides a comprehensive set of tools for working with fixed-point numbers in Solidity, enabling developers to perform complex financial calculations with precision and efficiency. However, it's crucial to understand the limitations and potential risks associated with using raw operations without overflow checks. 

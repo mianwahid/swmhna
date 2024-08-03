@@ -1,0 +1,151 @@
+## ERC1967Factory Smart Contract Functionality Breakdown
+
+This smart contract is an ERC1967 proxy factory. It allows for the deployment and management of upgradeable proxy contracts. Here's a detailed explanation of each function:
+
+**Admin Functions:**
+
+* **`adminOf(address proxy)`:**
+    - **Purpose:** Retrieves the admin address associated with a given proxy contract.
+    - **Input:** `proxy` - The address of the proxy contract.
+    - **Output:** `admin` - The address of the admin for the given proxy.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** `view` - Does not modify the contract's state.
+
+* **`changeAdmin(address proxy, address admin)`:**
+    - **Purpose:** Updates the admin address for a given proxy contract.
+    - **Input:** 
+        - `proxy` - The address of the proxy contract.
+        - `admin` - The new admin address.
+    - **Output:** None.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** Modifies the contract's state by updating the admin address for the proxy.
+    - **Authorization:** Only the current admin of the proxy (registered with this factory) can call this function.
+
+**Upgrade Functions:**
+
+* **`upgrade(address proxy, address implementation)`:**
+    - **Purpose:** Upgrades a proxy contract to use a new implementation contract.
+    - **Input:** 
+        - `proxy` - The address of the proxy contract.
+        - `implementation` - The address of the new implementation contract.
+    - **Output:** None.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** Modifies the proxy contract's state by updating its implementation address.
+    - **Authorization:** Only the current admin of the proxy (registered with this factory) can call this function.
+
+* **`upgradeAndCall(address proxy, address implementation, bytes calldata data)`:**
+    - **Purpose:** Upgrades a proxy contract to a new implementation and then calls a function on the new implementation.
+    - **Input:** 
+        - `proxy` - The address of the proxy contract.
+        - `implementation` - The address of the new implementation contract.
+        - `data` - The calldata to be passed to the function on the new implementation.
+    - **Output:** None.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** 
+        - Modifies the proxy contract's state by updating its implementation address.
+        - Potentially modifies the state of the new implementation contract depending on the function called and its logic.
+    - **Authorization:** Only the current admin of the proxy (registered with this factory) can call this function.
+
+**Deploy Functions:**
+
+* **`deploy(address implementation, address admin)`:**
+    - **Purpose:** Deploys a new proxy contract with a specified implementation and admin.
+    - **Input:** 
+        - `implementation` - The address of the initial implementation contract for the proxy.
+        - `admin` - The address of the initial admin for the proxy.
+    - **Output:** `proxy` - The address of the newly deployed proxy contract.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** Modifies the contract's state by creating a new proxy contract.
+
+* **`deployAndCall(address implementation, address admin, bytes calldata data)`:**
+    - **Purpose:** Deploys a new proxy contract and immediately calls a function on it.
+    - **Input:** 
+        - `implementation` - The address of the initial implementation contract for the proxy.
+        - `admin` - The address of the initial admin for the proxy.
+        - `data` - The calldata to be passed to the function on the newly deployed proxy.
+    - **Output:** `proxy` - The address of the newly deployed proxy contract.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** 
+        - Modifies the contract's state by creating a new proxy contract.
+        - Potentially modifies the state of the new proxy contract depending on the function called and its logic.
+
+* **`deployDeterministic(address implementation, address admin, bytes32 salt)`:**
+    - **Purpose:** Deploys a new proxy contract at a deterministic address derived from the provided salt.
+    - **Input:** 
+        - `implementation` - The address of the initial implementation contract for the proxy.
+        - `admin` - The address of the initial admin for the proxy.
+        - `salt` - A bytes32 value used to determine the proxy's address.
+    - **Output:** `proxy` - The address of the newly deployed proxy contract.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** Modifies the contract's state by creating a new proxy contract.
+
+* **`deployDeterministicAndCall(address implementation, address admin, bytes32 salt, bytes calldata data)`:**
+    - **Purpose:** Deploys a new proxy contract at a deterministic address and immediately calls a function on it.
+    - **Input:** 
+        - `implementation` - The address of the initial implementation contract for the proxy.
+        - `admin` - The address of the initial admin for the proxy.
+        - `salt` - A bytes32 value used to determine the proxy's address.
+        - `data` - The calldata to be passed to the function on the newly deployed proxy.
+    - **Output:** `proxy` - The address of the newly deployed proxy contract.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** 
+        - Modifies the contract's state by creating a new proxy contract.
+        - Potentially modifies the state of the new proxy contract depending on the function called and its logic.
+
+**Utility Functions:**
+
+* **`predictDeterministicAddress(bytes32 salt)`:**
+    - **Purpose:** Calculates the deterministic address of a proxy contract given a specific salt.
+    - **Input:** `salt` - The bytes32 value used to determine the proxy's address.
+    - **Output:** `predicted` - The calculated address of the proxy contract.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** `view` - Does not modify the contract's state.
+
+* **`initCodeHash()`:**
+    - **Purpose:** Returns the keccak256 hash of the proxy contract's initialization code.
+    - **Input:** None.
+    - **Output:** `result` - The hash of the initialization code.
+    - **Visibility:** `public` - Can be called by anyone.
+    - **State Mutability:** `view` - Does not modify the contract's state.
+
+**Internal Functions:**
+
+* **`_deploy(address implementation, address admin, bytes32 salt, bool useSalt, bytes calldata data)`:**
+    - **Purpose:** Internal function to handle the deployment of proxy contracts, both deterministic and non-deterministic.
+    - **Input:** 
+        - `implementation` - The address of the initial implementation contract for the proxy.
+        - `admin` - The address of the initial admin for the proxy.
+        - `salt` - A bytes32 value used to determine the proxy's address (if `useSalt` is true).
+        - `useSalt` - A boolean indicating whether to deploy deterministically using the provided salt.
+        - `data` - The calldata to be passed to the newly deployed proxy.
+    - **Output:** `proxy` - The address of the newly deployed proxy contract.
+    - **Visibility:** `internal` - Can only be called from within this contract and its derived contracts.
+
+* **`_initCode()`:**
+    - **Purpose:** Returns a pointer to the initialization code used for deploying proxy contracts.
+    - **Input:** None.
+    - **Output:** `m` - A pointer to the initialization code in memory.
+    - **Visibility:** `internal` - Can only be called from within this contract and its derived contracts.
+
+* **`_emptyData()`:**
+    - **Purpose:** Returns an empty bytes calldata.
+    - **Input:** None.
+    - **Output:** `data` - An empty bytes calldata.
+    - **Visibility:** `internal` - Can only be called from within this contract and its derived contracts.
+
+**Events:**
+
+* **`AdminChanged(address indexed proxy, address indexed admin)`:** Emitted when the admin of a proxy contract is changed.
+* **`Upgraded(address indexed proxy, address indexed implementation)`:** Emitted when the implementation for a proxy is upgraded.
+* **`Deployed(address indexed proxy, address indexed implementation, address indexed admin)`:** Emitted when a new proxy is deployed.
+
+**Error Handling:**
+
+The contract uses custom errors for specific error cases, making it easier to understand the reason for a transaction revert:
+
+* **`Unauthorized()`:** Thrown when a function is called by an address that is not authorized to perform the action.
+* **`DeploymentFailed()`:** Thrown when the deployment of a proxy contract fails.
+* **`UpgradeFailed()`:** Thrown when the upgrade of a proxy contract fails.
+* **`SaltDoesNotStartWithCaller()`:** Thrown when attempting to deploy a deterministic proxy with a salt that does not start with either the zero address or the caller's address.
+
+This comprehensive breakdown explains the functionalities of the ERC1967Factory smart contract, providing a clear understanding of its capabilities and how it can be used to manage upgradeable proxy contracts.

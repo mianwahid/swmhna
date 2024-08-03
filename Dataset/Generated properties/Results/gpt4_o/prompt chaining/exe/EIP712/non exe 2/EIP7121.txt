@@ -1,0 +1,74 @@
+The provided smart contract is an implementation of the EIP-712 standard for typed structured data hashing and signing. This standard is used to create a domain-specific message that can be signed and verified, ensuring the integrity and authenticity of the data. Below is a detailed explanation of the functionalities of this smart contract:
+
+### Constants and Immutables
+
+1. **_DOMAIN_TYPEHASH**:
+   - `bytes32 internal constant _DOMAIN_TYPEHASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;`
+   - This constant represents the keccak256 hash of the EIP-712 domain type string: `"EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"`.
+
+2. **Immutable Variables**:
+   - `_cachedThis`: Stores the address of the contract.
+   - `_cachedChainId`: Stores the chain ID at the time of contract deployment.
+   - `_cachedNameHash`: Stores the keccak256 hash of the domain name.
+   - `_cachedVersionHash`: Stores the keccak256 hash of the domain version.
+   - `_cachedDomainSeparator`: Stores the precomputed domain separator.
+
+### Constructor
+
+3. **Constructor**:
+   - The constructor initializes the immutable variables and precomputes the domain separator if the domain name and version are not expected to change.
+   - It uses inline assembly to compute the domain separator for efficiency.
+
+### Functions to Override
+
+4. **_domainNameAndVersion()**:
+   - This function should be overridden by derived contracts to return the domain name and version.
+   - Example:
+     ```solidity
+     function _domainNameAndVersion()
+         internal
+         pure
+         virtual
+         returns (string memory name, string memory version)
+     {
+         name = "Solady";
+         version = "1";
+     }
+     ```
+
+5. **_domainNameAndVersionMayChange()**:
+   - This function returns whether the domain name and version may change after deployment.
+   - Default implementation returns `false`.
+
+### Hashing Operations
+
+6. **_domainSeparator()**:
+   - Returns the EIP-712 domain separator.
+   - If the domain name and version may change, it builds the domain separator on-the-fly.
+   - If the cached domain separator is invalidated (e.g., due to a chain ID change), it rebuilds the domain separator.
+
+7. **_hashTypedData(bytes32 structHash)**:
+   - Returns the hash of the fully encoded EIP-712 message for the domain, given a `structHash`.
+   - This hash can be used with ECDSA to recover the signer of a message.
+   - Uses inline assembly for efficient computation.
+
+### EIP-5267 Operations
+
+8. **eip712Domain()**:
+   - Returns the EIP-712 domain details as specified in EIP-5267.
+   - Includes fields like domain name, version, chain ID, verifying contract address, salt, and extensions.
+
+### Private Helpers
+
+9. **_buildDomainSeparator()**:
+   - Private function to build the EIP-712 domain separator.
+   - Uses inline assembly for efficient computation.
+   - Computes the domain separator based on the domain name, version, chain ID, and contract address.
+
+10. **_cachedDomainSeparatorInvalidated()**:
+    - Private function to check if the cached domain separator has been invalidated.
+    - Returns `true` if the chain ID or contract address has changed since deployment.
+
+### Summary
+
+The contract provides a robust and gas-efficient implementation of the EIP-712 standard for typed structured data hashing and signing. It includes mechanisms to handle changes in domain name, version, chain ID, and contract address, ensuring the integrity and authenticity of signed messages. The contract is designed to be extended by overriding specific functions to customize the domain name and version.

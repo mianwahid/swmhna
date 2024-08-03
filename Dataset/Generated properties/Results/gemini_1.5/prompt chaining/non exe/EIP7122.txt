@@ -1,0 +1,77 @@
+## Test Invariants for EIP712 Smart Contract
+
+This list outlines test invariants for the provided EIP712 smart contract, focusing on edge cases and ensuring comprehensive coverage of its functionalities:
+
+**1. Constructor:**
+
+- **Invariant:** The constructor should correctly initialize all immutable variables.
+    - **Test Cases:**
+        - Deploy the contract and verify that `_cachedThis` matches the deployed address.
+        - Verify that `_cachedChainId` matches the current chain ID.
+        - If `_domainNameAndVersionMayChange()` is false:
+            - Verify that `_cachedNameHash` matches the keccak256 hash of the domain name returned by `_domainNameAndVersion()`.
+            - Verify that `_cachedVersionHash` matches the keccak256 hash of the domain version returned by `_domainNameAndVersion()`.
+            - Verify that `_cachedDomainSeparator` is calculated correctly using the pre-calculated hashes and chain ID.
+        - If `_domainNameAndVersionMayChange()` is true:
+            - Verify that `_cachedNameHash`, `_cachedVersionHash`, and `_cachedDomainSeparator` are initialized to 0.
+
+**2. Overridable Functions:**
+
+- **Invariant:** `_domainNameAndVersion()` should return the correct domain name and version.
+    - **Test Cases:**
+        - Inherit the contract and override `_domainNameAndVersion()` to return specific values.
+        - Deploy the inheriting contract and call `_domainNameAndVersion()`.
+        - Verify that the returned values match the expected domain name and version.
+- **Invariant:** `_domainNameAndVersionMayChange()` should accurately reflect the dynamic nature of the domain parameters.
+    - **Test Cases:**
+        - Inherit the contract and override `_domainNameAndVersionMayChange()` to return true.
+        - Deploy the inheriting contract and verify that the constructor initializes the cached hashes and domain separator to 0.
+        - Call `_domainSeparator()` and verify that it dynamically calculates the separator using `_buildDomainSeparator()`.
+
+**3. Hashing Operations:**
+
+- **Invariant:** `_domainSeparator()` should return the correct EIP-712 domain separator.
+    - **Test Cases:**
+        - If `_domainNameAndVersionMayChange()` is false:
+            - Call `_domainSeparator()` and verify that it returns the cached `_cachedDomainSeparator`.
+            - Manipulate the chain ID or contract address (e.g., using a test network or proxy) and call `_domainSeparator()`.
+            - Verify that it detects the invalidation and dynamically calculates the separator using `_buildDomainSeparator()`.
+        - If `_domainNameAndVersionMayChange()` is true:
+            - Call `_domainSeparator()` multiple times and verify that it consistently calculates the separator dynamically.
+- **Invariant:** `_hashTypedData(bytes32 structHash)` should correctly hash the EIP-712 message.
+    - **Test Cases:**
+        - Generate a valid `structHash` for a typed data structure.
+        - Call `_hashTypedData(structHash)` and capture the returned digest.
+        - Manually calculate the expected digest using the domain separator (obtained from `_domainSeparator()`) and the `structHash`, following the EIP-712 specification.
+        - Verify that the captured digest matches the manually calculated digest.
+
+**4. EIP-5267 Operations:**
+
+- **Invariant:** `eip712Domain()` should return the correct EIP-712 domain parameters.
+    - **Test Cases:**
+        - Call `eip712Domain()` and capture the returned values.
+        - Verify that:
+            - `fields` is `0x0f` (representing the enabled fields).
+            - `name` matches the domain name returned by `_domainNameAndVersion()`.
+            - `version` matches the domain version returned by `_domainNameAndVersion()`.
+            - `chainId` matches the current chain ID.
+            - `verifyingContract` matches the deployed contract address.
+            - `salt` is `bytes32(0)`.
+            - `extensions` is an empty array.
+
+**5. Private Helpers:**
+
+- **Invariant:** `_buildDomainSeparator()` should correctly calculate the domain separator.
+    - **Test Cases:**
+        - Call `_buildDomainSeparator()` directly (e.g., using a helper function in a test contract) and capture the returned separator.
+        - Manually calculate the expected separator using the domain name, version, chain ID, and contract address, following the EIP-712 specification.
+        - Verify that the captured separator matches the manually calculated separator.
+- **Invariant:** `_cachedDomainSeparatorInvalidated()` should accurately detect cache invalidation.
+    - **Test Cases:**
+        - Call `_cachedDomainSeparatorInvalidated()` in scenarios where:
+            - The chain ID has changed.
+            - The contract address has changed (e.g., using a proxy).
+            - Neither the chain ID nor contract address has changed.
+        - Verify that the function returns `true` only when the chain ID or contract address has changed.
+
+These test invariants and cases provide a comprehensive framework for testing the EIP712 smart contract. By covering various edge cases and ensuring the correctness of each function, you can build a high level of confidence in the contract's security and reliability. Remember to adapt these tests to your specific implementation and consider additional scenarios relevant to your use case. 

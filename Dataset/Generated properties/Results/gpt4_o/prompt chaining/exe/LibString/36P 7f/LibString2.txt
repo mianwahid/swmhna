@@ -1,0 +1,222 @@
+To ensure the robustness and correctness of the `LibString` library, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and typical scenarios for each function. Below is a list of test invariants for the functionalities provided by the `LibString` library:
+
+### Custom Errors
+1. **HexLengthInsufficient**:
+   - Ensure that `toHexString` and `toHexStringNoPrefix` revert with `HexLengthInsufficient` when the provided length is too small to contain all the hex digits of the value.
+
+2. **TooBigForSmallString**:
+   - Ensure that `toSmallString` reverts with `TooBigForSmallString` when the string length exceeds 32 bytes.
+
+### Decimal Operations
+1. **toString(uint256 value)**:
+   - Convert `0` to `"0"`.
+   - Convert the maximum `uint256` value to its string representation.
+   - Convert a typical number (e.g., `1234567890`) to its string representation.
+
+2. **toString(int256 value)**:
+   - Convert `0` to `"0"`.
+   - Convert the maximum `int256` value to its string representation.
+   - Convert the minimum `int256` value to its string representation.
+   - Convert a negative number (e.g., `-1234567890`) to its string representation.
+
+### Hexadecimal Operations
+1. **toHexString(uint256 value, uint256 length)**:
+   - Convert `0` to `"0x00"` with length `1`.
+   - Convert the maximum `uint256` value to its hex string representation with appropriate length.
+   - Ensure it reverts with `HexLengthInsufficient` if the length is too small.
+
+2. **toHexStringNoPrefix(uint256 value, uint256 length)**:
+   - Convert `0` to `"00"` with length `1`.
+   - Convert the maximum `uint256` value to its hex string representation without prefix with appropriate length.
+   - Ensure it reverts with `HexLengthInsufficient` if the length is too small.
+
+3. **toHexString(uint256 value)**:
+   - Convert `0` to `"0x00"`.
+   - Convert the maximum `uint256` value to its hex string representation with prefix.
+
+4. **toMinimalHexString(uint256 value)**:
+   - Convert `0` to `"0x0"`.
+   - Convert `1` to `"0x1"`.
+   - Convert `0x123` to `"0x123"`.
+
+5. **toMinimalHexStringNoPrefix(uint256 value)**:
+   - Convert `0` to `"0"`.
+   - Convert `1` to `"1"`.
+   - Convert `0x123` to `"123"`.
+
+6. **toHexStringNoPrefix(uint256 value)**:
+   - Convert `0` to `"00"`.
+   - Convert the maximum `uint256` value to its hex string representation without prefix.
+
+7. **toHexStringChecksummed(address value)**:
+   - Convert an address to its checksummed hex string representation.
+
+8. **toHexString(address value)**:
+   - Convert an address to its hex string representation with prefix.
+
+9. **toHexStringNoPrefix(address value)**:
+   - Convert an address to its hex string representation without prefix.
+
+10. **toHexString(bytes memory raw)**:
+    - Convert a byte array to its hex string representation with prefix.
+
+11. **toHexStringNoPrefix(bytes memory raw)**:
+    - Convert a byte array to its hex string representation without prefix.
+
+### Rune String Operations
+1. **runeCount(string memory s)**:
+   - Count the number of UTF characters in an empty string.
+   - Count the number of UTF characters in a string with ASCII characters.
+   - Count the number of UTF characters in a string with multi-byte UTF characters.
+
+2. **is7BitASCII(string memory s)**:
+   - Check if an empty string is 7-bit ASCII.
+   - Check if a string with only ASCII characters is 7-bit ASCII.
+   - Check if a string with non-ASCII characters is 7-bit ASCII.
+
+### Byte String Operations
+1. **replace(string memory subject, string memory search, string memory replacement)**:
+   - Replace occurrences of a substring in an empty string.
+   - Replace occurrences of a substring that does not exist in the subject.
+   - Replace occurrences of a substring that exists multiple times in the subject.
+
+2. **indexOf(string memory subject, string memory search, uint256 from)**:
+   - Find the index of a substring in an empty string.
+   - Find the index of a substring that does not exist in the subject.
+   - Find the index of a substring that exists in the subject starting from a specific index.
+
+3. **indexOf(string memory subject, string memory search)**:
+   - Find the index of a substring in an empty string.
+   - Find the index of a substring that does not exist in the subject.
+   - Find the index of a substring that exists in the subject.
+
+4. **lastIndexOf(string memory subject, string memory search, uint256 from)**:
+   - Find the last index of a substring in an empty string.
+   - Find the last index of a substring that does not exist in the subject.
+   - Find the last index of a substring that exists in the subject starting from a specific index.
+
+5. **lastIndexOf(string memory subject, string memory search)**:
+   - Find the last index of a substring in an empty string.
+   - Find the last index of a substring that does not exist in the subject.
+   - Find the last index of a substring that exists in the subject.
+
+6. **contains(string memory subject, string memory search)**:
+   - Check if an empty string contains a substring.
+   - Check if a string contains a substring that does not exist.
+   - Check if a string contains a substring that exists.
+
+7. **startsWith(string memory subject, string memory search)**:
+   - Check if an empty string starts with a substring.
+   - Check if a string starts with a substring that does not exist.
+   - Check if a string starts with a substring that exists.
+
+8. **endsWith(string memory subject, string memory search)**:
+   - Check if an empty string ends with a substring.
+   - Check if a string ends with a substring that does not exist.
+   - Check if a string ends with a substring that exists.
+
+9. **repeat(string memory subject, uint256 times)**:
+   - Repeat an empty string.
+   - Repeat a string zero times.
+   - Repeat a string multiple times.
+
+10. **slice(string memory subject, uint256 start, uint256 end)**:
+    - Slice an empty string.
+    - Slice a string from start to end.
+    - Slice a string with start greater than end.
+
+11. **slice(string memory subject, uint256 start)**:
+    - Slice an empty string.
+    - Slice a string from start to the end.
+    - Slice a string with start greater than the length of the string.
+
+12. **indicesOf(string memory subject, string memory search)**:
+    - Find all indices of a substring in an empty string.
+    - Find all indices of a substring that does not exist in the subject.
+    - Find all indices of a substring that exists multiple times in the subject.
+
+13. **split(string memory subject, string memory delimiter)**:
+    - Split an empty string.
+    - Split a string with a delimiter that does not exist.
+    - Split a string with a delimiter that exists multiple times.
+
+14. **concat(string memory a, string memory b)**:
+    - Concatenate two empty strings.
+    - Concatenate an empty string with a non-empty string.
+    - Concatenate two non-empty strings.
+
+15. **toCase(string memory subject, bool toUpper)**:
+    - Convert an empty string to lowercase/uppercase.
+    - Convert a string with only lowercase/uppercase characters.
+    - Convert a string with mixed case characters.
+
+16. **fromSmallString(bytes32 s)**:
+    - Convert a null-terminated `bytes32` string to a `string`.
+    - Convert a `bytes32` string without null termination.
+
+17. **normalizeSmallString(bytes32 s)**:
+    - Normalize a `bytes32` string with null termination.
+    - Normalize a `bytes32` string without null termination.
+
+18. **toSmallString(string memory s)**:
+    - Convert an empty string to a `bytes32` small string.
+    - Convert a string with length less than 32 bytes.
+    - Ensure it reverts with `TooBigForSmallString` if the string length exceeds 32 bytes.
+
+19. **lower(string memory subject)**:
+    - Convert an empty string to lowercase.
+    - Convert a string with only uppercase characters to lowercase.
+    - Convert a string with mixed case characters to lowercase.
+
+20. **upper(string memory subject)**:
+    - Convert an empty string to uppercase.
+    - Convert a string with only lowercase characters to uppercase.
+    - Convert a string with mixed case characters to uppercase.
+
+21. **escapeHTML(string memory s)**:
+    - Escape an empty string.
+    - Escape a string with no special HTML characters.
+    - Escape a string with special HTML characters.
+
+22. **escapeJSON(string memory s, bool addDoubleQuotes)**:
+    - Escape an empty string with/without double quotes.
+    - Escape a string with no special JSON characters with/without double quotes.
+    - Escape a string with special JSON characters with/without double quotes.
+
+23. **escapeJSON(string memory s)**:
+    - Escape an empty string.
+    - Escape a string with no special JSON characters.
+    - Escape a string with special JSON characters.
+
+24. **eq(string memory a, string memory b)**:
+    - Check if two empty strings are equal.
+    - Check if an empty string and a non-empty string are equal.
+    - Check if two non-empty strings are equal.
+
+25. **eqs(string memory a, bytes32 b)**:
+    - Check if an empty string and a null-terminated small string are equal.
+    - Check if a non-empty string and a null-terminated small string are equal.
+
+26. **packOne(string memory a)**:
+    - Pack an empty string.
+    - Pack a string with length less than 32 bytes.
+    - Ensure it returns `bytes32(0)` if the length is zero or greater than 31.
+
+27. **unpackOne(bytes32 packed)**:
+    - Unpack a `bytes32` packed string.
+    - Ensure it returns the empty string if `packed` is `bytes32(0)`.
+
+28. **packTwo(string memory a, string memory b)**:
+    - Pack two empty strings.
+    - Pack two strings with combined length less than 31 bytes.
+    - Ensure it returns `bytes32(0)` if the combined length is zero or greater than 30.
+
+29. **unpackTwo(bytes32 packed)**:
+    - Unpack two `bytes32` packed strings.
+    - Ensure it returns the empty strings if `packed` is `bytes32(0)`.
+
+30. **directReturn(string memory a)**:
+    - Directly return an empty string.
+    - Directly return a non-empty string.
+
+These test invariants cover a wide range of edge cases and typical scenarios for each function in the `LibString` library. They ensure that the library functions correctly handle various inputs and edge cases, providing robust and reliable string manipulation capabilities.

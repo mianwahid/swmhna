@@ -1,0 +1,79 @@
+The provided smart contract is an abstract contract named `UUPSUpgradeable`, which is designed to facilitate the upgradeability of smart contracts using the UUPS (Universal Upgradeable Proxy Standard) pattern. This contract is intended to be used with ERC1967 proxies. Below is a detailed explanation of each functionality within the contract:
+
+### Custom Errors
+1. **`UpgradeFailed`**: This error is thrown when the upgrade process fails.
+2. **`UnauthorizedCallContext`**: This error is thrown when a function is called from an unauthorized context.
+
+### Immutables
+1. **`__self`**: This immutable variable stores the address of the contract itself. It is used to check if the context of the call is a delegate call.
+
+### Events
+1. **`Upgraded`**: This event is emitted when the proxy's implementation is upgraded. It includes the address of the new implementation.
+2. **`_UPGRADED_EVENT_SIGNATURE`**: This constant stores the `keccak256` hash of the `Upgraded` event signature. It is used in the assembly code to log the event.
+
+### Storage
+1. **`_ERC1967_IMPLEMENTATION_SLOT`**: This constant defines the storage slot used by the implementation in the proxy. It is calculated as `uint256(keccak256("eip1967.proxy.implementation")) - 1`.
+
+### UUPS Operations
+1. **`_authorizeUpgrade`**: This is an abstract function that must be overridden in derived contracts. It should contain the logic to check if `msg.sender` is authorized to upgrade the proxy to `newImplementation`. If not authorized, it should revert.
+   ```solidity
+   function _authorizeUpgrade(address newImplementation) internal virtual;
+   ```
+
+2. **`proxiableUUID`**: This function returns the storage slot used by the implementation, complying with ERC1822. It uses the `notDelegated` modifier to ensure it is not called via delegatecall.
+   ```solidity
+   function proxiableUUID() public view virtual notDelegated returns (bytes32) {
+       return _ERC1967_IMPLEMENTATION_SLOT;
+   }
+   ```
+
+3. **`upgradeToAndCall`**: This function upgrades the proxy's implementation to `newImplementation` and optionally calls a function on the new implementation with the provided `data`. It emits the `Upgraded` event. The function uses the `onlyProxy` modifier to ensure it is called through a proxy.
+   ```solidity
+   function upgradeToAndCall(address newImplementation, bytes calldata data)
+       public
+       payable
+       virtual
+       onlyProxy
+   {
+       _authorizeUpgrade(newImplementation);
+       // Assembly code to perform the upgrade and optional delegatecall
+   }
+   ```
+
+### Modifiers
+1. **`onlyProxy`**: This modifier ensures that the function is called through a proxy. It checks if the context is a delegate call by comparing the contract's address with the stored `__self` address.
+   ```solidity
+   modifier onlyProxy() {
+       uint256 s = __self;
+       assembly {
+           if eq(s, address()) {
+               mstore(0x00, 0x9f03a026) // `UnauthorizedCallContext()`.
+               revert(0x1c, 0x04)
+           }
+       }
+       _;
+   }
+   ```
+
+2. **`notDelegated`**: This modifier ensures that the function is not called via delegatecall. It is the opposite of `onlyProxy`.
+   ```solidity
+   modifier notDelegated() {
+       uint256 s = __self;
+       assembly {
+           if iszero(eq(s, address())) {
+               mstore(0x00, 0x9f03a026) // `UnauthorizedCallContext()`.
+               revert(0x1c, 0x04)
+           }
+       }
+       _;
+   }
+   ```
+
+### Assembly Code in `upgradeToAndCall`
+- **Clearing Upper 96 Bits**: The upper 96 bits of `newImplementation` are cleared to ensure it is a valid address.
+- **Checking `proxiableUUID`**: The function checks if `newImplementation` correctly implements `proxiableUUID` by comparing the returned value with `_ERC1967_IMPLEMENTATION_SLOT`.
+- **Emitting `Upgraded` Event**: The `Upgraded` event is emitted using the `log2` assembly instruction.
+- **Updating Implementation**: The implementation address in the storage slot is updated to `newImplementation`.
+- **Optional Delegatecall**: If `data` is non-empty, a delegatecall is made to `newImplementation` with the provided `data`.
+
+This contract provides a robust framework for upgrading smart contracts using the UUPS pattern, ensuring that only authorized users can perform upgrades and that the new implementation is correctly set up.

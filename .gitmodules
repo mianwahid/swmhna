@@ -1,0 +1,15 @@
+[submodule "FoundryProject/lib/forge-std"]
+	path = FoundryProject/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "FoundryProject/FoundryProject/lib/forge-std"]
+	path = FoundryProject/FoundryProject/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "FoundryProject/lib/solady"]
+	path = FoundryProject/lib/solady
+	url = https://github.com/vectorized/solady
+[submodule "FoundryProject/lib/solmate"]
+	path = FoundryProject/lib/solmate
+	url = https://github.com/transmissions11/solmate
+[submodule "FoundryProject/lib/openzeppelin-contracts"]
+	path = FoundryProject/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

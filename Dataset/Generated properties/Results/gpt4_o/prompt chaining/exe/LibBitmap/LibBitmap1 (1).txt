@@ -1,0 +1,103 @@
+The provided smart contract, `LibBitmap`, is a Solidity library designed for efficient storage and manipulation of packed unsigned booleans using bitmaps. Below is a detailed explanation of each functionality within the contract:
+
+### Constants
+
+1. **`NOT_FOUND`**:
+   - **Type**: `uint256`
+   - **Value**: `type(uint256).max`
+   - **Description**: This constant is used to indicate that a bitmap scan did not find a result. It is set to the maximum value of a `uint256`.
+
+### Structs
+
+2. **`Bitmap`**:
+   - **Type**: `struct`
+   - **Description**: Represents a bitmap in storage.
+   - **Fields**:
+     - `map`: A mapping from `uint256` to `uint256` that stores the bits.
+
+### Functions
+
+3. **`get`**:
+   - **Signature**: `function get(Bitmap storage bitmap, uint256 index) internal view returns (bool isSet)`
+   - **Description**: Returns the boolean value of the bit at the specified `index` in the `bitmap`.
+   - **Implementation**: 
+     - Calculates the bit position and checks if it is set.
+     - Uses bitwise operations to isolate the bit and returns its value.
+
+4. **`set`**:
+   - **Signature**: `function set(Bitmap storage bitmap, uint256 index) internal`
+   - **Description**: Sets the bit at the specified `index` in the `bitmap` to `true`.
+   - **Implementation**: 
+     - Uses bitwise OR to set the bit at the specified position.
+
+5. **`unset`**:
+   - **Signature**: `function unset(Bitmap storage bitmap, uint256 index) internal`
+   - **Description**: Sets the bit at the specified `index` in the `bitmap` to `false`.
+   - **Implementation**: 
+     - Uses bitwise AND with the negation of the bit mask to unset the bit.
+
+6. **`toggle`**:
+   - **Signature**: `function toggle(Bitmap storage bitmap, uint256 index) internal returns (bool newIsSet)`
+   - **Description**: Flips the bit at the specified `index` in the `bitmap` and returns the new boolean value of the bit.
+   - **Implementation**: 
+     - Uses XOR to flip the bit and returns the new state of the bit.
+
+7. **`setTo`**:
+   - **Signature**: `function setTo(Bitmap storage bitmap, uint256 index, bool shouldSet) internal`
+   - **Description**: Sets the bit at the specified `index` in the `bitmap` to the value of `shouldSet`.
+   - **Implementation**: 
+     - Uses bitwise operations to set or unset the bit based on the value of `shouldSet`.
+
+8. **`setBatch`**:
+   - **Signature**: `function setBatch(Bitmap storage bitmap, uint256 start, uint256 amount) internal`
+   - **Description**: Sets a consecutive batch of bits starting from the bit at `start` for `amount` bits.
+   - **Implementation**: 
+     - Uses bitwise operations and loops to set multiple bits efficiently.
+
+9. **`unsetBatch`**:
+   - **Signature**: `function unsetBatch(Bitmap storage bitmap, uint256 start, uint256 amount) internal`
+   - **Description**: Unsets a consecutive batch of bits starting from the bit at `start` for `amount` bits.
+   - **Implementation**: 
+     - Uses bitwise operations and loops to unset multiple bits efficiently.
+
+10. **`popCount`**:
+    - **Signature**: `function popCount(Bitmap storage bitmap, uint256 start, uint256 amount) internal view returns (uint256 count)`
+    - **Description**: Returns the number of set bits within a range by scanning `amount` of bits starting from the bit at `start`.
+    - **Implementation**: 
+      - Uses the `LibBit.popCount` function to count the number of set bits in the specified range.
+
+11. **`findLastSet`**:
+    - **Signature**: `function findLastSet(Bitmap storage bitmap, uint256 upTo) internal view returns (uint256 setBitIndex)`
+    - **Description**: Returns the index of the most significant set bit in the range `[0..upTo]`. If no set bit is found, returns `NOT_FOUND`.
+    - **Implementation**: 
+      - Uses bitwise operations and loops to find the most significant set bit.
+
+### References
+
+The `LibBitmap` library relies on another library, `LibBit`, for various bit manipulation operations. Here are the key functions from `LibBit`:
+
+1. **`fls`**:
+   - **Description**: Finds the last set bit (most significant bit) in a `uint256` value.
+
+2. **`clz`**:
+   - **Description**: Counts the leading zeros in a `uint256` value.
+
+3. **`ffs`**:
+   - **Description**: Finds the first set bit (least significant bit) in a `uint256` value.
+
+4. **`popCount`**:
+   - **Description**: Returns the number of set bits in a `uint256` value.
+
+5. **`isPo2`**:
+   - **Description**: Checks if a `uint256` value is a power of 2.
+
+6. **`reverseBits`**:
+   - **Description**: Reverses the bits in a `uint256` value.
+
+7. **`reverseBytes`**:
+   - **Description**: Reverses the bytes in a `uint256` value.
+
+8. **`rawAnd`, `and`, `rawOr`, `or`, `rawToUint`, `toUint`**:
+   - **Description**: Various boolean operations and conversions.
+
+These functions from `LibBit` are used within `LibBitmap` to perform efficient bitwise operations on the bitmap.

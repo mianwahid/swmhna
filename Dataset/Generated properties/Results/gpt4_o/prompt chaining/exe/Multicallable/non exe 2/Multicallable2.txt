@@ -1,0 +1,56 @@
+To ensure the robustness and correctness of the `Multicallable` contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for the `multicall` function:
+
+### Test Invariants
+
+1. **Empty Data Array**:
+   - **Invariant**: When the `data` array is empty, the function should return an empty array.
+   - **Edge Case**: Call `multicall` with an empty `data` array.
+   - **Expected Result**: The function should return an empty array (`[]`).
+
+2. **Single Call Success**:
+   - **Invariant**: When the `data` array contains a single valid call, the function should execute it and return the result.
+   - **Edge Case**: Call `multicall` with a single valid method call in the `data` array.
+   - **Expected Result**: The function should return an array containing the result of the single call.
+
+3. **Multiple Calls Success**:
+   - **Invariant**: When the `data` array contains multiple valid calls, the function should execute all of them and return their results in order.
+   - **Edge Case**: Call `multicall` with multiple valid method calls in the `data` array.
+   - **Expected Result**: The function should return an array containing the results of all the calls in the order they were provided.
+
+4. **Call Reversion**:
+   - **Invariant**: If any call in the `data` array reverts, the entire transaction should revert, and no state changes should occur.
+   - **Edge Case**: Call `multicall` with a mix of valid and invalid method calls where one of the calls reverts.
+   - **Expected Result**: The entire transaction should revert, and no partial results should be returned.
+
+5. **Non-Payable Guard**:
+   - **Invariant**: The `multicall` function should not accept any Ether.
+   - **Edge Case**: Attempt to send Ether along with the `multicall` call.
+   - **Expected Result**: The transaction should revert due to the non-payable modifier.
+
+6. **Gas Limit Handling**:
+   - **Invariant**: The function should handle gas limits correctly and revert if it runs out of gas.
+   - **Edge Case**: Call `multicall` with a large number of method calls that exceed the gas limit.
+   - **Expected Result**: The transaction should revert due to out-of-gas error.
+
+7. **Return Data Size Handling**:
+   - **Invariant**: The function should correctly handle and return the size of the return data for each call.
+   - **Edge Case**: Call `multicall` with method calls that return varying sizes of data.
+   - **Expected Result**: The function should return an array with the correct sizes of return data for each call.
+
+8. **Delegate Call Context**:
+   - **Invariant**: The `delegatecall` should execute in the context of the calling contract, preserving state and storage.
+   - **Edge Case**: Call `multicall` with method calls that modify the state of the contract.
+   - **Expected Result**: The state changes should be reflected in the calling contract's storage.
+
+9. **Reentrancy Protection**:
+   - **Invariant**: The function should be protected against reentrancy attacks.
+   - **Edge Case**: Call `multicall` with method calls that attempt reentrancy.
+   - **Expected Result**: The function should handle reentrancy attempts gracefully and not allow reentrant calls to modify the state.
+
+10. **Calldata Manipulation**:
+    - **Invariant**: The function should correctly handle calldata manipulation and offsets.
+    - **Edge Case**: Call `multicall` with method calls that have complex calldata structures.
+    - **Expected Result**: The function should correctly parse and execute the calls based on the provided calldata.
+
+### Conclusion
+These test invariants cover a wide range of scenarios, including edge cases, to ensure the `Multicallable` contract functions correctly and securely. By implementing tests based on these invariants, we can verify the contract's behavior and identify any potential issues.

@@ -1,0 +1,166 @@
+To ensure the correctness and robustness of the `DateTimeLib` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various edge cases and normal conditions. Below are the test invariants for each functionality provided by the contract:
+
+### Constants
+1. **Weekdays Constants**:
+   - Ensure that `MON` to `SUN` are correctly set to values 1 to 7.
+2. **Months Constants**:
+   - Ensure that `JAN` to `DEC` are correctly set to values 1 to 12.
+3. **Limits Constants**:
+   - Ensure that `MAX_SUPPORTED_YEAR`, `MAX_SUPPORTED_EPOCH_DAY`, and `MAX_SUPPORTED_TIMESTAMP` are correctly set to their respective values.
+
+### Date Time Operations
+1. **dateToEpochDay**:
+   - Ensure that the function returns the correct epoch day for a given valid date.
+   - Test edge cases such as leap years, end of months, and invalid dates (e.g., `dateToEpochDay(1970, 2, 30)` should result in undefined behavior).
+
+2. **epochDayToDate**:
+   - Ensure that the function returns the correct date for a given valid epoch day.
+   - Test edge cases such as the minimum and maximum supported epoch days.
+
+3. **dateToTimestamp**:
+   - Ensure that the function returns the correct Unix timestamp for a given valid date.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+4. **timestampToDate**:
+   - Ensure that the function returns the correct date for a given valid Unix timestamp.
+   - Test edge cases such as the minimum and maximum supported timestamps.
+
+5. **dateTimeToTimestamp**:
+   - Ensure that the function returns the correct Unix timestamp for a given valid date and time.
+   - Test edge cases such as leap years, end of months, and invalid date-times.
+
+6. **timestampToDateTime**:
+   - Ensure that the function returns the correct date and time for a given valid Unix timestamp.
+   - Test edge cases such as the minimum and maximum supported timestamps.
+
+7. **isLeapYear**:
+   - Ensure that the function correctly identifies leap years.
+   - Test edge cases such as century years (e.g., 1900 is not a leap year, but 2000 is).
+
+8. **daysInMonth**:
+   - Ensure that the function returns the correct number of days for each month of a given year.
+   - Test edge cases such as February in leap and non-leap years.
+
+9. **weekday**:
+   - Ensure that the function returns the correct weekday for a given Unix timestamp.
+   - Test edge cases such as the minimum and maximum supported timestamps.
+
+10. **isSupportedDate**:
+    - Ensure that the function correctly identifies supported dates.
+    - Test edge cases such as the minimum and maximum supported years, months, and days.
+
+11. **isSupportedDateTime**:
+    - Ensure that the function correctly identifies supported date-times.
+    - Test edge cases such as the minimum and maximum supported years, months, days, hours, minutes, and seconds.
+
+12. **isSupportedEpochDay**:
+    - Ensure that the function correctly identifies supported epoch days.
+    - Test edge cases such as the minimum and maximum supported epoch days.
+
+13. **isSupportedTimestamp**:
+    - Ensure that the function correctly identifies supported Unix timestamps.
+    - Test edge cases such as the minimum and maximum supported timestamps.
+
+14. **nthWeekdayInMonthOfYearTimestamp**:
+    - Ensure that the function returns the correct Unix timestamp for the nth weekday in a given month and year.
+    - Test edge cases such as invalid weekdays, months with fewer than n occurrences of the weekday, and invalid dates.
+
+15. **mondayTimestamp**:
+    - Ensure that the function returns the correct Unix timestamp for the most recent Monday.
+    - Test edge cases such as timestamps that fall on a Monday, and the minimum and maximum supported timestamps.
+
+16. **isWeekEnd**:
+    - Ensure that the function correctly identifies weekends.
+    - Test edge cases such as timestamps that fall on the boundary between weekdays and weekends.
+
+### Date Time Arithmetic Operations
+1. **addYears**:
+   - Ensure that the function correctly adds years to a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+2. **addMonths**:
+   - Ensure that the function correctly adds months to a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+3. **addDays**:
+   - Ensure that the function correctly adds days to a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+4. **addHours**:
+   - Ensure that the function correctly adds hours to a Unix timestamp.
+   - Test edge cases such as the boundary between days.
+
+5. **addMinutes**:
+   - Ensure that the function correctly adds minutes to a Unix timestamp.
+   - Test edge cases such as the boundary between hours.
+
+6. **addSeconds**:
+   - Ensure that the function correctly adds seconds to a Unix timestamp.
+   - Test edge cases such as the boundary between minutes.
+
+7. **subYears**:
+   - Ensure that the function correctly subtracts years from a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+8. **subMonths**:
+   - Ensure that the function correctly subtracts months from a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+9. **subDays**:
+   - Ensure that the function correctly subtracts days from a Unix timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+10. **subHours**:
+    - Ensure that the function correctly subtracts hours from a Unix timestamp.
+    - Test edge cases such as the boundary between days.
+
+11. **subMinutes**:
+    - Ensure that the function correctly subtracts minutes from a Unix timestamp.
+    - Test edge cases such as the boundary between hours.
+
+12. **subSeconds**:
+    - Ensure that the function correctly subtracts seconds from a Unix timestamp.
+    - Test edge cases such as the boundary between minutes.
+
+13. **diffYears**:
+    - Ensure that the function correctly calculates the difference in years between two Unix timestamps.
+    - Test edge cases such as timestamps that fall in the same year.
+
+14. **diffMonths**:
+    - Ensure that the function correctly calculates the difference in months between two Unix timestamps.
+    - Test edge cases such as timestamps that fall in the same month.
+
+15. **diffDays**:
+    - Ensure that the function correctly calculates the difference in days between two Unix timestamps.
+    - Test edge cases such as timestamps that fall on the same day.
+
+16. **diffHours**:
+    - Ensure that the function correctly calculates the difference in hours between two Unix timestamps.
+    - Test edge cases such as timestamps that fall in the same hour.
+
+17. **diffMinutes**:
+    - Ensure that the function correctly calculates the difference in minutes between two Unix timestamps.
+    - Test edge cases such as timestamps that fall in the same minute.
+
+18. **diffSeconds**:
+    - Ensure that the function correctly calculates the difference in seconds between two Unix timestamps.
+    - Test edge cases such as timestamps that fall in the same second.
+
+### Private Helpers
+1. **_totalMonths**:
+   - Ensure that the function correctly calculates the total number of months given years and months.
+   - Test edge cases such as zero months and years.
+
+2. **_add**:
+   - Ensure that the function correctly adds two numbers.
+   - Test edge cases such as adding zero and adding large numbers.
+
+3. **_sub**:
+   - Ensure that the function correctly subtracts two numbers.
+   - Test edge cases such as subtracting zero and subtracting large numbers.
+
+4. **_offsetted**:
+   - Ensure that the function correctly calculates the offsetted timestamp.
+   - Test edge cases such as leap years, end of months, and invalid dates.
+
+By defining these test invariants, we can comprehensively test the `DateTimeLib` smart contract to ensure its correctness and robustness under various conditions.

@@ -1,0 +1,68 @@
+To ensure the correctness and robustness of the `MinHeapLib` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for each functionality provided by the contract:
+
+### Custom Errors
+1. **HeapIsEmpty Error**:
+   - **Invariant**: Any operation that requires the heap to be non-empty should revert with `HeapIsEmpty` if the heap is empty.
+
+### Root Operations
+2. **Root of Non-Empty Heap**:
+   - **Invariant**: The `root` function should return the minimum value of the heap.
+   - **Edge Case**: Verify that the `root` function reverts with `HeapIsEmpty` if the heap is empty.
+
+### Memory Management
+3. **Reserve Memory**:
+   - **Invariant**: The `reserve` function should allocate at least the specified minimum slots of memory.
+   - **Edge Case**: Verify that the `reserve` function does not reallocate memory if the current capacity is already sufficient.
+
+### Smallest Elements
+4. **Smallest Elements in Non-Empty Heap**:
+   - **Invariant**: The `smallest` function should return an array of the `k` smallest items in the heap, sorted in ascending order.
+   - **Edge Case**: Verify that the `smallest` function returns all items if the heap has fewer than `k` items.
+
+### Length
+5. **Heap Length**:
+   - **Invariant**: The `length` function should return the correct number of items in the heap.
+
+### Push Operations
+6. **Push Value onto Heap**:
+   - **Invariant**: The `push` function should correctly insert the value into the heap while maintaining the heap property.
+   - **Edge Case**: Verify that pushing a value onto an empty heap correctly sets the root.
+
+### Pop Operations
+7. **Pop Minimum Value from Heap**:
+   - **Invariant**: The `pop` function should remove and return the minimum value from the heap.
+   - **Edge Case**: Verify that the `pop` function reverts with `HeapIsEmpty` if the heap is empty.
+
+### Push-Pop Operations
+8. **Push and Pop Value**:
+   - **Invariant**: The `pushPop` function should push the value onto the heap and then pop the minimum value.
+   - **Edge Case**: Verify that the `pushPop` function correctly handles the case when the heap is empty.
+
+### Replace Operations
+9. **Replace Minimum Value**:
+   - **Invariant**: The `replace` function should pop the minimum value and push the new value onto the heap.
+   - **Edge Case**: Verify that the `replace` function reverts with `HeapIsEmpty` if the heap is empty.
+
+### Enqueue Operations
+10. **Enqueue Value with Bounded Length**:
+    - **Invariant**: The `enqueue` function should push the value onto the heap and pop the minimum value if the length exceeds `maxLength`.
+    - **Edge Case**: Verify that the `enqueue` function reverts if `maxLength` is zero.
+    - **Edge Case**: Verify that the `enqueue` function correctly handles the case when the heap is not full.
+    - **Edge Case**: Verify that the `enqueue` function correctly handles the case when the heap is full and the new value is not greater than the minimum value.
+    - **Edge Case**: Verify that the `enqueue` function correctly handles the case when the heap is full and the new value is greater than the minimum value.
+
+### Private Helpers
+11. **Heap Property Maintenance**:
+    - **Invariant**: The `_set` function should maintain the heap property for all operations (enqueue, pop, replace, push, pushPop).
+    - **Edge Case**: Verify that the `_set` function correctly handles the case when the heap is empty.
+    - **Edge Case**: Verify that the `_set` function correctly handles the case when the heap is full.
+
+### Usage Tips
+12. **Max-Heap Conversion**:
+    - **Invariant**: Verify that bitwise negating the input and output values correctly converts the min-heap to a max-heap.
+13. **Tuple Packing**:
+    - **Invariant**: Verify that packing tuple values into a single integer and using the heap functions correctly maintains the heap property.
+14. **Signed Integer Conversion**:
+    - **Invariant**: Verify that converting signed integers into their ordered unsigned counterparts and using the heap functions correctly maintains the heap property.
+
+These test invariants cover the core functionalities and edge cases of the `MinHeapLib` smart contract, ensuring that it behaves as expected under various conditions.

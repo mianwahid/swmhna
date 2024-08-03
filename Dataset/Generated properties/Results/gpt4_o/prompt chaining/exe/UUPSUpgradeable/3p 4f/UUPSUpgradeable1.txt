@@ -1,0 +1,55 @@
+The provided smart contract is an abstract contract named `UUPSUpgradeable`, which is designed to facilitate the upgradeability of smart contracts using the UUPS (Universal Upgradeable Proxy Standard) pattern. This contract is intended to be used with ERC1967 proxies. Below is a detailed explanation of each functionality within the contract:
+
+### Custom Errors
+1. **`UpgradeFailed`**:
+   - This error is thrown when the upgrade process fails.
+
+2. **`UnauthorizedCallContext`**:
+   - This error is thrown when a function is called from an unauthorized context, such as when a function that should only be called via a proxy is called directly.
+
+### Immutables
+3. **`__self`**:
+   - This immutable variable stores the address of the contract itself. It is used to check if the context of the call is a delegate call.
+
+### Events
+4. **`Upgraded`**:
+   - This event is emitted when the proxy's implementation is successfully upgraded. It includes the address of the new implementation.
+
+5. **`_UPGRADED_EVENT_SIGNATURE`**:
+   - This constant stores the `keccak256` hash of the `Upgraded(address)` event signature. It is used in the assembly code to log the event.
+
+### Storage
+6. **`_ERC1967_IMPLEMENTATION_SLOT`**:
+   - This constant defines the storage slot used by the implementation in the proxy, as specified by ERC1967. It is calculated as `uint256(keccak256("eip1967.proxy.implementation")) - 1`.
+
+### UUPS Operations
+7. **`_authorizeUpgrade`**:
+   - This is an abstract function that must be overridden in derived contracts. It is used to check if the `msg.sender` is authorized to upgrade the proxy to `newImplementation`. If not authorized, it should revert.
+
+8. **`proxiableUUID`**:
+   - This function returns the storage slot used by the implementation, complying with ERC1822. It uses the `notDelegated` modifier to ensure it is not called via a delegate call.
+
+9. **`upgradeToAndCall`**:
+   - This function upgrades the proxy's implementation to `newImplementation` and optionally calls a function on the new implementation with the provided `data`.
+   - It first calls `_authorizeUpgrade` to check if the upgrade is authorized.
+   - It then uses assembly code to:
+     - Ensure the new implementation correctly implements `proxiableUUID`.
+     - Emit the `Upgraded` event.
+     - Update the implementation in the storage slot.
+     - Perform a delegate call to the new implementation if `data` is non-empty.
+
+### Modifiers
+10. **`onlyProxy`**:
+    - This modifier ensures that the function it modifies is only called through a proxy. It checks if the current context is a delegate call by comparing the contract's address with `__self`.
+
+11. **`notDelegated`**:
+    - This modifier ensures that the function it modifies is not called via a delegate call. It is the opposite of `onlyProxy` and checks if the current context is not a delegate call.
+
+### Summary
+The `UUPSUpgradeable` contract provides a framework for upgrading smart contracts using the UUPS pattern. It includes mechanisms for:
+- Authorizing upgrades.
+- Ensuring upgrades are performed correctly.
+- Emitting events when upgrades occur.
+- Protecting functions from being called in the wrong context (either directly or via delegate call).
+
+To use this contract, a developer would need to inherit from it and implement the `_authorizeUpgrade` function to define the authorization logic for upgrades.

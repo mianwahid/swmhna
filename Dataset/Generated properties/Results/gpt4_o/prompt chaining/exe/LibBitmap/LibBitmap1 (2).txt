@@ -1,0 +1,166 @@
+The provided smart contract, `LibBitmap`, is a Solidity library designed for efficient storage and manipulation of packed unsigned booleans using bitmaps. Below is a detailed explanation of each functionality provided by the `LibBitmap` library:
+
+### Constants
+
+1. **`NOT_FOUND`**:
+   - **Description**: A constant representing the value returned when a bitmap scan does not find a result.
+   - **Value**: `type(uint256).max` (i.e., the maximum value of a `uint256`).
+
+### Structs
+
+2. **`Bitmap`**:
+   - **Description**: A struct representing a bitmap in storage.
+   - **Fields**:
+     - `map`: A mapping from `uint256` to `uint256`, where each key-value pair represents a segment of the bitmap.
+
+### Operations
+
+3. **`get`**:
+   - **Description**: Returns the boolean value of the bit at a given `index` in the `bitmap`.
+   - **Parameters**:
+     - `bitmap`: The bitmap to query.
+     - `index`: The index of the bit to query.
+   - **Returns**: `true` if the bit is set, `false` otherwise.
+
+4. **`set`**:
+   - **Description**: Sets the bit at a given `index` in the `bitmap` to `true`.
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `index`: The index of the bit to set.
+
+5. **`unset`**:
+   - **Description**: Sets the bit at a given `index` in the `bitmap` to `false`.
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `index`: The index of the bit to unset.
+
+6. **`toggle`**:
+   - **Description**: Flips the bit at a given `index` in the `bitmap` and returns the new boolean value of the bit.
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `index`: The index of the bit to toggle.
+   - **Returns**: The new boolean value of the bit after toggling.
+
+7. **`setTo`**:
+   - **Description**: Sets the bit at a given `index` in the `bitmap` to a specified boolean value (`shouldSet`).
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `index`: The index of the bit to set.
+     - `shouldSet`: The boolean value to set the bit to.
+
+8. **`setBatch`**:
+   - **Description**: Sets a consecutive range of bits starting from a given `start` index to `true`.
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `start`: The starting index of the range.
+     - `amount`: The number of bits to set.
+
+9. **`unsetBatch`**:
+   - **Description**: Sets a consecutive range of bits starting from a given `start` index to `false`.
+   - **Parameters**:
+     - `bitmap`: The bitmap to modify.
+     - `start`: The starting index of the range.
+     - `amount`: The number of bits to unset.
+
+10. **`popCount`**:
+    - **Description**: Returns the number of set bits within a specified range by scanning a given number of bits starting from a given `start` index.
+    - **Parameters**:
+      - `bitmap`: The bitmap to query.
+      - `start`: The starting index of the range.
+      - `amount`: The number of bits to scan.
+    - **Returns**: The number of set bits within the specified range.
+
+11. **`findLastSet`**:
+    - **Description**: Returns the index of the most significant set bit within a range `[0..upTo]`. If no set bit is found, returns `NOT_FOUND`.
+    - **Parameters**:
+      - `bitmap`: The bitmap to query.
+      - `upTo`: The upper bound of the range to scan.
+    - **Returns**: The index of the most significant set bit, or `NOT_FOUND` if no set bit is found.
+
+### References
+
+The `LibBitmap` library relies on another library, `LibBit`, for bit manipulation operations. Below are the functionalities provided by `LibBit`:
+
+1. **`fls`**:
+   - **Description**: Finds the last set bit (most significant bit) in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to query.
+   - **Returns**: The index of the most significant bit, or 256 if `x` is zero.
+
+2. **`clz`**:
+   - **Description**: Counts the leading zeros in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to query.
+   - **Returns**: The number of leading zeros, or 256 if `x` is zero.
+
+3. **`ffs`**:
+   - **Description**: Finds the first set bit (least significant bit) in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to query.
+   - **Returns**: The index of the least significant bit, or 256 if `x` is zero.
+
+4. **`popCount`**:
+   - **Description**: Returns the number of set bits in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to query.
+   - **Returns**: The number of set bits.
+
+5. **`isPo2`**:
+   - **Description**: Checks if a given `uint256` value is a power of 2.
+   - **Parameters**:
+     - `x`: The value to query.
+   - **Returns**: `true` if `x` is a power of 2, `false` otherwise.
+
+6. **`reverseBits`**:
+   - **Description**: Reverses the bits in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to reverse.
+   - **Returns**: The value with its bits reversed.
+
+7. **`reverseBytes`**:
+   - **Description**: Reverses the bytes in a given `uint256` value.
+   - **Parameters**:
+     - `x`: The value to reverse.
+   - **Returns**: The value with its bytes reversed.
+
+8. **`rawAnd`**:
+   - **Description**: Performs a bitwise AND operation on two boolean values.
+   - **Parameters**:
+     - `x`: The first boolean value.
+     - `y`: The second boolean value.
+   - **Returns**: The result of the bitwise AND operation.
+
+9. **`and`**:
+   - **Description**: Performs a bitwise AND operation on two boolean values, ensuring they are clean (either 0 or 1).
+   - **Parameters**:
+     - `x`: The first boolean value.
+     - `y`: The second boolean value.
+   - **Returns**: The result of the bitwise AND operation.
+
+10. **`rawOr`**:
+    - **Description**: Performs a bitwise OR operation on two boolean values.
+    - **Parameters**:
+      - `x`: The first boolean value.
+      - `y`: The second boolean value.
+    - **Returns**: The result of the bitwise OR operation.
+
+11. **`or`**:
+    - **Description**: Performs a bitwise OR operation on two boolean values, ensuring they are clean (either 0 or 1).
+    - **Parameters**:
+      - `x`: The first boolean value.
+      - `y`: The second boolean value.
+    - **Returns**: The result of the bitwise OR operation.
+
+12. **`rawToUint`**:
+    - **Description**: Converts a boolean value to a `uint256` (1 if true, 0 if false).
+    - **Parameters**:
+      - `b`: The boolean value to convert.
+    - **Returns**: The `uint256` representation of the boolean value.
+
+13. **`toUint`**:
+    - **Description**: Converts a boolean value to a `uint256` (1 if true, 0 if false), ensuring it is clean.
+    - **Parameters**:
+      - `b`: The boolean value to convert.
+    - **Returns**: The `uint256` representation of the boolean value.
+
+These functionalities together provide a comprehensive set of tools for efficient bit manipulation and boolean operations in Solidity.

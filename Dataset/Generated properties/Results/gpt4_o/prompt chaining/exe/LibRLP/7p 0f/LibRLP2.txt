@@ -1,0 +1,124 @@
+To ensure the correctness and robustness of the `LibRLP` library, we need to define a set of test invariants that cover various edge cases and typical scenarios. Here are the test invariants for the `computeAddress` function:
+
+### Test Invariants
+
+1. **Invariant: Correct Address Calculation for Small Nonces**
+   - **Description:** Verify that the function correctly computes the address for small nonces (0 to 127).
+   - **Edge Cases:** Test with nonce values 0, 1, 127.
+   - **Test Cases:**
+     - `computeAddress(deployer, 0)`
+     - `computeAddress(deployer, 1)`
+     - `computeAddress(deployer, 127)`
+
+2. **Invariant: Correct Address Calculation for Large Nonces**
+   - **Description:** Verify that the function correctly computes the address for large nonces (greater than 127).
+   - **Edge Cases:** Test with nonce values 128, 255, 256, 1024, 2**64-2.
+   - **Test Cases:**
+     - `computeAddress(deployer, 128)`
+     - `computeAddress(deployer, 255)`
+     - `computeAddress(deployer, 256)`
+     - `computeAddress(deployer, 1024)`
+     - `computeAddress(deployer, 2**64-2)`
+
+3. **Invariant: Correct Address Calculation for Edge Nonce Values**
+   - **Description:** Verify that the function correctly computes the address for edge nonce values.
+   - **Edge Cases:** Test with nonce values 0, 1, 2**64-2.
+   - **Test Cases:**
+     - `computeAddress(deployer, 0)`
+     - `computeAddress(deployer, 1)`
+     - `computeAddress(deployer, 2**64-2)`
+
+4. **Invariant: Correct Address Calculation for Different Deployer Addresses**
+   - **Description:** Verify that the function correctly computes the address for different deployer addresses.
+   - **Edge Cases:** Test with various deployer addresses including zero address, typical user address, and contract address.
+   - **Test Cases:**
+     - `computeAddress(0x0000000000000000000000000000000000000000, nonce)`
+     - `computeAddress(0x1234567890abcdef1234567890abcdef12345678, nonce)`
+     - `computeAddress(0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef, nonce)`
+
+5. **Invariant: Consistency of Address Calculation**
+   - **Description:** Verify that the function consistently computes the same address for the same deployer and nonce.
+   - **Edge Cases:** Test with repeated calls using the same deployer and nonce.
+   - **Test Cases:**
+     - `computeAddress(deployer, nonce)` should return the same address on multiple calls.
+
+6. **Invariant: Address Calculation with Maximum Deployer Address**
+   - **Description:** Verify that the function correctly computes the address when the deployer address is at its maximum value.
+   - **Edge Cases:** Test with deployer address `0xffffffffffffffffffffffffffffffffffffffff`.
+   - **Test Cases:**
+     - `computeAddress(0xffffffffffffffffffffffffffffffffffffffff, nonce)`
+
+7. **Invariant: Address Calculation with Nonce Overflow**
+   - **Description:** Verify that the function handles nonce values that are theoretically out of range (although impractical).
+   - **Edge Cases:** Test with nonce values greater than 2**64-2.
+   - **Test Cases:**
+     - `computeAddress(deployer, 2**64-1)`
+     - `computeAddress(deployer, 2**64)`
+
+### Example Test Cases
+
+Here are some example test cases based on the above invariants:
+
+```solidity
+pragma solidity ^0.8.4;
+
+import "ds-test/test.sol";
+import "./LibRLP.sol";
+
+contract LibRLPTest is DSTest {
+    function testComputeAddressSmallNonces() public {
+        address deployer = 0x1234567890abcdef1234567890abcdef12345678;
+        assertEq(LibRLP.computeAddress(deployer, 0), expectedAddress0);
+        assertEq(LibRLP.computeAddress(deployer, 1), expectedAddress1);
+        assertEq(LibRLP.computeAddress(deployer, 127), expectedAddress127);
+    }
+
+    function testComputeAddressLargeNonces() public {
+        address deployer = 0x1234567890abcdef1234567890abcdef12345678;
+        assertEq(LibRLP.computeAddress(deployer, 128), expectedAddress128);
+        assertEq(LibRLP.computeAddress(deployer, 255), expectedAddress255);
+        assertEq(LibRLP.computeAddress(deployer, 256), expectedAddress256);
+        assertEq(LibRLP.computeAddress(deployer, 1024), expectedAddress1024);
+        assertEq(LibRLP.computeAddress(deployer, 2**64-2), expectedAddressMax);
+    }
+
+    function testComputeAddressEdgeNonceValues() public {
+        address deployer = 0x1234567890abcdef1234567890abcdef12345678;
+        assertEq(LibRLP.computeAddress(deployer, 0), expectedAddress0);
+        assertEq(LibRLP.computeAddress(deployer, 1), expectedAddress1);
+        assertEq(LibRLP.computeAddress(deployer, 2**64-2), expectedAddressMax);
+    }
+
+    function testComputeAddressDifferentDeployers() public {
+        uint256 nonce = 1;
+        assertEq(LibRLP.computeAddress(0x0000000000000000000000000000000000000000, nonce), expectedAddressZero);
+        assertEq(LibRLP.computeAddress(0x1234567890abcdef1234567890abcdef12345678, nonce), expectedAddressUser);
+        assertEq(LibRLP.computeAddress(0xabcdefabcdefabcdefabcdefabcdefabcdefabcdef, nonce), expectedAddressContract);
+    }
+
+    function testComputeAddressConsistency() public {
+        address deployer = 0x1234567890abcdef1234567890abcdef12345678;
+        uint256 nonce = 1;
+        address computedAddress = LibRLP.computeAddress(deployer, nonce);
+        assertEq(computedAddress, LibRLP.computeAddress(deployer, nonce));
+        assertEq(computedAddress, LibRLP.computeAddress(deployer, nonce));
+    }
+
+    function testComputeAddressMaxDeployer() public {
+        address deployer = 0xffffffffffffffffffffffffffffffffffffffff;
+        uint256 nonce = 1;
+        assertEq(LibRLP.computeAddress(deployer, nonce), expectedAddressMaxDeployer);
+    }
+
+    function testComputeAddressNonceOverflow() public {
+        address deployer = 0x1234567890abcdef1234567890abcdef12345678;
+        assertEq(LibRLP.computeAddress(deployer, 2**64-1), expectedAddressOverflow1);
+        assertEq(LibRLP.computeAddress(deployer, 2**64), expectedAddressOverflow2);
+    }
+}
+```
+
+### Notes:
+- `expectedAddress0`, `expectedAddress1`, `expectedAddress127`, etc., should be replaced with the actual expected addresses computed using the same logic as in the `computeAddress` function.
+- The `DSTest` library from DappTools is used for testing. You can replace it with any other testing framework you prefer.
+- Ensure that the expected addresses are precomputed and verified to be correct before running the tests.

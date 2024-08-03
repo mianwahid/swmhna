@@ -1,0 +1,56 @@
+## Test Invariants for ReentrancyGuard Contract
+
+Here are the test invariants for the provided `ReentrancyGuard` contract, focusing on edge cases:
+
+**`nonReentrant` Modifier:**
+
+**Invariant 1: Single Entry**
+
+* **Description:**  A `nonReentrant` function should not be able to call itself recursively.
+* **Test Cases:**
+    * **Direct Recursion:** Call the `nonReentrant` function from within itself. **Expected:** Revert with `Reentrancy` error.
+    * **Indirect Recursion:** Call another function that internally calls the original `nonReentrant` function. **Expected:** Revert with `Reentrancy` error.
+
+**Invariant 2: Cross-Function Protection**
+
+* **Description:** Calling one `nonReentrant` function should prevent the execution of another `nonReentrant` function within the same contract until the first one finishes.
+* **Test Cases:**
+    * **Sequential Calls:** Call one `nonReentrant` function, and from within it, attempt to call another `nonReentrant` function. **Expected:** Revert with `Reentrancy` error.
+    * **Parallel Calls (if applicable):** If your testing environment supports it, simulate parallel calls to different `nonReentrant` functions. **Expected:** One should succeed, and the other should revert with `Reentrancy` error.
+
+**Invariant 3: State Consistency**
+
+* **Description:** The contract's state should remain consistent even after a successful `nonReentrant` function call.
+* **Test Cases:**
+    * **State Modification:** Call a `nonReentrant` function that modifies the contract's state (e.g., transfers funds). **Expected:** Verify that the state is updated correctly and no unexpected changes occur.
+
+**Invariant 4: Unlocking After Execution**
+
+* **Description:** The `nonReentrant` modifier should properly "unlock" the contract after the function execution is complete, allowing subsequent calls.
+* **Test Cases:**
+    * **Call After Success:** Call a `nonReentrant` function, and after it successfully executes, call it again. **Expected:** The second call should succeed without reverting.
+
+**`nonReadReentrant` Modifier:**
+
+**Invariant 5: Read-Only Reentrancy Prevention**
+
+* **Description:** A `nonReadReentrant` view function should not be callable recursively or by other `nonReentrant` functions while a `nonReentrant` function is executing.
+* **Test Cases:**
+    * **Recursive View Call:** Call the `nonReadReentrant` view function from within itself. **Expected:** Revert with `Reentrancy` error if a `nonReentrant` function is currently executing.
+    * **Call from `nonReentrant` Function:** Call a `nonReadReentrant` view function from within a `nonReentrant` function. **Expected:** Revert with `Reentrancy` error.
+
+**Invariant 6: No State Modification**
+
+* **Description:** A `nonReadReentrant` function should not be able to modify the contract's state.
+* **Test Cases:**
+    * **Attempt State Change:** Try to modify a state variable from within a `nonReadReentrant` function. **Expected:** The compiler should throw an error during compilation.
+
+**General Edge Cases:**
+
+* **Gas Limit:** Test with very low gas limits to ensure the modifiers don't consume excessive gas and cause failures.
+* **Multiple Inheritance:** If your contract inherits from multiple contracts that might also have reentrancy guards, test interactions between them to ensure they don't conflict.
+
+**Important Notes:**
+
+* These test invariants provide a starting point for testing your `ReentrancyGuard` implementation. You should adapt and expand them based on your specific contract's logic and potential vulnerabilities.
+* Consider using tools like Slither or Mythril for automated vulnerability analysis to complement your testing efforts. 

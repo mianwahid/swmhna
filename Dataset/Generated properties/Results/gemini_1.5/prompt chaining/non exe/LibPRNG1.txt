@@ -1,0 +1,77 @@
+## LibPRNG Smart Contract Functionalities Explained
+
+This smart contract, `LibPRNG`, is a library designed for generating pseudorandom numbers and performing lazy Fisher-Yates shuffles. It offers functionalities both for generating random numbers in memory and for managing a persistent, lazily shuffled range in storage.
+
+**Part 1: Pseudorandom Number Generation (PRNG) in Memory**
+
+These functions operate on a `PRNG` struct in memory, which stores the current state of the PRNG.
+
+1. **`seed(PRNG memory prng, uint256 state)`**
+    - **Purpose:** Initializes the `prng` with a given `state`.
+    - **How it works:** Directly sets the `state` value within the provided `PRNG` struct.
+
+2. **`next(PRNG memory prng) internal pure returns (uint256 result)`**
+    - **Purpose:** Generates the next pseudorandom `uint256` value.
+    - **How it works:** Uses `keccak256` hash function on the current `prng` state to generate a new random number. The `prng` state is then updated with this new number.
+
+3. **`uniform(PRNG memory prng, uint256 upper) internal pure returns (uint256 result)`**
+    - **Purpose:** Generates a pseudorandom `uint256` uniformly distributed between 0 (inclusive) and `upper` (exclusive).
+    - **How it works:** Repeatedly generates random numbers using `keccak256` until a value less than `upper` is found. This method helps avoid modulo bias when working with large moduli.
+
+4. **`shuffle(PRNG memory prng, uint256[] memory a) internal pure`**
+    - **Purpose:** Shuffles the elements of a `uint256` array (`a`) in-place using the Fisher-Yates shuffle algorithm.
+    - **How it works:** Iterates through the array, generating a random index for each element using `keccak256` and swapping the current element with the element at the random index.
+
+5. **`shuffle(PRNG memory prng, bytes memory a) internal pure`**
+    - **Purpose:** Shuffles the bytes of a `bytes` array (`a`) in-place using the Fisher-Yates shuffle algorithm.
+    - **How it works:** Similar to the `uint256` array shuffle, but operates on individual bytes within the `bytes` array.
+
+6. **`standardNormalWad(PRNG memory prng) internal pure returns (int256 result)`**
+    - **Purpose:** Generates a sample from the standard normal distribution, denominated in WAD (1e18).
+    - **How it works:** Employs an approximation of the Irwin-Hall distribution with 20 samples using `keccak256` to generate a value close to the standard normal distribution.
+
+7. **`exponentialWad(PRNG memory prng) internal pure returns (uint256 result)`**
+    - **Purpose:** Generates a sample from the unit exponential distribution, denominated in WAD (1e18).
+    - **How it works:** Utilizes a rejection sampling method with `keccak256` to generate a value following the unit exponential distribution.
+
+**Part 2: Lazy Fisher-Yates Shuffling in Storage**
+
+These functions operate on a `LazyShuffler` struct in storage, which maintains the state of a lazily shuffled range.
+
+1. **`initialize(LazyShuffler storage $, uint256 n) internal`**
+    - **Purpose:** Initializes the `LazyShuffler` to shuffle the range `[0..n)`.
+    - **How it works:** Sets the initial state of the `LazyShuffler` with the given length (`n`) and a random permutation slot generated using `keccak256`.
+
+2. **`grow(LazyShuffler storage $, uint256 n) internal`**
+    - **Purpose:** Increases the length of the shuffled range in the `LazyShuffler`.
+    - **How it works:** Updates the length of the `LazyShuffler` to the new value (`n`), ensuring that the new length is not smaller than the previous one.
+
+3. **`restart(LazyShuffler storage $) internal`**
+    - **Purpose:** Resets the `LazyShuffler` to its initial state, allowing elements to be drawn again.
+    - **How it works:** Resets the `numShuffled` counter to zero without modifying the internal permutation or length.
+
+4. **`numShuffled(LazyShuffler storage $) internal view returns (uint256 result)`**
+    - **Purpose:** Returns the number of elements that have been shuffled so far.
+    - **How it works:** Reads the `numShuffled` value directly from the `LazyShuffler` state.
+
+5. **`length(LazyShuffler storage $) internal view returns (uint256 result)`**
+    - **Purpose:** Returns the length of the shuffled range in the `LazyShuffler`.
+    - **How it works:** Reads the length value directly from the `LazyShuffler` state.
+
+6. **`initialized(LazyShuffler storage $) internal view returns (bool result)`**
+    - **Purpose:** Checks if the `LazyShuffler` has been initialized.
+    - **How it works:** Returns `true` if the `LazyShuffler` state is not zero, indicating initialization.
+
+7. **`finished(LazyShuffler storage $) internal view returns (bool result)`**
+    - **Purpose:** Checks if all elements in the `LazyShuffler` have been shuffled.
+    - **How it works:** Compares the `numShuffled` counter with the length of the `LazyShuffler`. Returns `true` if they are equal, indicating all elements have been shuffled.
+
+8. **`get(LazyShuffler storage $, uint256 index) internal view returns (uint256 result)`**
+    - **Purpose:** Returns the value at a given `index` in the shuffled range, considering all previous shuffles.
+    - **How it works:** Calculates the correct bucket slot and offset within the `LazyShuffler` state based on the `index` and returns the corresponding value.
+
+9. **`next(LazyShuffler storage $, uint256 randomness) internal returns (uint256 chosen)`**
+    - **Purpose:** Performs a single Fisher-Yates shuffle step, increments the `numShuffled` counter, and returns the next shuffled value.
+    - **How it works:** Uses the provided `randomness` to select a random index within the remaining unshuffled range. It then swaps the value at this index with the value at the `numShuffled` position, effectively shuffling one more element. The chosen value is then returned.
+
+**In summary, this `LibPRNG` contract provides a comprehensive set of tools for generating pseudorandom numbers and performing lazy Fisher-Yates shuffles, both in memory and persistently in storage.** This makes it a valuable library for various applications requiring randomness and shuffling, such as games, raffles, and random data selection.

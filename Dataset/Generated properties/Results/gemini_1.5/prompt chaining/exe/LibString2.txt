@@ -1,0 +1,118 @@
+## Test Invariants for LibString Smart Contract
+
+This list outlines test invariants for the `LibString` smart contract, focusing on edge cases and specific functionalities:
+
+**I. Decimal Operations:**
+
+* **`toString(uint256 value)` & `toString(int256 value)`:**
+    - **Invariant 1:** For any valid `uint256` or `int256` input, the output string should be its accurate base 10 representation.
+    - **Invariant 2:** `toString(0)` should return "0".
+    - **Invariant 3:** `toString(type(uint256).max)` should return "115792089237316195423570985008687907853269984665640564039457584007913129639935".
+    - **Invariant 4:** `toString(type(int256).min)` should return "-57896044618658097711785492504343953926634992332820282019728792003956564819968".
+
+**II. Hexadecimal Operations:**
+
+* **`toHexString(uint256 value, uint256 length)` & `toHexStringNoPrefix(uint256 value, uint256 length)`:**
+    - **Invariant 1:** For any valid `uint256` input and `length` sufficient to hold the hex representation, the output should be the correct hex string, left-padded with "0" if necessary.
+    - **Invariant 2:** The output of `toHexString` should always start with "0x", while `toHexStringNoPrefix` should not.
+    - **Invariant 3:** Reverts with `HexLengthInsufficient` if `length` is too small to hold the hex representation.
+
+* **`toHexString(uint256 value)` & `toHexStringNoPrefix(uint256 value)`:**
+    - **Invariant 1:** Output should be equivalent to calling the respective function with `length` set to 20 bytes (address length).
+
+* **`toMinimalHexString(uint256 value)` & `toMinimalHexStringNoPrefix(uint256 value)`:**
+    - **Invariant 1:** Output should be the shortest possible hex representation of the input, excluding any leading zeros.
+    - **Invariant 2:** `toMinimalHexString(0)` should return "0x0", and `toMinimalHexStringNoPrefix(0)` should return "0".
+
+* **`toHexStringChecksummed(address value)`:**
+    - **Invariant 1:** Output should be the checksummed hex representation of the input address, adhering to EIP-55.
+    - **Invariant 2:** Checksummed address should match the output of popular web3 libraries like ethers.js and web3.js.
+
+* **`toHexString(address value)` & `toHexStringNoPrefix(address value)`:**
+    - **Invariant 1:** Output should be the hex representation of the input address, with or without the "0x" prefix.
+
+* **`toHexString(bytes memory raw)` & `toHexStringNoPrefix(bytes memory raw)`:**
+    - **Invariant 1:** Output should be the hex representation of the input byte array, with or without the "0x" prefix.
+    - **Invariant 2:** Test with empty byte arrays, single-byte arrays, and multi-byte arrays.
+
+**III. Rune String Operations:**
+
+* **`runeCount(string memory s)`:**
+    - **Invariant 1:** Correctly count UTF characters, including special characters and emojis.
+    - **Invariant 2:** `runeCount("")` should return 0.
+
+* **`is7BitASCII(string memory s)`:**
+    - **Invariant 1:** Correctly identify strings containing only 7-bit ASCII characters.
+    - **Invariant 2:** Test with strings containing extended ASCII characters and Unicode characters.
+
+**IV. Byte String Operations:**
+
+* **`replace(string memory subject, string memory search, string memory replacement)`:**
+    - **Invariant 1:** All occurrences of `search` should be replaced with `replacement` in the `subject` string.
+    - **Invariant 2:** Test with empty `search`, empty `replacement`, and overlapping occurrences of `search`.
+
+* **`indexOf(string memory subject, string memory search, uint256 from)` & `indexOf(string memory subject, string memory search)`:**
+    - **Invariant 1:** Correctly find the first occurrence of `search` in `subject`, starting from the specified `from` index or 0 by default.
+    - **Invariant 2:** Return `NOT_FOUND` if `search` is not present in `subject`.
+    - **Invariant 3:** Test with empty `search`, `search` longer than `subject`, and `from` index out of bounds.
+
+* **`lastIndexOf(string memory subject, string memory search, uint256 from)` & `lastIndexOf(string memory subject, string memory search)`:**
+    - **Invariant 1:** Correctly find the last occurrence of `search` in `subject`, starting from the specified `from` index or the end of the string by default.
+    - **Invariant 2:** Return `NOT_FOUND` if `search` is not present in `subject`.
+    - **Invariant 3:** Test with empty `search`, `search` longer than `subject`, and `from` index out of bounds.
+
+* **`contains(string memory subject, string memory search)`:**
+    - **Invariant 1:** Return true if `search` is present in `subject`, false otherwise.
+
+* **`startsWith(string memory subject, string memory search)` & `endsWith(string memory subject, string memory search)`:**
+    - **Invariant 1:** Correctly identify if `subject` starts or ends with `search`, respectively.
+    - **Invariant 2:** Test with empty `search` and `search` longer than `subject`.
+
+* **`repeat(string memory subject, uint256 times)`:**
+    - **Invariant 1:** Correctly repeat the `subject` string `times` times.
+    - **Invariant 2:** Test with `times` equal to 0 and 1.
+
+* **`slice(string memory subject, uint256 start, uint256 end)` & `slice(string memory subject, uint256 start)`:**
+    - **Invariant 1:** Correctly extract the substring from `subject` based on the provided `start` and `end` indices.
+    - **Invariant 2:** Test with `start` and `end` indices at the boundaries and out of bounds.
+
+* **`indicesOf(string memory subject, string memory search)`:**
+    - **Invariant 1:** Correctly find and return all indices of `search` within `subject`.
+    - **Invariant 2:** Return an empty array if `search` is not present in `subject`.
+
+* **`split(string memory subject, string memory delimiter)`:**
+    - **Invariant 1:** Correctly split the `subject` string into substrings based on the `delimiter`.
+    - **Invariant 2:** Test with empty `delimiter`, `delimiter` not present in `subject`, and `subject` starting or ending with `delimiter`.
+
+* **`concat(string memory a, string memory b)`:**
+    - **Invariant 1:** Correctly concatenate `a` and `b` without any data corruption.
+    - **Invariant 2:** Test with empty `a` and empty `b`.
+
+* **`toCase(string memory subject, bool toUpper)`:**
+    - **Invariant 1:** Correctly convert the case of the input string to lowercase or uppercase based on `toUpper`.
+    - **Invariant 2:** Test with strings containing a mix of uppercase and lowercase characters.
+
+* **`fromSmallString(bytes32 s)` & `normalizeSmallString(bytes32 s)` & `toSmallString(string memory s)`:**
+    - **Invariant 1:** Correctly convert between `string` and null-terminated `bytes32` representations.
+    - **Invariant 2:** `toSmallString` should revert with `TooBigForSmallString` if the input string is too long.
+
+* **`lower(string memory subject)` & `upper(string memory subject)`:**
+    - **Invariant 1:** Correctly convert the case of the input string to lowercase or uppercase, respectively.
+
+* **`escapeHTML(string memory s)` & `escapeJSON(string memory s, bool addDoubleQuotes)` & `escapeJSON(string memory s)`:**
+    - **Invariant 1:** Correctly escape special characters for safe use in HTML and JSON formats.
+    - **Invariant 2:** Test with strings containing a variety of special characters.
+
+* **`eq(string memory a, string memory b)` & `eqs(string memory a, bytes32 b)`:**
+    - **Invariant 1:** Correctly compare strings and return true if they are equal, false otherwise.
+    - **Invariant 2:** Test with strings of different lengths and cases.
+
+* **`packOne(string memory a)` & `unpackOne(bytes32 packed)` & `packTwo(string memory a, string memory b)` & `unpackTwo(bytes32 packed)`:**
+    - **Invariant 1:** Correctly pack and unpack one or two strings with their lengths into a single `bytes32` word.
+    - **Invariant 2:** Test with empty strings and strings of varying lengths.
+
+* **`directReturn(string memory a)`:**
+    - **Invariant 1:** The returned string should be equivalent to the input string without any modifications.
+    - **Invariant 2:** Ensure that the function does not modify any storage values.
+
+These test invariants provide a comprehensive framework for testing the `LibString` smart contract. By covering various edge cases and functionalities, we can ensure the library's reliability and robustness in different scenarios. Remember to use a combination of unit tests and property-based testing to achieve high test coverage and confidence in the code's correctness. 

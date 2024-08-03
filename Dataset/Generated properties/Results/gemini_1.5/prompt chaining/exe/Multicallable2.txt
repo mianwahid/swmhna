@@ -1,0 +1,62 @@
+## Test Invariants for the Multicallable Contract
+
+This list outlines test invariants for the `Multicallable` contract, focusing on edge cases and ensuring robust functionality.
+
+**General Invariants:**
+
+1. **Non-Payable:**
+    * `multicall` should always revert if any ETH is sent with the transaction.
+
+2. **Empty Data Array:**
+    * Calling `multicall` with an empty `data` array should return an empty `bytes[] memory` array without making any delegatecalls.
+
+**Successful Execution Invariants:**
+
+3. **Single Function Call:**
+    * Calling `multicall` with a single function call in the `data` array should return a single element `bytes[] memory` array containing the return data of that function call.
+    * The state of the contract should be updated as if the function was called directly.
+
+4. **Multiple Function Calls:**
+    * Calling `multicall` with multiple function calls in the `data` array should return a `bytes[] memory` array with the same length as the input array.
+    * Each element in the returned array should contain the return data of the corresponding function call in the input array.
+    * The state of the contract should be updated as if each function was called sequentially in the order they appear in the `data` array.
+
+5. **Function Calls with Varying Return Data Sizes:**
+    * `multicall` should correctly handle function calls that return varying sizes of data (e.g., empty returns, small values, large structs).
+    * The returned `bytes[] memory` array should accurately reflect the size of each function call's return data.
+
+**Error Handling Invariants:**
+
+6. **Single Revert:**
+    * If any function call within `multicall` reverts, the entire `multicall` function should revert.
+    * The returned error message should be the error message from the reverted function call.
+    * The state of the contract should remain unchanged, as if no function calls were executed (atomicity).
+
+7. **Multiple Reverts:**
+    * If multiple function calls within `multicall` revert, the entire `multicall` function should revert.
+    * The returned error message should be the error message from the first reverted function call.
+    * The state of the contract should remain unchanged, as if no function calls were executed (atomicity).
+
+8. **Out of Gas:**
+    * If any function call within `multicall` runs out of gas, the entire `multicall` function should revert.
+    * The state of the contract should remain unchanged, as if no function calls were executed (atomicity).
+
+**Edge Case Invariants:**
+
+9. **Large Data Array:**
+    * Test `multicall` with a very large `data` array (approaching block gas limit) to ensure it handles large numbers of function calls efficiently and correctly.
+
+10. **Function Calls Modifying State:**
+    * Include function calls within `multicall` that modify the contract's state in different ways (e.g., updating variables, emitting events).
+    * Verify that the state changes are applied correctly and consistently, even when combined with other function calls.
+
+11. **Recursive Calls:**
+    * While not directly related to the `Multicallable` contract itself, test for potential reentrancy vulnerabilities if the functions being called within `multicall` are themselves externally callable.
+
+**Gas Efficiency Invariants:**
+
+12. **Gas Consumption:**
+    * Compare the gas consumption of using `multicall` to execute multiple function calls versus making separate transactions for each call.
+    * `multicall` should demonstrate significant gas savings, especially as the number of function calls increases.
+
+These test invariants provide a comprehensive framework for testing the `Multicallable` contract, ensuring its functionality, robustness, and security. Remember to adapt and expand these invariants based on the specific functions being called within `multicall` and the overall context of your application. 

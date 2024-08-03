@@ -1,0 +1,94 @@
+## Test Invariants for ERC1967Factory
+
+This list outlines test invariants for the provided `ERC1967Factory` contract, focusing on edge cases and ensuring comprehensive coverage of all functionalities.
+
+**General Invariants:**
+
+* **Gas Usage:** All functions should have reasonable gas consumption. Track gas usage across different scenarios and optimize where possible.
+* **Error Handling:** Verify that the correct custom errors are thrown in all failure scenarios.
+* **Event Emission:** Ensure that the appropriate events are emitted with the correct parameters for all successful function executions.
+
+**Admin Functions:**
+
+* **`adminOf(address proxy)`:**
+    - **Invariant:** The function should always return the correct admin address for a given proxy, even if the admin has been changed multiple times.
+    - **Edge Cases:**
+        - Proxy with no admin set (should return the zero address).
+        - Non-existent proxy address (should revert).
+
+* **`changeAdmin(address proxy, address admin)`:**
+    - **Invariant:** Only the current admin of the proxy can change the admin.
+    - **Edge Cases:**
+        - Caller is not the admin (should revert with `Unauthorized`).
+        - Setting admin to the zero address.
+        - Setting admin to the same address as the current admin.
+        - Non-existent proxy address (should revert).
+
+**Upgrade Functions:**
+
+* **`upgrade(address proxy, address implementation)`:**
+    - **Invariant:** Only the admin can upgrade the proxy. The implementation slot of the proxy should be updated correctly.
+    - **Edge Cases:**
+        - Caller is not the admin (should revert with `Unauthorized`).
+        - Upgrading to the same implementation address.
+        - Upgrading to the zero address.
+        - Non-existent proxy address (should revert).
+        - Implementation contract does not have a valid upgrade mechanism (potential for unexpected behavior).
+
+* **`upgradeAndCall(address proxy, address implementation, bytes calldata data)`:**
+    - **Invariant:** Only the admin can upgrade the proxy and call the new implementation. The implementation slot should be updated, and the specified function on the new implementation should be called with the provided data.
+    - **Edge Cases:**
+        - Caller is not the admin (should revert with `Unauthorized`).
+        - Upgrading to the same implementation address.
+        - Upgrading to the zero address.
+        - Non-existent proxy address (should revert).
+        - `data` does not match the function signature on the new implementation (should revert).
+        - Function call on the new implementation reverts (should bubble up the error).
+
+**Deploy Functions:**
+
+* **`deploy(address implementation, address admin)`:**
+    - **Invariant:** The function should deploy a new proxy contract with the specified implementation and admin. The proxy should be initialized correctly.
+    - **Edge Cases:**
+        - Deploying with the zero address for implementation or admin.
+        - Insufficient balance to deploy the proxy (should revert).
+        - Initialization of the proxy fails (should revert with `DeploymentFailed`).
+
+* **`deployAndCall(address implementation, address admin, bytes calldata data)`:**
+    - **Invariant:** The function should deploy a new proxy and call the specified function on the implementation with the provided data.
+    - **Edge Cases:**
+        - Same as `deploy` function.
+        - `data` does not match the function signature on the implementation (should revert).
+        - Function call on the implementation reverts (should bubble up the error).
+
+* **`deployDeterministic(address implementation, address admin, bytes32 salt)`:**
+    - **Invariant:** The function should deploy a new proxy at a deterministic address derived from the salt. The proxy should be initialized correctly.
+    - **Edge Cases:**
+        - Same as `deploy` function.
+        - Salt does not start with the zero address or the caller's address (should revert with `SaltDoesNotStartWithCaller`).
+        - Salt collision (deploying two proxies with the same salt - should revert).
+
+* **`deployDeterministicAndCall(address implementation, address admin, bytes32 salt, bytes calldata data)`:**
+    - **Invariant:** The function should deploy a new proxy at a deterministic address and call the specified function on the implementation.
+    - **Edge Cases:**
+        - Same as `deployDeterministic` function.
+        - `data` does not match the function signature on the implementation (should revert).
+        - Function call on the implementation reverts (should bubble up the error).
+
+**Utility Functions:**
+
+* **`predictDeterministicAddress(bytes32 salt)`:**
+    - **Invariant:** The function should correctly calculate the deterministic address of a proxy given the salt.
+    - **Edge Cases:**
+        - Different salts should result in different predicted addresses.
+
+* **`initCodeHash()`:**
+    - **Invariant:** The function should return the correct keccak256 hash of the proxy initialization code.
+
+**Additional Considerations:**
+
+* **Security:** Test for potential vulnerabilities like reentrancy attacks, especially in the upgrade functions.
+* **Upgradability:** Ensure that the proxy can be upgraded multiple times without issues.
+* **Compatibility:** Test the factory with different implementation contracts and ensure compatibility.
+
+By thoroughly testing these invariants and edge cases, you can ensure the robustness and reliability of the `ERC1967Factory` contract. Remember to use a combination of unit tests and property-based testing to achieve comprehensive coverage. 

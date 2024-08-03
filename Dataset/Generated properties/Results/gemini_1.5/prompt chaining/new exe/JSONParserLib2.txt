@@ -1,0 +1,131 @@
+## Test Invariants for `JSONParserLib`
+
+To ensure the robustness of the `JSONParserLib` contract, we need to cover a wide range of test cases, focusing on both valid and invalid JSON strings, edge cases, and specific functionalities. Here's a breakdown of test invariants for each function:
+
+**1. `parse(string memory s)`:**
+
+**Invariants:**
+
+- **Valid JSON:**
+    - **Basic Types:** Successfully parses JSON strings containing numbers, strings (with escape sequences), booleans, and null values.
+    - **Arrays:** Correctly parses arrays with various element types and nesting levels.
+    - **Objects:** Parses objects with different key-value pairs, including duplicate keys (preserving order).
+    - **Nested Structures:** Handles complex JSON structures with nested arrays and objects.
+    - **Whitespace:** Ignores whitespace around structural characters (e.g., `[ { "a": 1 } ]`).
+- **Invalid JSON:**
+    - **Syntax Errors:** Reverts with `ParsingFailed` for JSON strings with syntax errors (e.g., missing commas, unclosed brackets, invalid escape sequences).
+    - **Invalid Characters:** Reverts for strings containing invalid Unicode characters or control characters outside of escape sequences.
+    - **Unexpected End:** Reverts if the JSON string ends prematurely.
+- **Edge Cases:**
+    - **Empty String:** Parses an empty string as an undefined `Item`.
+    - **Single Element:** Correctly parses JSON strings containing a single number, string, boolean, or null value.
+
+**2. `value(Item memory item)`:**
+
+**Invariants:**
+
+- **String Type:** Returns the double-quoted, JSON-encoded string value.
+- **Number, Boolean, Null Types:** Returns the correct string representation of the value.
+- **Array, Object Types:** Returns a string representation of the starting and ending brackets/braces.
+- **Undefined Type:** Returns an empty string.
+
+**3. `index(Item memory item)`:**
+
+**Invariants:**
+
+- **Array Item:** Returns the correct index of the item within its parent array.
+- **Non-Array Item:** Returns 0.
+
+**4. `key(Item memory item)`:**
+
+**Invariants:**
+
+- **Object Item:** Returns the double-quoted, JSON-encoded key of the item.
+- **Non-Object Item:** Returns an empty string.
+
+**5. `children(Item memory item)`:**
+
+**Invariants:**
+
+- **Array/Object Item:** Returns an array containing all child `Item` objects in the correct order.
+- **Non-Array/Object Item:** Returns an empty array.
+
+**6. `size(Item memory item)`:**
+
+**Invariants:**
+
+- **Array/Object Item:** Returns the correct number of child elements.
+- **Non-Array/Object Item:** Returns 0.
+
+**7. `at(Item memory item, uint256 i)`:**
+
+**Invariants:**
+
+- **Array Item, Valid Index:** Returns the correct child `Item` at the specified index.
+- **Array Item, Invalid Index:** Returns an undefined `Item`.
+- **Non-Array Item:** Returns an undefined `Item`.
+
+**8. `at(Item memory item, string memory k)`:**
+
+**Invariants:**
+
+- **Object Item, Valid Key:** Returns the correct child `Item` with the specified key.
+- **Object Item, Invalid Key:** Returns an undefined `Item`.
+- **Object Item, Duplicate Keys:** Returns the last `Item` with the duplicate key.
+- **Non-Object Item:** Returns an undefined `Item`.
+
+**9. `getType(Item memory item)`:**
+
+**Invariants:**
+
+- Returns the correct type constant for all possible `Item` types (undefined, array, object, number, string, boolean, null).
+
+**10. Type Checkers (isArray, isObject, isNumber, etc.):**
+
+**Invariants:**
+
+- Correctly identifies the type of an `Item` and returns true or false accordingly.
+
+**11. `parent(Item memory item)`:**
+
+**Invariants:**
+
+- **Non-Root Item:** Returns the correct parent `Item`.
+- **Root Item:** Returns an undefined `Item`.
+
+**12. `parseUint(string memory s)`:**
+
+**Invariants:**
+
+- **Valid Input:** Correctly parses decimal strings representing uint256 values.
+- **Invalid Input:** Reverts with `ParsingFailed` for non-numeric strings, strings with leading zeros, or strings representing values outside the uint256 range.
+
+**13. `parseInt(string memory s)`:**
+
+**Invariants:**
+
+- **Valid Input:** Parses decimal strings representing int256 values, including negative numbers.
+- **Invalid Input:** Reverts with `ParsingFailed` for non-numeric strings, strings with leading zeros (except for a single leading zero for negative numbers), or strings representing values outside the int256 range.
+
+**14. `parseUintFromHex(string memory s)`:**
+
+**Invariants:**
+
+- **Valid Input:** Parses hexadecimal strings (with or without the "0x" prefix) representing uint256 values.
+- **Invalid Input:** Reverts with `ParsingFailed` for strings containing non-hexadecimal characters or representing values outside the uint256 range.
+
+**15. `decodeString(string memory s)`:**
+
+**Invariants:**
+
+- **Valid Input:** Correctly decodes JSON-encoded strings, handling various escape sequences (e.g., `\n`, `\t`, `\uXXXX`).
+- **Invalid Input:** Reverts with `ParsingFailed` for strings that are not properly double-quoted or contain invalid escape sequences.
+
+**Testing Methodology:**
+
+- Use a combination of unit tests and property-based testing.
+- Generate a wide range of valid and invalid JSON strings, including edge cases.
+- Test each function independently and in combination with others to ensure proper interaction.
+- Focus on code coverage to ensure all branches and statements are tested.
+
+By thoroughly testing these invariants, we can gain confidence in the correctness and reliability of the `JSONParserLib` contract. 

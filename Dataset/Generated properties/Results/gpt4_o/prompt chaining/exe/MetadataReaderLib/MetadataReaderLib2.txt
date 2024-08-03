@@ -1,0 +1,101 @@
+To ensure the robustness and correctness of the `MetadataReaderLib` library, we need to define a comprehensive set of test invariants. These invariants will cover various edge cases and functionalities provided by the library. Below is a list of test invariants for each function in the library:
+
+### General Invariants
+
+1. **Gas Stipend Invariant**:
+   - Ensure that the gas stipend provided is sufficient to prevent reverts for typical use cases.
+   - Test with `GAS_STIPEND_NO_GRIEF` and verify that the function does not revert.
+
+2. **String Length Limit Invariant**:
+   - Ensure that the string length does not exceed `STRING_LIMIT_DEFAULT` (1000 bytes) unless a different limit is specified.
+   - Test with strings of varying lengths, including edge cases like 0 bytes and exactly 1000 bytes.
+
+### String Reading Functions
+
+#### `readName` Functions
+
+1. **readName(address target)**:
+   - Test with a contract that has a `name` function returning a non-empty string.
+   - Test with a contract that has a `name` function returning an empty string.
+   - Test with a contract that does not have a `name` function (should return an empty string).
+   - Test with an EOA (Externally Owned Account) as the target (should return an empty string).
+
+2. **readName(address target, uint256 limit)**:
+   - Test with a contract that has a `name` function returning a string longer than the specified limit (should truncate).
+   - Test with a contract that has a `name` function returning a string shorter than the specified limit (should not truncate).
+
+3. **readName(address target, uint256 limit, uint256 gasStipend)**:
+   - Test with varying gas stipends to ensure the function does not revert with sufficient gas.
+   - Test with insufficient gas to ensure it handles the revert gracefully and returns an empty string.
+
+#### `readSymbol` Functions
+
+1. **readSymbol(address target)**:
+   - Test with a contract that has a `symbol` function returning a non-empty string.
+   - Test with a contract that has a `symbol` function returning an empty string.
+   - Test with a contract that does not have a `symbol` function (should return an empty string).
+   - Test with an EOA as the target (should return an empty string).
+
+2. **readSymbol(address target, uint256 limit)**:
+   - Test with a contract that has a `symbol` function returning a string longer than the specified limit (should truncate).
+   - Test with a contract that has a `symbol` function returning a string shorter than the specified limit (should not truncate).
+
+3. **readSymbol(address target, uint256 limit, uint256 gasStipend)**:
+   - Test with varying gas stipends to ensure the function does not revert with sufficient gas.
+   - Test with insufficient gas to ensure it handles the revert gracefully and returns an empty string.
+
+#### `readString` Functions
+
+1. **readString(address target, bytes memory data)**:
+   - Test with a contract that returns a non-empty string for the provided calldata.
+   - Test with a contract that returns an empty string for the provided calldata.
+   - Test with a contract that does not have the function corresponding to the provided calldata (should return an empty string).
+   - Test with an EOA as the target (should return an empty string).
+
+2. **readString(address target, bytes memory data, uint256 limit)**:
+   - Test with a contract that returns a string longer than the specified limit (should truncate).
+   - Test with a contract that returns a string shorter than the specified limit (should not truncate).
+
+3. **readString(address target, bytes memory data, uint256 limit, uint256 gasStipend)**:
+   - Test with varying gas stipends to ensure the function does not revert with sufficient gas.
+   - Test with insufficient gas to ensure it handles the revert gracefully and returns an empty string.
+
+### Unsigned Integer Reading Functions
+
+#### `readDecimals` Functions
+
+1. **readDecimals(address target)**:
+   - Test with a contract that has a `decimals` function returning a non-zero value.
+   - Test with a contract that has a `decimals` function returning zero.
+   - Test with a contract that does not have a `decimals` function (should return zero).
+   - Test with an EOA as the target (should return zero).
+
+2. **readDecimals(address target, uint256 gasStipend)**:
+   - Test with varying gas stipends to ensure the function does not revert with sufficient gas.
+   - Test with insufficient gas to ensure it handles the revert gracefully and returns zero.
+
+#### `readUint` Functions
+
+1. **readUint(address target, bytes memory data)**:
+   - Test with a contract that returns a non-zero uint for the provided calldata.
+   - Test with a contract that returns zero for the provided calldata.
+   - Test with a contract that does not have the function corresponding to the provided calldata (should return zero).
+   - Test with an EOA as the target (should return zero).
+
+2. **readUint(address target, bytes memory data, uint256 gasStipend)**:
+   - Test with varying gas stipends to ensure the function does not revert with sufficient gas.
+   - Test with insufficient gas to ensure it handles the revert gracefully and returns zero.
+
+### Private Helper Functions
+
+1. **_string(address target, bytes32 ptr, uint256 limit, uint256 gasStipend)**:
+   - Ensure that the function correctly handles various edge cases, such as empty returndata, null-terminated strings, and `abi.decode` failures.
+   - Test with varying gas stipends and string lengths to ensure robustness.
+
+2. **_uint(address target, bytes32 ptr, uint256 gasStipend)**:
+   - Ensure that the function correctly handles cases where the returndata is insufficient or the `abi.decode` fails.
+   - Test with varying gas stipends to ensure robustness.
+
+### Summary
+
+These test invariants cover a wide range of edge cases and ensure that the `MetadataReaderLib` library functions correctly under various conditions. By thoroughly testing these invariants, we can ensure the robustness and reliability of the library.

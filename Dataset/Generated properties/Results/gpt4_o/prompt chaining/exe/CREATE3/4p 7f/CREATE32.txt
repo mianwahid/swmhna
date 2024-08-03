@@ -1,0 +1,74 @@
+To ensure the robustness and correctness of the `CREATE3` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for the `CREATE3` library:
+
+### Invariants for `deploy` Function
+
+1. **Successful Deployment**:
+   - **Invariant**: The function should successfully deploy a contract when provided with valid `salt`, `creationCode`, and `value`.
+   - **Edge Cases**:
+     - Deploy with zero `value`.
+     - Deploy with non-zero `value`.
+     - Deploy with minimal `creationCode` (e.g., a contract that does nothing).
+     - Deploy with complex `creationCode` (e.g., a contract with multiple functions and storage variables).
+
+2. **Deployment Failure**:
+   - **Invariant**: The function should revert with `DeploymentFailed` if the proxy contract deployment fails.
+   - **Edge Cases**:
+     - Use a `salt` that causes `create2` to fail (e.g., a salt that results in an address collision).
+
+3. **Initialization Failure**:
+   - **Invariant**: The function should revert with `InitializationFailed` if the initialization of the deployed contract fails.
+   - **Edge Cases**:
+     - Provide `creationCode` that reverts during initialization.
+     - Provide `creationCode` that consumes all gas during initialization.
+
+4. **Zero Code Size**:
+   - **Invariant**: The function should revert with `InitializationFailed` if the deployed contract has zero code size.
+   - **Edge Cases**:
+     - Provide `creationCode` that results in a contract with zero code size.
+
+5. **Deterministic Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for the deployed contract.
+   - **Edge Cases**:
+     - Verify the address for different `salt` values.
+     - Verify the address for different `creationCode` values.
+     - Verify the address for different `value` values.
+
+### Invariants for `getDeployed` Function (with deployer parameter)
+
+1. **Correct Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for a given `salt` and `deployer`.
+   - **Edge Cases**:
+     - Verify the address for different `salt` values.
+     - Verify the address for different `deployer` addresses.
+     - Verify the address for different combinations of `salt` and `deployer`.
+
+### Invariants for `getDeployed` Function (without deployer parameter)
+
+1. **Correct Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for a given `salt` using the current contract's address as the deployer.
+   - **Edge Cases**:
+     - Verify the address for different `salt` values.
+     - Verify the address when the current contract's address changes (e.g., through a proxy or upgradeable contract).
+
+### General Invariants
+
+1. **Gas Consumption**:
+   - **Invariant**: The functions should not consume excessive gas.
+   - **Edge Cases**:
+     - Measure gas consumption for minimal `creationCode`.
+     - Measure gas consumption for complex `creationCode`.
+     - Measure gas consumption for different `salt` values.
+
+2. **Reentrancy**:
+   - **Invariant**: The functions should be resistant to reentrancy attacks.
+   - **Edge Cases**:
+     - Attempt reentrancy during the `deploy` function.
+     - Attempt reentrancy during the `getDeployed` functions.
+
+3. **State Preservation**:
+   - **Invariant**: The functions should not alter the state of the contract or the blockchain unexpectedly.
+   - **Edge Cases**:
+     - Verify that no state variables are modified.
+     - Verify that no unexpected ETH transfers occur.
+
+By covering these invariants and edge cases, we can ensure that the `CREATE3` library functions correctly and securely under various conditions.

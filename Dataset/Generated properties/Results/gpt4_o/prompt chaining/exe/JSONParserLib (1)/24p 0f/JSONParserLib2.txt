@@ -1,0 +1,108 @@
+To ensure the correctness and robustness of the `JSONParserLib` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Here are the test invariants for each functionality of the contract:
+
+### 1. Parsing JSON Strings
+- **Invariant 1.1**: Parsing a valid JSON string should not revert.
+  - Input: Valid JSON strings (e.g., `{"key": "value"}`, `[1, 2, 3]`, `true`, `null`).
+  - Expected: No revert, returns a valid `Item`.
+
+- **Invariant 1.2**: Parsing an invalid JSON string should revert with `ParsingFailed`.
+  - Input: Invalid JSON strings (e.g., `{"key": "value"`, `[1, 2, 3`, `tru`, `nul`).
+  - Expected: Reverts with `ParsingFailed`.
+
+### 2. Retrieving Values
+- **Invariant 2.1**: Retrieving the value of a string item should return the exact string representation.
+  - Input: JSON string with a string value (e.g., `{"key": "value"}`).
+  - Expected: Returns `"value"`.
+
+- **Invariant 2.2**: Retrieving the value of a number item should return the exact number representation.
+  - Input: JSON string with a number value (e.g., `{"key": 123}`).
+  - Expected: Returns `123`.
+
+- **Invariant 2.3**: Retrieving the value of a boolean item should return the exact boolean representation.
+  - Input: JSON string with a boolean value (e.g., `{"key": true}`).
+  - Expected: Returns `true`.
+
+- **Invariant 2.4**: Retrieving the value of a null item should return `null`.
+  - Input: JSON string with a null value (e.g., `{"key": null}`).
+  - Expected: Returns `null`.
+
+### 3. Retrieving Index and Key
+- **Invariant 3.1**: Retrieving the index of an item in an array should return the correct index.
+  - Input: JSON array (e.g., `[1, 2, 3]`).
+  - Expected: Index of each item matches its position in the array.
+
+- **Invariant 3.2**: Retrieving the key of an item in an object should return the correct key.
+  - Input: JSON object (e.g., `{"key": "value"}`).
+  - Expected: Key of the item matches the key in the object.
+
+### 4. Retrieving Children
+- **Invariant 4.1**: Retrieving children of an array should return all items in the array.
+  - Input: JSON array (e.g., `[1, 2, 3]`).
+  - Expected: Returns an array of items `[1, 2, 3]`.
+
+- **Invariant 4.2**: Retrieving children of an object should return all key-value pairs in the object.
+  - Input: JSON object (e.g., `{"key1": "value1", "key2": "value2"}`).
+  - Expected: Returns an array of items `["key1": "value1", "key2": "value2"]`.
+
+### 5. Retrieving Size
+- **Invariant 5.1**: Retrieving the size of an array should return the correct number of items.
+  - Input: JSON array (e.g., `[1, 2, 3]`).
+  - Expected: Returns `3`.
+
+- **Invariant 5.2**: Retrieving the size of an object should return the correct number of key-value pairs.
+  - Input: JSON object (e.g., `{"key1": "value1", "key2": "value2"}`).
+  - Expected: Returns `2`.
+
+### 6. Retrieving Items by Index or Key
+- **Invariant 6.1**: Retrieving an item by index in an array should return the correct item.
+  - Input: JSON array (e.g., `[1, 2, 3]`), index `1`.
+  - Expected: Returns `2`.
+
+- **Invariant 6.2**: Retrieving an item by key in an object should return the correct item.
+  - Input: JSON object (e.g., `{"key1": "value1", "key2": "value2"}`), key `"key2"`.
+  - Expected: Returns `"value2"`.
+
+### 7. Type Checking
+- **Invariant 7.1**: Checking the type of an item should return the correct type.
+  - Input: JSON items of various types (e.g., string, number, boolean, null, array, object).
+  - Expected: Returns the correct type constant (e.g., `TYPE_STRING`, `TYPE_NUMBER`).
+
+### 8. Parent Retrieval
+- **Invariant 8.1**: Retrieving the parent of an item should return the correct parent item.
+  - Input: Nested JSON objects and arrays.
+  - Expected: Returns the correct parent item for each child item.
+
+### 9. Utility Functions
+- **Invariant 9.1**: Parsing a valid unsigned integer string should return the correct uint256 value.
+  - Input: Valid uint256 strings (e.g., `"123"`, `"0"`, `"99999999999999999999999999999999999999"`).
+  - Expected: Returns the correct uint256 value.
+
+- **Invariant 9.2**: Parsing an invalid unsigned integer string should revert with `ParsingFailed`.
+  - Input: Invalid uint256 strings (e.g., `"abc"`, `"-123"`, `"123.45"`).
+  - Expected: Reverts with `ParsingFailed`.
+
+- **Invariant 9.3**: Parsing a valid signed integer string should return the correct int256 value.
+  - Input: Valid int256 strings (e.g., `"123"`, `"-123"`, `"0"`).
+  - Expected: Returns the correct int256 value.
+
+- **Invariant 9.4**: Parsing an invalid signed integer string should revert with `ParsingFailed`.
+  - Input: Invalid int256 strings (e.g., `"abc"`, `"123.45"`, `"--123"`).
+  - Expected: Reverts with `ParsingFailed`.
+
+- **Invariant 9.5**: Parsing a valid hexadecimal string should return the correct uint256 value.
+  - Input: Valid hexadecimal strings (e.g., `"0x1a"`, `"0XFF"`, `"123abc"`).
+  - Expected: Returns the correct uint256 value.
+
+- **Invariant 9.6**: Parsing an invalid hexadecimal string should revert with `ParsingFailed`.
+  - Input: Invalid hexadecimal strings (e.g., `"0x1g"`, `"0XZZ"`, `"123xyz"`).
+  - Expected: Reverts with `ParsingFailed`.
+
+- **Invariant 9.7**: Decoding a valid JSON encoded string should return the correct string.
+  - Input: Valid JSON encoded strings (e.g., `'"hello"'`, `'"world"'`).
+  - Expected: Returns the correct decoded string.
+
+- **Invariant 9.8**: Decoding an invalid JSON encoded string should revert with `ParsingFailed`.
+  - Input: Invalid JSON encoded strings (e.g., `'hello'`, `'"world'`).
+  - Expected: Reverts with `ParsingFailed`.
+
+These invariants cover the core functionalities and edge cases of the `JSONParserLib` smart contract, ensuring its correctness and robustness.

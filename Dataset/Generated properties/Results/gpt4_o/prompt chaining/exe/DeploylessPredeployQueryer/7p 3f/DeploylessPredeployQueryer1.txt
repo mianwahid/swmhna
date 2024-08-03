@@ -1,0 +1,58 @@
+The provided smart contract, `DeploylessPredeployQueryer`, is designed to be used in a deployless manner, meaning it is not intended to be deployed on the blockchain but rather used via a static `eth_call`. This contract is useful for querying predeploys and generating ERC-6492 compliant signatures. Below is a detailed explanation of its functionalities:
+
+### 1. Custom Error: `ReturnedAddressMismatch`
+```solidity
+error ReturnedAddressMismatch();
+```
+- **Functionality**: This custom error is defined to handle the scenario where the address returned by the factory does not match the provided target address. If this error is triggered, it indicates a mismatch in the expected and actual addresses.
+
+### 2. Constructor
+```solidity
+constructor(
+    address target,
+    bytes[] memory targetQueryCalldata,
+    address factory,
+    bytes memory factoryCalldata
+) payable
+```
+- **Parameters**:
+  - `target`: The address of the target contract to query.
+  - `targetQueryCalldata`: An array of calldata bytes to be used for querying the target contract.
+  - `factory`: The address of the factory contract responsible for deploying the target contract if it does not exist.
+  - `factoryCalldata`: The calldata to be used for calling the factory contract to deploy the target contract.
+
+- **Functionality**:
+  - **Check if Target Exists**: The constructor first checks if the target contract already exists using `extcodesize(target)`.
+  - **Deploy Target if Not Exists**: If the target contract does not exist, it calls the factory contract with the provided `factoryCalldata` to deploy the target contract.
+    - If the deployment fails, it reverts with the returned data.
+    - If the deployment succeeds, it checks if the returned address matches the provided target address. If not, it reverts with the `ReturnedAddressMismatch` error.
+  - **Query Target Contract**: The constructor then iterates over the `targetQueryCalldata` array and performs calls to the target contract with each calldata entry.
+    - It stores the results of these calls in memory.
+    - If any call fails, it reverts with the returned data.
+  - **Return Results**: Finally, it returns the results of the queries as an array of bytes.
+
+### Detailed Steps in Constructor
+1. **Memory Allocation**: Allocate memory for storing intermediate results.
+2. **Check Target Existence**: Use `extcodesize(target)` to check if the target contract is already deployed.
+3. **Deploy Target**:
+   - If the target does not exist, call the factory contract with `factoryCalldata`.
+   - Check if the deployment was successful and if the returned address matches the target address.
+   - If there is a mismatch, revert with `ReturnedAddressMismatch`.
+4. **Query Target**:
+   - Iterate over the `targetQueryCalldata` array.
+   - For each calldata entry, call the target contract and store the result in memory.
+   - If any call fails, revert with the returned data.
+5. **Return Results**:
+   - Store the results in memory as an array of bytes.
+   - Return the results.
+
+### Usage
+- **Deployless Nature**: This contract is not meant to be deployed on the blockchain. Instead, it is used via a static `eth_call` to perform queries on predeploys.
+- **ERC-6492 Compliance**: The contract can be useful for generating ERC-6492 compliant signatures, which are signatures that can be verified without requiring the contract to be deployed.
+
+### Example Usage
+- **Querying a Target Contract**: You can use this contract to query a target contract by providing the target address, the calldata for the queries, the factory address, and the factory calldata.
+- **Mock Deployment**: The contract can be mock deployed and used to perform static calls to check the state or behavior of a target contract without actually deploying it.
+
+### Summary
+The `DeploylessPredeployQueryer` contract is a utility for querying predeploys and generating compliant signatures without requiring actual deployment. It handles the deployment of the target contract if it does not exist, performs the necessary queries, and returns the results. The custom error `ReturnedAddressMismatch` ensures that the correct target address is used.

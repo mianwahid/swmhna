@@ -1,0 +1,375 @@
+To ensure the correctness and robustness of the `LibSort` library, we need to define test invariants for each functionality provided by the contract. These invariants will help us verify that the functions behave as expected under various edge cases. Below are the test invariants for each functionality:
+
+### Insertion Sort Functions
+
+1. **`insertionSort(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+
+2. **`insertionSort(int256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+     - Array with both positive and negative elements.
+
+3. **`insertionSort(address[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+
+### Intro-Quicksort Functions
+
+1. **`sort(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+
+2. **`sort(int256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+     - Array with both positive and negative elements.
+
+3. **`sort(address[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain the same elements as the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with already sorted elements.
+     - Array with elements in reverse order.
+
+### Other Useful Operations
+
+1. **`uniquifySorted(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain no duplicate elements.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with no duplicates.
+
+2. **`uniquifySorted(int256[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain no duplicate elements.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with no duplicates.
+     - Array with both positive and negative elements.
+
+3. **`uniquifySorted(address[] memory a)`**
+   - **Invariant 1**: The output array should be sorted in ascending order.
+   - **Invariant 2**: The output array should contain no duplicate elements.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all identical elements.
+     - Array with no duplicates.
+
+4. **`searchSorted(uint256[] memory a, uint256 needle)`**
+   - **Invariant 1**: If the needle is found, the returned index should point to the needle.
+   - **Invariant 2**: If the needle is not found, the returned index should be the nearest position where the needle could be inserted.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Needle is the smallest element.
+     - Needle is the largest element.
+     - Needle is not present in the array.
+
+5. **`searchSorted(int256[] memory a, int256 needle)`**
+   - **Invariant 1**: If the needle is found, the returned index should point to the needle.
+   - **Invariant 2**: If the needle is not found, the returned index should be the nearest position where the needle could be inserted.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Needle is the smallest element.
+     - Needle is the largest element.
+     - Needle is not present in the array.
+     - Needle is a negative number.
+
+6. **`searchSorted(address[] memory a, address needle)`**
+   - **Invariant 1**: If the needle is found, the returned index should point to the needle.
+   - **Invariant 2**: If the needle is not found, the returned index should be the nearest position where the needle could be inserted.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Needle is the smallest address.
+     - Needle is the largest address.
+     - Needle is not present in the array.
+
+7. **`reverse(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be the reverse of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+8. **`reverse(int256[] memory a)`**
+   - **Invariant 1**: The output array should be the reverse of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+9. **`reverse(address[] memory a)`**
+   - **Invariant 1**: The output array should be the reverse of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+10. **`copy(uint256[] memory a)`**
+    - **Invariant 1**: The output array should be identical to the input array.
+    - **Invariant 2**: Modifying the output array should not affect the input array.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+
+11. **`copy(int256[] memory a)`**
+    - **Invariant 1**: The output array should be identical to the input array.
+    - **Invariant 2**: Modifying the output array should not affect the input array.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+
+12. **`copy(address[] memory a)`**
+    - **Invariant 1**: The output array should be identical to the input array.
+    - **Invariant 2**: Modifying the output array should not affect the input array.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+
+13. **`isSorted(uint256[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted in ascending order.
+    - **Invariant 2**: The function should return `false` if the array is not sorted in ascending order.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+14. **`isSorted(int256[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted in ascending order.
+    - **Invariant 2**: The function should return `false` if the array is not sorted in ascending order.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+15. **`isSorted(address[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted in ascending order.
+    - **Invariant 2**: The function should return `false` if the array is not sorted in ascending order.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+16. **`isSortedAndUniquified(uint256[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted and contains no duplicates.
+    - **Invariant 2**: The function should return `false` if the array is not sorted or contains duplicates.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+17. **`isSortedAndUniquified(int256[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted and contains no duplicates.
+    - **Invariant 2**: The function should return `false` if the array is not sorted or contains duplicates.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+18. **`isSortedAndUniquified(address[] memory a)`**
+    - **Invariant 1**: The function should return `true` if the array is sorted and contains no duplicates.
+    - **Invariant 2**: The function should return `false` if the array is not sorted or contains duplicates.
+    - **Edge Cases**:
+      - Empty array.
+      - Single element array.
+      - Array with all identical elements.
+      - Array with elements in reverse order.
+
+19. **`difference(uint256[] memory a, uint256[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in `a` but not in `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+20. **`difference(int256[] memory a, int256[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in `a` but not in `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+21. **`difference(address[] memory a, address[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in `a` but not in `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+22. **`intersection(uint256[] memory a, uint256[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+23. **`intersection(int256[] memory a, int256[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+24. **`intersection(address[] memory a, address[] memory b)`**
+    - **Invariant 1**: The output array should contain elements that are in both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+25. **`union(uint256[] memory a, uint256[] memory b)`**
+    - **Invariant 1**: The output array should contain all unique elements from both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+26. **`union(int256[] memory a, int256[] memory b)`**
+    - **Invariant 1**: The output array should contain all unique elements from both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+27. **`union(address[] memory a, address[] memory b)`**
+    - **Invariant 1**: The output array should contain all unique elements from both `a` and `b`.
+    - **Invariant 2**: The output array should be sorted in ascending order.
+    - **Edge Cases**:
+      - Both arrays are empty.
+      - One array is empty.
+      - Both arrays are identical.
+      - No common elements between the arrays.
+
+### Private Helper Functions
+
+1. **`_toUints(int256[] memory a)`**
+   - **Invariant 1**: The output array should be a reinterpret cast of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+2. **`_toUints(address[] memory a)`**
+   - **Invariant 1**: The output array should be a reinterpret cast of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+3. **`_toInts(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be a reinterpret cast of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+4. **`_toAddresses(uint256[] memory a)`**
+   - **Invariant 1**: The output array should be a reinterpret cast of the input array.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+
+5. **`_flipSign(int256[] memory a)`**
+   - **Invariant 1**: The output array should have the sign of each element flipped.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Array with all positive elements.
+     - Array with all negative elements.
+
+6. **`_searchSorted(uint256[] memory a, uint256 needle, uint256 signed)`**
+   - **Invariant 1**: If the needle is found, the returned index should point to the needle.
+   - **Invariant 2**: If the needle is not found, the returned index should be the nearest position where the needle could be inserted.
+   - **Edge Cases**:
+     - Empty array.
+     - Single element array.
+     - Needle is the smallest element.
+     - Needle is the largest element.
+     - Needle is not present in the array.
+
+7. **`_difference(uint256[] memory a, uint256[] memory b, uint256 signed)`**
+   - **Invariant 1**: The output array should contain elements that are in `a` but not in `b`.
+   - **Invariant 2**: The output array should be sorted in ascending order.
+   - **Edge Cases**:
+     - Both arrays are empty.
+     - One array is empty.
+     - Both arrays are identical.
+     - No common elements between the arrays.
+
+8. **`_intersection(uint256[] memory a, uint256[] memory b, uint256 signed)`**
+   - **Invariant 1**: The output array should contain elements that are in both `a` and `b`.
+   - **Invariant 2**: The output array should be sorted in ascending order.
+   - **Edge Cases**:
+     - Both arrays are empty.
+     - One array is empty.
+     - Both arrays are identical.
+     - No common elements between the arrays.
+
+9. **`_union(uint256[] memory a, uint256[] memory b, uint256 signed)`**
+   - **Invariant 1**: The output array should contain all unique elements from both `a` and `b`.
+   - **Invariant 2**: The output array should be sorted in ascending order.
+   - **Edge Cases**:
+     - Both arrays are empty.
+     - One array is empty.
+     - Both arrays are identical.
+     - No common elements between the arrays.
+
+These test invariants cover a wide range of edge cases and ensure that the `LibSort` library functions correctly under various conditions.

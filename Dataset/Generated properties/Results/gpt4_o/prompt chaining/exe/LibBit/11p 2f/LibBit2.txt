@@ -1,0 +1,78 @@
+To ensure the correctness and robustness of the `LibBit` library, we need to write test invariants for each function. These invariants will cover various edge cases and typical scenarios to validate the expected behavior of the functions. Below are the test invariants for each function:
+
+### Bit Twiddling Operations
+
+1. **`fls(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be 256.
+   - **Invariant 2**: For any non-zero `x`, the result should be between 0 and 255.
+   - **Invariant 3**: For `x = 2^n`, the result should be `n`.
+   - **Invariant 4**: For `x = 2^n - 1`, the result should be `n-1`.
+
+2. **`clz(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be 256.
+   - **Invariant 2**: For any non-zero `x`, the result should be between 0 and 255.
+   - **Invariant 3**: For `x = 2^n`, the result should be `255 - n`.
+   - **Invariant 4**: For `x = 2^n - 1`, the result should be `256 - n`.
+
+3. **`ffs(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be 256.
+   - **Invariant 2**: For any non-zero `x`, the result should be between 0 and 255.
+   - **Invariant 3**: For `x = 2^n`, the result should be `n`.
+   - **Invariant 4**: For `x = 2^n - 1`, the result should be 0.
+
+4. **`popCount(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be 0.
+   - **Invariant 2**: For `x = 2^n`, the result should be 1.
+   - **Invariant 3**: For `x = 2^n - 1`, the result should be `n`.
+   - **Invariant 4**: For `x = 2^255`, the result should be 1.
+
+5. **`isPo2(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be false.
+   - **Invariant 2**: For `x = 2^n`, the result should be true.
+   - **Invariant 3**: For `x = 2^n - 1`, the result should be false.
+   - **Invariant 4**: For `x = 2^n + 1`, the result should be false.
+
+6. **`reverseBits(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be zero.
+   - **Invariant 2**: If `x` is `2^n`, the result should be `2^(255-n)`.
+   - **Invariant 3**: If `x` is `2^255`, the result should be 1.
+   - **Invariant 4**: If `x` is `2^255 + 1`, the result should be `2^255 + 1`.
+
+7. **`reverseBytes(uint256 x)`**
+   - **Invariant 1**: If `x` is zero, the result should be zero.
+   - **Invariant 2**: If `x` is `0x0102030405060708`, the result should be `0x0807060504030201`.
+   - **Invariant 3**: If `x` is `0xFFFFFFFFFFFFFFFF`, the result should be `0xFFFFFFFFFFFFFFFF`.
+   - **Invariant 4**: If `x` is `0x0000000000000001`, the result should be `0x0100000000000000`.
+
+### Boolean Operations
+
+1. **`rawAnd(bool x, bool y)`**
+   - **Invariant 1**: If both `x` and `y` are true, the result should be true.
+   - **Invariant 2**: If either `x` or `y` is false, the result should be false.
+   - **Invariant 3**: If both `x` and `y` are false, the result should be false.
+
+2. **`and(bool x, bool y)`**
+   - **Invariant 1**: If both `x` and `y` are true, the result should be true.
+   - **Invariant 2**: If either `x` or `y` is false, the result should be false.
+   - **Invariant 3**: If both `x` and `y` are false, the result should be false.
+
+3. **`rawOr(bool x, bool y)`**
+   - **Invariant 1**: If both `x` and `y` are true, the result should be true.
+   - **Invariant 2**: If either `x` or `y` is true, the result should be true.
+   - **Invariant 3**: If both `x` and `y` are false, the result should be false.
+
+4. **`or(bool x, bool y)`**
+   - **Invariant 1**: If both `x` and `y` are true, the result should be true.
+   - **Invariant 2**: If either `x` or `y` is true, the result should be true.
+   - **Invariant 3**: If both `x` and `y` are false, the result should be false.
+
+5. **`rawToUint(bool b)`**
+   - **Invariant 1**: If `b` is true, the result should be 1.
+   - **Invariant 2**: If `b` is false, the result should be 0.
+
+6. **`toUint(bool b)`**
+   - **Invariant 1**: If `b` is true, the result should be 1.
+   - **Invariant 2**: If `b` is false, the result should be 0.
+
+### Summary
+These test invariants cover a wide range of edge cases and typical scenarios for each function in the `LibBit` library. By implementing these invariants in your test suite, you can ensure that the library functions correctly and handles various inputs as expected.

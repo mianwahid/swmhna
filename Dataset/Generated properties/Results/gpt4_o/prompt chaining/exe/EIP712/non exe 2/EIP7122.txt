@@ -1,0 +1,80 @@
+To ensure the robustness and correctness of the provided EIP-712 smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for the functionalities of the given contract:
+
+### 1. Domain Separator Invariants
+
+#### Invariant 1: Cached Domain Separator Consistency
+- **Description**: The cached domain separator should remain consistent if the domain name and version do not change and the chain ID and contract address remain the same.
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainSeparator()` and store the result.
+  - Call `_domainSeparator()` again and ensure the result is the same as the stored result.
+
+#### Invariant 2: Domain Separator Recalculation on Chain ID Change
+- **Description**: The domain separator should be recalculated if the chain ID changes.
+- **Test**:
+  - Deploy the contract.
+  - Simulate a chain ID change (this might require a mock or a forked chain).
+  - Call `_domainSeparator()` and ensure it is different from the cached domain separator.
+
+#### Invariant 3: Domain Separator Recalculation on Contract Address Change
+- **Description**: The domain separator should be recalculated if the contract address changes (e.g., in a proxy setup).
+- **Test**:
+  - Deploy the contract.
+  - Simulate a contract address change (this might require a proxy setup).
+  - Call `_domainSeparator()` and ensure it is different from the cached domain separator.
+
+### 2. Hashing Operations Invariants
+
+#### Invariant 4: Typed Data Hash Consistency
+- **Description**: The hash of the fully encoded EIP-712 message should be consistent for the same input.
+- **Test**:
+  - Deploy the contract.
+  - Call `_hashTypedData()` with a specific `structHash` and store the result.
+  - Call `_hashTypedData()` again with the same `structHash` and ensure the result is the same as the stored result.
+
+#### Invariant 5: Typed Data Hash Recalculation on Domain Separator Change
+- **Description**: The hash of the fully encoded EIP-712 message should change if the domain separator changes.
+- **Test**:
+  - Deploy the contract.
+  - Call `_hashTypedData()` with a specific `structHash` and store the result.
+  - Simulate a domain separator change (e.g., by changing the chain ID or contract address).
+  - Call `_hashTypedData()` again with the same `structHash` and ensure the result is different from the stored result.
+
+### 3. EIP-5267 Operations Invariants
+
+#### Invariant 6: EIP-712 Domain Details Consistency
+- **Description**: The EIP-712 domain details should be consistent with the contract's state.
+- **Test**:
+  - Deploy the contract.
+  - Call `eip712Domain()` and store the result.
+  - Ensure the returned `name` and `version` match the values from `_domainNameAndVersion()`.
+  - Ensure the returned `chainId` matches `block.chainid`.
+  - Ensure the returned `verifyingContract` matches `address(this)`.
+
+### 4. Override Function Invariants
+
+#### Invariant 7: Domain Name and Version Override
+- **Description**: The domain name and version should be correctly overridden by derived contracts.
+- **Test**:
+  - Create a derived contract that overrides `_domainNameAndVersion()` to return specific values.
+  - Deploy the derived contract.
+  - Call `_domainNameAndVersion()` and ensure the returned values match the overridden values.
+
+#### Invariant 8: Domain Name and Version Changeability
+- **Description**: The domain name and version should be changeable if `_domainNameAndVersionMayChange()` returns true.
+- **Test**:
+  - Create a derived contract that overrides `_domainNameAndVersionMayChange()` to return true and allows changing the domain name and version.
+  - Deploy the derived contract.
+  - Change the domain name and version.
+  - Call `_domainNameAndVersion()` and ensure the returned values match the new values.
+
+### 5. Private Helper Invariants
+
+#### Invariant 9: Cached Domain Separator Invalidated
+- **Description**: The cached domain separator should be invalidated if the chain ID or contract address changes.
+- **Test**:
+  - Deploy the contract.
+  - Simulate a chain ID change or contract address change.
+  - Call `_cachedDomainSeparatorInvalidated()` and ensure it returns true.
+
+By implementing these test invariants, we can thoroughly verify the correctness and robustness of the EIP-712 smart contract under various conditions and edge cases.

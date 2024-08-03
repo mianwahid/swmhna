@@ -1,0 +1,7 @@
+    [
+        {"input": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.13;\ncontract Safe {\n // contract body}",
+          "output": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.13;\n\nimport {Test, console2} from \"forge-std/Test.sol\";\nimport {Safe} from \"../src/Safe.sol\";\n\ncontract SafeTest is Test {\n // test functions}"},
+
+        {"input": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.13;\n\ncontract Counter {\n // contract body}",
+          "output": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.13;\n\nimport {Test, console2} from \"forge-std/Test.sol\";\nimport {Counter} from \"../src/Counter.sol\";\n\ncontract CounterTest is Test {\n // test functions}"}
+    ]

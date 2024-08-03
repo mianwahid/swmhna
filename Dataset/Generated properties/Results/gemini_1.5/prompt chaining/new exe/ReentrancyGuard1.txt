@@ -1,0 +1,24 @@
+This smart contract implements two functionalities, both related to preventing reentrancy attacks:
+
+**1. `nonReentrant` Modifier:**
+
+* **Purpose:** This modifier is designed to prevent reentrancy attacks on functions that modify the contract's state. 
+* **Mechanism:**
+    * **Entry Check:** At the beginning of the function execution, it checks if the `_REENTRANCY_GUARD_SLOT` storage slot is empty (contains the zero address). 
+        * If empty, it means no other function is currently executing, so it allows the function to proceed.
+        * If not empty, it means another function is already executing, and it throws a `Reentrancy` error, preventing the reentrant call.
+    * **Locking:** After the entry check, it sets the `_REENTRANCY_GUARD_SLOT` to the current contract's address, effectively "locking" the contract.
+    * **Unlocking:** After the function's logic (`_` represents the function's code), it resets the `_REENTRANCY_GUARD_SLOT` to the contract's code size. This "unlocks" the contract, allowing other functions to execute.
+* **Usage:** You would apply this modifier to any function that modifies the contract's state, like transferring funds, updating balances, or changing important variables.
+
+**2. `nonReadReentrant` Modifier:**
+
+* **Purpose:** This modifier is a lighter version of `nonReentrant` specifically designed for view functions (functions that only read data and don't modify the contract's state).
+* **Mechanism:**
+    * **Entry Check:** Similar to `nonReentrant`, it checks if the `_REENTRANCY_GUARD_SLOT` is empty. If not, it throws a `Reentrancy` error.
+* **Key Difference:** Unlike `nonReentrant`, it doesn't "lock" and "unlock" the contract because view functions are not supposed to modify the state. It only performs the entry check to prevent reentrancy within read-only operations.
+* **Usage:** You would apply this modifier to view functions that might be vulnerable to reentrancy attacks, especially if they interact with other contracts or rely on external data that could be manipulated.
+
+**Explanation of Reentrancy Attacks:**
+
+Reentrancy attacks occur when a malicious contract calls back into a function that hasn't finished executing, potentially manipulating the contract's state in an unintended way. These modifiers act as safeguards by preventing a function from being called again while it's still in progress.

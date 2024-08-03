@@ -1,0 +1,107 @@
+To ensure the robustness and correctness of the `MetadataReaderLib` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for the functionalities of the given contract:
+
+### Invariants for `readName` Functions
+
+1. **Invariant: Empty String on Revert**
+   - **Description:** If the target contract reverts when calling `name()`, the function should return an empty string.
+   - **Edge Case:** Target contract reverts.
+
+2. **Invariant: Empty String on No Return Data**
+   - **Description:** If the target contract does not return any data when calling `name()`, the function should return an empty string.
+   - **Edge Case:** Target contract returns no data.
+
+3. **Invariant: Correct String Truncation**
+   - **Description:** If the returned string exceeds the specified limit, it should be truncated to the limit.
+   - **Edge Case:** Returned string length > limit.
+
+4. **Invariant: Correct String with Null Byte**
+   - **Description:** If the returned string contains a null byte, it should be interpreted as a null-terminated string.
+   - **Edge Case:** Returned string contains '\0'.
+
+5. **Invariant: Correct Gas Stipend Handling**
+   - **Description:** The function should handle the specified gas stipend correctly and not revert if sufficient gas is provided.
+   - **Edge Case:** Different gas stipends.
+
+### Invariants for `readSymbol` Functions
+
+1. **Invariant: Empty String on Revert**
+   - **Description:** If the target contract reverts when calling `symbol()`, the function should return an empty string.
+   - **Edge Case:** Target contract reverts.
+
+2. **Invariant: Empty String on No Return Data**
+   - **Description:** If the target contract does not return any data when calling `symbol()`, the function should return an empty string.
+   - **Edge Case:** Target contract returns no data.
+
+3. **Invariant: Correct String Truncation**
+   - **Description:** If the returned string exceeds the specified limit, it should be truncated to the limit.
+   - **Edge Case:** Returned string length > limit.
+
+4. **Invariant: Correct String with Null Byte**
+   - **Description:** If the returned string contains a null byte, it should be interpreted as a null-terminated string.
+   - **Edge Case:** Returned string contains '\0'.
+
+5. **Invariant: Correct Gas Stipend Handling**
+   - **Description:** The function should handle the specified gas stipend correctly and not revert if sufficient gas is provided.
+   - **Edge Case:** Different gas stipends.
+
+### Invariants for `readString` Functions
+
+1. **Invariant: Empty String on Revert**
+   - **Description:** If the target contract reverts when calling the function with provided calldata, the function should return an empty string.
+   - **Edge Case:** Target contract reverts.
+
+2. **Invariant: Empty String on No Return Data**
+   - **Description:** If the target contract does not return any data when calling the function with provided calldata, the function should return an empty string.
+   - **Edge Case:** Target contract returns no data.
+
+3. **Invariant: Correct String Truncation**
+   - **Description:** If the returned string exceeds the specified limit, it should be truncated to the limit.
+   - **Edge Case:** Returned string length > limit.
+
+4. **Invariant: Correct String with Null Byte**
+   - **Description:** If the returned string contains a null byte, it should be interpreted as a null-terminated string.
+   - **Edge Case:** Returned string contains '\0'.
+
+5. **Invariant: Correct Gas Stipend Handling**
+   - **Description:** The function should handle the specified gas stipend correctly and not revert if sufficient gas is provided.
+   - **Edge Case:** Different gas stipends.
+
+### Invariants for `readDecimals` Functions
+
+1. **Invariant: Zero on Revert**
+   - **Description:** If the target contract reverts when calling `decimal()`, the function should return zero.
+   - **Edge Case:** Target contract reverts.
+
+2. **Invariant: Zero on No Return Data**
+   - **Description:** If the target contract does not return any data when calling `decimal()`, the function should return zero.
+   - **Edge Case:** Target contract returns no data.
+
+3. **Invariant: Correct Gas Stipend Handling**
+   - **Description:** The function should handle the specified gas stipend correctly and not revert if sufficient gas is provided.
+   - **Edge Case:** Different gas stipends.
+
+### Invariants for `readUint` Functions
+
+1. **Invariant: Zero on Revert**
+   - **Description:** If the target contract reverts when calling the function with provided calldata, the function should return zero.
+   - **Edge Case:** Target contract reverts.
+
+2. **Invariant: Zero on No Return Data**
+   - **Description:** If the target contract does not return any data when calling the function with provided calldata, the function should return zero.
+   - **Edge Case:** Target contract returns no data.
+
+3. **Invariant: Correct Gas Stipend Handling**
+   - **Description:** The function should handle the specified gas stipend correctly and not revert if sufficient gas is provided.
+   - **Edge Case:** Different gas stipends.
+
+### General Invariants
+
+1. **Invariant: Memory Safety**
+   - **Description:** The functions should not cause memory corruption or access out-of-bounds memory.
+   - **Edge Case:** Large data sizes, invalid memory access.
+
+2. **Invariant: Gas Efficiency**
+   - **Description:** The functions should be gas-efficient and not consume excessive gas for typical use cases.
+   - **Edge Case:** Large data sizes, complex calldata.
+
+By testing these invariants, we can ensure that the `MetadataReaderLib` library functions correctly and robustly under various edge cases and conditions.

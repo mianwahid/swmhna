@@ -1,0 +1,57 @@
+## MinHeapLib Smart Contract Functionalities Explained
+
+This smart contract implements a MinHeap data structure in Solidity, offering functionalities for both storage and memory-based heaps. Here's a breakdown of each function:
+
+**1. Custom Errors:**
+
+- **HeapIsEmpty():** This error is thrown whenever an operation requiring a non-empty heap is performed on an empty heap.
+
+**2. Structs:**
+
+- **Heap:** Represents a min-heap stored in persistent storage. It contains a single field:
+    - `data`: A dynamic array of `uint256` values representing the heap elements.
+- **MemHeap:** Represents a min-heap stored in memory. Similar to `Heap`, it contains:
+    - `data`: A dynamic array of `uint256` values representing the heap elements.
+
+**3. Operations:**
+
+**General Heap Operations:**
+
+- **root(Heap storage heap):** Returns the minimum value (root) of the heap stored in storage. Reverts with `HeapIsEmpty` if the heap is empty.
+- **root(MemHeap memory heap):** Returns the minimum value (root) of the heap stored in memory. Reverts with `HeapIsEmpty` if the heap is empty.
+- **reserve(MemHeap memory heap, uint256 minimum):** Reserves at least `minimum` slots of memory for the `MemHeap`. This helps avoid costly reallocations if the maximum size of the heap is known beforehand.
+- **length(Heap storage heap):** Returns the number of elements in the heap stored in storage.
+- **length(MemHeap memory heap):** Returns the number of elements in the heap stored in memory.
+
+**Heap Modification Operations:**
+
+- **push(Heap storage heap, uint256 value):** Pushes a new `value` onto the min-heap stored in storage.
+- **push(MemHeap memory heap, uint256 value):** Pushes a new `value` onto the min-heap stored in memory.
+- **pop(Heap storage heap):** Removes and returns the minimum value (root) from the heap stored in storage. Reverts with `HeapIsEmpty` if the heap is empty.
+- **pop(MemHeap memory heap):** Removes and returns the minimum value (root) from the heap stored in memory. Reverts with `HeapIsEmpty` if the heap is empty.
+- **pushPop(Heap storage heap, uint256 value):** Pushes a new `value` onto the heap and then removes and returns the minimum value. This is more efficient than separate `push` and `pop` calls.
+- **pushPop(MemHeap memory heap, uint256 value):** Pushes a new `value` onto the heap and then removes and returns the minimum value. This is more efficient than separate `push` and `pop` calls.
+- **replace(Heap storage heap, uint256 value):** Replaces the minimum value (root) with the new `value` and returns the original minimum value. Reverts with `HeapIsEmpty` if the heap is empty.
+- **replace(MemHeap memory heap, uint256 value):** Replaces the minimum value (root) with the new `value` and returns the original minimum value. Reverts with `HeapIsEmpty` if the heap is empty.
+
+**Bounded Priority Queue Operations:**
+
+- **enqueue(Heap storage heap, uint256 value, uint256 maxLength):** This function implements a bounded priority queue functionality. It attempts to push the `value` onto the heap. If the heap is full (length equals `maxLength`), it only pushes the `value` if it's smaller than the current minimum, replacing the minimum in the process. It returns three values:
+    - `success`: Boolean indicating if the `value` was successfully enqueued.
+    - `hasPopped`: Boolean indicating if a value was popped to make room for the new `value`.
+    - `popped`: The value that was popped, if any.
+- **enqueue(MemHeap memory heap, uint256 value, uint256 maxLength):** This function provides the same bounded priority queue functionality as its storage counterpart but operates on a `MemHeap` instead.
+
+**4. Private Helpers:**
+
+- **_set(Heap storage heap, uint256 value, uint256 maxLength, uint256 mode):** This internal helper function handles the core logic for various heap operations based on the provided `mode`. It optimizes for code conciseness and bytecode efficiency.
+- **_set(MemHeap memory heap, uint256 value, uint256 maxLength, uint256 mode):** This internal helper function mirrors the functionality of its storage counterpart but operates on a `MemHeap` instead.
+
+**Key Takeaways:**
+
+- This contract provides a versatile implementation of a min-heap data structure in Solidity.
+- It supports both storage and memory-based heaps, allowing developers to choose the appropriate option based on their needs.
+- The contract offers a comprehensive set of operations for managing the heap, including insertion, deletion, retrieval, and bounded priority queue functionality.
+- The internal `_set` function optimizes the code for efficiency and reduces gas costs.
+
+This detailed explanation should provide a clear understanding of the functionalities offered by the `MinHeapLib` smart contract.

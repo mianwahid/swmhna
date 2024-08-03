@@ -1,0 +1,84 @@
+To ensure the correctness and robustness of the `LibBit` library, we need to write test invariants for each function. These invariants will cover various edge cases and typical scenarios to validate the expected behavior of the functions. Below are the test invariants for each function:
+
+### Bit Twiddling Operations
+
+1. **`fls(uint256 x) -> uint256 r`**
+   - **Invariant 1**: If `x` is zero, `r` should be 256.
+   - **Invariant 2**: For any non-zero `x`, `r` should be less than 256.
+   - **Invariant 3**: For `x = 1`, `r` should be 0.
+   - **Invariant 4**: For `x = 2^255`, `r` should be 255.
+   - **Invariant 5**: For `x = 2^n - 1` (where `n` is any integer from 1 to 256), `r` should be `n-1`.
+
+2. **`clz(uint256 x) -> uint256 r`**
+   - **Invariant 1**: If `x` is zero, `r` should be 256.
+   - **Invariant 2**: For any non-zero `x`, `r` should be less than 256.
+   - **Invariant 3**: For `x = 1`, `r` should be 255.
+   - **Invariant 4**: For `x = 2^255`, `r` should be 0.
+   - **Invariant 5**: For `x = 2^n - 1` (where `n` is any integer from 1 to 256), `r` should be `256 - n`.
+
+3. **`ffs(uint256 x) -> uint256 r`**
+   - **Invariant 1**: If `x` is zero, `r` should be 256.
+   - **Invariant 2**: For any non-zero `x`, `r` should be less than 256.
+   - **Invariant 3**: For `x = 1`, `r` should be 0.
+   - **Invariant 4**: For `x = 2^255`, `r` should be 255.
+   - **Invariant 5**: For `x = 2^n` (where `n` is any integer from 0 to 255), `r` should be `n`.
+
+4. **`popCount(uint256 x) -> uint256 c`**
+   - **Invariant 1**: If `x` is zero, `c` should be 0.
+   - **Invariant 2**: For `x = 2^n` (where `n` is any integer from 0 to 255), `c` should be 1.
+   - **Invariant 3**: For `x = 2^256 - 1`, `c` should be 256.
+   - **Invariant 4**: For `x = 2^n - 1` (where `n` is any integer from 1 to 256), `c` should be `n`.
+
+5. **`isPo2(uint256 x) -> bool result`**
+   - **Invariant 1**: If `x` is zero, `result` should be false.
+   - **Invariant 2**: For `x = 2^n` (where `n` is any integer from 0 to 255), `result` should be true.
+   - **Invariant 3**: For `x = 2^n - 1` (where `n` is any integer from 2 to 256), `result` should be false.
+   - **Invariant 4**: For `x = 2^256 - 1`, `result` should be false.
+
+6. **`reverseBits(uint256 x) -> uint256 r`**
+   - **Invariant 1**: If `x` is zero, `r` should be zero.
+   - **Invariant 2**: For `x = 2^n` (where `n` is any integer from 0 to 255), `r` should be `2^(255-n)`.
+   - **Invariant 3**: For `x = 2^256 - 1`, `r` should be `2^256 - 1`.
+   - **Invariant 4**: For `x = 0xF0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0`, `r` should be `0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F`.
+
+7. **`reverseBytes(uint256 x) -> uint256 r`**
+   - **Invariant 1**: If `x` is zero, `r` should be zero.
+   - **Invariant 2**: For `x = 0x0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20`, `r` should be `0x201F1E1D1C1B1A191817161514131211100F0E0D0C0B0A090807060504030201`.
+   - **Invariant 3**: For `x = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`, `r` should be `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`.
+
+### Boolean Operations
+
+1. **`rawAnd(bool x, bool y) -> bool z`**
+   - **Invariant 1**: For `x = true` and `y = true`, `z` should be true.
+   - **Invariant 2**: For `x = true` and `y = false`, `z` should be false.
+   - **Invariant 3**: For `x = false` and `y = true`, `z` should be false.
+   - **Invariant 4**: For `x = false` and `y = false`, `z` should be false.
+
+2. **`and(bool x, bool y) -> bool z`**
+   - **Invariant 1**: For `x = true` and `y = true`, `z` should be true.
+   - **Invariant 2**: For `x = true` and `y = false`, `z` should be false.
+   - **Invariant 3**: For `x = false` and `y = true`, `z` should be false.
+   - **Invariant 4**: For `x = false` and `y = false`, `z` should be false.
+
+3. **`rawOr(bool x, bool y) -> bool z`**
+   - **Invariant 1**: For `x = true` and `y = true`, `z` should be true.
+   - **Invariant 2**: For `x = true` and `y = false`, `z` should be true.
+   - **Invariant 3**: For `x = false` and `y = true`, `z` should be true.
+   - **Invariant 4**: For `x = false` and `y = false`, `z` should be false.
+
+4. **`or(bool x, bool y) -> bool z`**
+   - **Invariant 1**: For `x = true` and `y = true`, `z` should be true.
+   - **Invariant 2**: For `x = true` and `y = false`, `z` should be true.
+   - **Invariant 3**: For `x = false` and `y = true`, `z` should be true.
+   - **Invariant 4**: For `x = false` and `y = false`, `z` should be false.
+
+5. **`rawToUint(bool b) -> uint256 z`**
+   - **Invariant 1**: For `b = true`, `z` should be 1.
+   - **Invariant 2**: For `b = false`, `z` should be 0.
+
+6. **`toUint(bool b) -> uint256 z`**
+   - **Invariant 1**: For `b = true`, `z` should be 1.
+   - **Invariant 2**: For `b = false`, `z` should be 0.
+
+### Summary
+These test invariants cover a wide range of edge cases and typical scenarios for each function in the `LibBit` library. By implementing these invariants in your test suite, you can ensure that the library functions correctly and handles various inputs as expected.

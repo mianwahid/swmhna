@@ -1,0 +1,46 @@
+To ensure the robustness and correctness of the `SSTORE2` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for the `SSTORE2` library:
+
+### Write Logic Invariants
+
+1. **Invariant for `write` Function:**
+   - **Deployment Success:** Ensure that the `write` function successfully deploys a contract and returns a valid address.
+   - **Data Integrity:** Verify that the data written to the contract is correctly stored and can be retrieved without any corruption.
+   - **Gas Limit:** Ensure that the function reverts if the data size exceeds the maximum contract size limit (24,576 bytes).
+   - **Deployment Failure:** Ensure that the function reverts with `DeploymentFailed` error if the contract deployment fails.
+
+2. **Invariant for `writeDeterministic` Function:**
+   - **Deterministic Address:** Ensure that the `writeDeterministic` function deploys a contract at a deterministic address derived from the provided `salt`.
+   - **Data Integrity:** Verify that the data written to the contract is correctly stored and can be retrieved without any corruption.
+   - **Gas Limit:** Ensure that the function reverts if the data size exceeds the maximum contract size limit (24,576 bytes).
+   - **Deployment Failure:** Ensure that the function reverts with `DeploymentFailed` error if the contract deployment fails.
+
+3. **Invariant for `initCodeHash` Function:**
+   - **Correct Hash Calculation:** Ensure that the `initCodeHash` function returns the correct initialization code hash for the provided data.
+   - **Data Integrity:** Verify that the hash is consistent and matches the expected value for the given data.
+
+4. **Invariant for `predictDeterministicAddress` Function:**
+   - **Correct Address Prediction:** Ensure that the `predictDeterministicAddress` function returns the correct predicted address for the provided data, salt, and deployer.
+   - **Address Consistency:** Verify that the predicted address is consistent and matches the expected value for the given inputs.
+
+### Read Logic Invariants
+
+1. **Invariant for `read` Function:**
+   - **Valid Pointer:** Ensure that the `read` function correctly reads data from a valid storage contract address.
+   - **Invalid Pointer:** Ensure that the function reverts with `InvalidPointer` error if the provided address is not a valid storage contract.
+   - **Data Integrity:** Verify that the data read from the contract matches the data that was originally written.
+   - **Empty Data:** Ensure that the function correctly handles and returns an empty byte array if the contract contains no data.
+
+2. **Invariant for `read` Function with Start Index:**
+   - **Valid Pointer and Start Index:** Ensure that the `read` function correctly reads data from a valid storage contract address starting from the specified index.
+   - **Invalid Pointer:** Ensure that the function reverts with `InvalidPointer` error if the provided address is not a valid storage contract.
+   - **Out of Bounds Start Index:** Ensure that the function reverts with `ReadOutOfBounds` error if the start index is out of bounds.
+   - **Data Integrity:** Verify that the data read from the contract matches the expected data starting from the specified index.
+
+3. **Invariant for `read` Function with Start and End Indices:**
+   - **Valid Pointer and Indices:** Ensure that the `read` function correctly reads data from a valid storage contract address within the specified range.
+   - **Invalid Pointer:** Ensure that the function reverts with `InvalidPointer` error if the provided address is not a valid storage contract.
+   - **Out of Bounds Indices:** Ensure that the function reverts with `ReadOutOfBounds` error if the start or end index is out of bounds or if the start index is greater than the end index.
+   - **Data Integrity:** Verify that the data read from the contract matches the expected data within the specified range.
+
+### Summary
+These test invariants cover various edge cases and ensure the correctness and robustness of the `SSTORE2` library's functionalities. By implementing these invariants in a test suite, we can validate that the library behaves as expected under different scenarios and handles potential errors gracefully.

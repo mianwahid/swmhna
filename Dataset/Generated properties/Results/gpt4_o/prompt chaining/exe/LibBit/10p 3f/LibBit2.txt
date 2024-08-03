@@ -1,0 +1,89 @@
+To ensure the correctness and robustness of the `LibBit` library, we need to define test invariants for each function. These invariants will cover various edge cases and typical scenarios to validate the functionality of the library. Below are the test invariants for each function:
+
+### Bit Twiddling Operations
+
+1. **`fls(uint256 x)`**
+   - **Invariant 1**: `fls(0) == 256`
+   - **Invariant 2**: `fls(1) == 0`
+   - **Invariant 3**: `fls(2) == 1`
+   - **Invariant 4**: `fls(0x80000000000000000000000000000000) == 127`
+   - **Invariant 5**: `fls(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == 255`
+
+2. **`clz(uint256 x)`**
+   - **Invariant 1**: `clz(0) == 256`
+   - **Invariant 2**: `clz(1) == 255`
+   - **Invariant 3**: `clz(2) == 254`
+   - **Invariant 4**: `clz(0x80000000000000000000000000000000) == 127`
+   - **Invariant 5**: `clz(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == 0`
+
+3. **`ffs(uint256 x)`**
+   - **Invariant 1**: `ffs(0) == 256`
+   - **Invariant 2**: `ffs(1) == 0`
+   - **Invariant 3**: `ffs(2) == 1`
+   - **Invariant 4**: `ffs(0x80000000000000000000000000000000) == 127`
+   - **Invariant 5**: `ffs(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == 0`
+
+4. **`popCount(uint256 x)`**
+   - **Invariant 1**: `popCount(0) == 0`
+   - **Invariant 2**: `popCount(1) == 1`
+   - **Invariant 3**: `popCount(2) == 1`
+   - **Invariant 4**: `popCount(3) == 2`
+   - **Invariant 5**: `popCount(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == 256`
+
+5. **`isPo2(uint256 x)`**
+   - **Invariant 1**: `isPo2(0) == false`
+   - **Invariant 2**: `isPo2(1) == true`
+   - **Invariant 3**: `isPo2(2) == true`
+   - **Invariant 4**: `isPo2(3) == false`
+   - **Invariant 5**: `isPo2(0x80000000000000000000000000000000) == true`
+
+6. **`reverseBits(uint256 x)`**
+   - **Invariant 1**: `reverseBits(0) == 0`
+   - **Invariant 2**: `reverseBits(1) == 0x80000000000000000000000000000000`
+   - **Invariant 3**: `reverseBits(0x80000000000000000000000000000000) == 1`
+   - **Invariant 4**: `reverseBits(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) == 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`
+   - **Invariant 5**: `reverseBits(0x123456789ABCDEF0) == 0x0F7B3D591E6A2C48`
+
+7. **`reverseBytes(uint256 x)`**
+   - **Invariant 1**: `reverseBytes(0) == 0`
+   - **Invariant 2**: `reverseBytes(0x0102030405060708) == 0x0807060504030201`
+   - **Invariant 3**: `reverseBytes(0x123456789ABCDEF0) == 0xF0DEBC9A78563412`
+   - **Invariant 4**: `reverseBytes(0xFFFFFFFFFFFFFFFF) == 0xFFFFFFFFFFFFFFFF`
+   - **Invariant 5**: `reverseBytes(0x0000000000000001) == 0x0100000000000000`
+
+### Boolean Operations
+
+1. **`rawAnd(bool x, bool y)`**
+   - **Invariant 1**: `rawAnd(false, false) == false`
+   - **Invariant 2**: `rawAnd(false, true) == false`
+   - **Invariant 3**: `rawAnd(true, false) == false`
+   - **Invariant 4**: `rawAnd(true, true) == true`
+
+2. **`and(bool x, bool y)`**
+   - **Invariant 1**: `and(false, false) == false`
+   - **Invariant 2**: `and(false, true) == false`
+   - **Invariant 3**: `and(true, false) == false`
+   - **Invariant 4**: `and(true, true) == true`
+
+3. **`rawOr(bool x, bool y)`**
+   - **Invariant 1**: `rawOr(false, false) == false`
+   - **Invariant 2**: `rawOr(false, true) == true`
+   - **Invariant 3**: `rawOr(true, false) == true`
+   - **Invariant 4**: `rawOr(true, true) == true`
+
+4. **`or(bool x, bool y)`**
+   - **Invariant 1**: `or(false, false) == false`
+   - **Invariant 2**: `or(false, true) == true`
+   - **Invariant 3**: `or(true, false) == true`
+   - **Invariant 4**: `or(true, true) == true`
+
+5. **`rawToUint(bool b)`**
+   - **Invariant 1**: `rawToUint(false) == 0`
+   - **Invariant 2**: `rawToUint(true) == 1`
+
+6. **`toUint(bool b)`**
+   - **Invariant 1**: `toUint(false) == 0`
+   - **Invariant 2**: `toUint(true) == 1`
+
+### Summary
+These test invariants cover a wide range of edge cases and typical scenarios for each function in the `LibBit` library. By implementing these invariants in your test suite, you can ensure that the library functions correctly and handles various inputs as expected.

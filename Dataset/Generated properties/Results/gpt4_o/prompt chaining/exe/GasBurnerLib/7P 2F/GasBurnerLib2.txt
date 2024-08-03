@@ -1,0 +1,56 @@
+To create a comprehensive set of test invariants for the `GasBurnerLib` smart contract, we need to consider various edge cases and scenarios that could affect the behavior of the `burn` function. Here are the test invariants that should be covered:
+
+### Test Invariants for `burn` Function
+
+1. **Invariant: Gas Consumption for Zero Input**
+   - **Description**: Ensure that calling `burn(0)` does not consume significant gas.
+   - **Edge Case**: Input `x = 0`.
+   - **Expected Behavior**: The function should not enter the loop and should not consume significant gas.
+
+2. **Invariant: Gas Consumption for Small Input**
+   - **Description**: Ensure that calling `burn` with a small value (e.g., `x < 120`) does not consume significant gas.
+   - **Edge Case**: Input `x = 1`, `x = 50`, `x = 119`.
+   - **Expected Behavior**: The function should not enter the loop and should not consume significant gas.
+
+3. **Invariant: Gas Consumption for Boundary Input**
+   - **Description**: Ensure that calling `burn` with the boundary value `x = 120` does not consume significant gas.
+   - **Edge Case**: Input `x = 120`.
+   - **Expected Behavior**: The function should not enter the loop and should not consume significant gas.
+
+4. **Invariant: Gas Consumption for Input Just Above Boundary**
+   - **Description**: Ensure that calling `burn` with a value just above the boundary (e.g., `x = 121`) starts consuming more gas.
+   - **Edge Case**: Input `x = 121`.
+   - **Expected Behavior**: The function should enter the loop and consume more gas.
+
+5. **Invariant: Gas Consumption for Large Input**
+   - **Description**: Ensure that calling `burn` with a large value consumes a significant amount of gas.
+   - **Edge Case**: Input `x = 1000`, `x = 10000`, `x = 100000`.
+   - **Expected Behavior**: The function should enter the loop and consume a significant amount of gas proportional to the input value.
+
+6. **Invariant: Memory Store Check**
+   - **Description**: Ensure that the memory store operation works correctly and does not cause unexpected behavior.
+   - **Edge Case**: Any valid input value.
+   - **Expected Behavior**: The value stored at memory location `0x10` should be non-zero after the loop.
+
+7. **Invariant: Invalid Opcode Trigger**
+   - **Description**: Ensure that the `invalid` opcode is not triggered unexpectedly.
+   - **Edge Case**: Any valid input value.
+   - **Expected Behavior**: The `invalid` opcode should not be triggered unless there is an unexpected zero value at memory location `0x10`.
+
+8. **Invariant: Compatibility with Different Environments**
+   - **Description**: Ensure that the function works correctly across different Ethereum environments (e.g., mainnet, testnets).
+   - **Edge Case**: Any valid input value.
+   - **Expected Behavior**: The function should behave consistently across different environments.
+
+9. **Invariant: Gas Consumption Proportionality**
+   - **Description**: Ensure that the gas consumption is roughly proportional to the input value `x`.
+   - **Edge Case**: Input `x = 100`, `x = 200`, `x = 300`.
+   - **Expected Behavior**: The gas consumption should increase proportionally with the input value.
+
+10. **Invariant: No Reversion for Valid Inputs**
+    - **Description**: Ensure that the function does not revert for any valid input value.
+    - **Edge Case**: Any valid input value.
+    - **Expected Behavior**: The function should not revert for any valid input value.
+
+### Summary
+These test invariants cover a range of edge cases and scenarios to ensure that the `burn` function in the `GasBurnerLib` smart contract behaves as expected. By testing these invariants, we can verify that the function correctly burns gas without causing unexpected behavior or reversion.

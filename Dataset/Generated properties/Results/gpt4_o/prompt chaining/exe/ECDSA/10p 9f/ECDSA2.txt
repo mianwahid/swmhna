@@ -1,0 +1,58 @@
+To ensure the robustness and correctness of the `ECDSA` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the contract. Here are the test invariants for each function:
+
+### Custom Errors
+1. **`InvalidSignature` Error**:
+   - Ensure that the `InvalidSignature` error is thrown when the signature recovery fails in the `recover` functions.
+
+### Recovery Operations
+2. **`recover(bytes32 hash, bytes memory signature)`**:
+   - **Valid Signature**: Ensure that a valid `(r, s, v)` or `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Length**: Ensure that an invalid signature length (not 64 or 65 bytes) reverts with `InvalidSignature`.
+   - **Invalid Signature Values**: Ensure that invalid `r`, `s`, or `v` values revert with `InvalidSignature`.
+
+3. **`recoverCalldata(bytes32 hash, bytes calldata signature)`**:
+   - **Valid Signature**: Ensure that a valid `(r, s, v)` or `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Length**: Ensure that an invalid signature length (not 64 or 65 bytes) reverts with `InvalidSignature`.
+   - **Invalid Signature Values**: Ensure that invalid `r`, `s`, or `v` values revert with `InvalidSignature`.
+
+4. **`recover(bytes32 hash, bytes32 r, bytes32 vs)`**:
+   - **Valid Signature**: Ensure that a valid `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Values**: Ensure that invalid `r` or `vs` values revert with `InvalidSignature`.
+
+5. **`recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s)`**:
+   - **Valid Signature**: Ensure that a valid `(v, r, s)` signature correctly recovers the signer's address.
+   - **Invalid Signature Values**: Ensure that invalid `v`, `r`, or `s` values revert with `InvalidSignature`.
+
+### Try-Recover Operations
+6. **`tryRecover(bytes32 hash, bytes memory signature)`**:
+   - **Valid Signature**: Ensure that a valid `(r, s, v)` or `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Length**: Ensure that an invalid signature length (not 64 or 65 bytes) returns the zero address.
+   - **Invalid Signature Values**: Ensure that invalid `r`, `s`, or `v` values return the zero address.
+
+7. **`tryRecoverCalldata(bytes32 hash, bytes calldata signature)`**:
+   - **Valid Signature**: Ensure that a valid `(r, s, v)` or `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Length**: Ensure that an invalid signature length (not 64 or 65 bytes) returns the zero address.
+   - **Invalid Signature Values**: Ensure that invalid `r`, `s`, or `v` values return the zero address.
+
+8. **`tryRecover(bytes32 hash, bytes32 r, bytes32 vs)`**:
+   - **Valid Signature**: Ensure that a valid `(r, vs)` signature correctly recovers the signer's address.
+   - **Invalid Signature Values**: Ensure that invalid `r` or `vs` values return the zero address.
+
+9. **`tryRecover(bytes32 hash, uint8 v, bytes32 r, bytes32 s)`**:
+   - **Valid Signature**: Ensure that a valid `(v, r, s)` signature correctly recovers the signer's address.
+   - **Invalid Signature Values**: Ensure that invalid `v`, `r`, or `s` values return the zero address.
+
+### Hashing Operations
+10. **`toEthSignedMessageHash(bytes32 hash)`**:
+    - **Correct Hash**: Ensure that the function correctly produces the Ethereum Signed Message hash for a given `hash`.
+
+11. **`toEthSignedMessageHash(bytes memory s)`**:
+    - **Correct Hash**: Ensure that the function correctly produces the Ethereum Signed Message hash for a given byte array `s`.
+    - **Maximum Length**: Ensure that the function handles the maximum length of `s` (999999 bytes) correctly.
+
+### Empty Calldata Helpers
+12. **`emptySignature()`**:
+    - **Empty Signature**: Ensure that the function returns an empty `bytes` calldata.
+
+### Summary
+These test invariants cover the edge cases and expected behaviors for each function in the `ECDSA` library. By implementing these tests, we can ensure that the library functions correctly and handles various edge cases gracefully.

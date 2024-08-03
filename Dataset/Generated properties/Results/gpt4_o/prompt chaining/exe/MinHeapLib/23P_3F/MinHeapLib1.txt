@@ -1,0 +1,55 @@
+The provided smart contract is a library for managing a min-heap in Solidity. A min-heap is a binary tree where the parent node is always less than or equal to its child nodes. This library provides various functionalities to interact with and manipulate the heap. Below is a detailed explanation of each functionality:
+
+### Custom Errors
+- **HeapIsEmpty()**: This error is thrown when an operation that requires the heap to be non-empty is attempted on an empty heap.
+
+### Structs
+- **Heap**: Represents a heap stored in contract storage. It contains a single field `data` which is an array of `uint256` values.
+- **MemHeap**: Represents a heap stored in memory. It also contains a single field `data` which is an array of `uint256` values.
+
+### Operations
+#### Root Operations
+- **root(Heap storage heap)**: Returns the minimum value (root) of the heap stored in contract storage. Reverts with `HeapIsEmpty` if the heap is empty.
+- **root(MemHeap memory heap)**: Returns the minimum value (root) of the heap stored in memory. Reverts with `HeapIsEmpty` if the heap is empty.
+
+#### Memory Management
+- **reserve(MemHeap memory heap, uint256 minimum)**: Reserves at least `minimum` slots of memory for the heap. This helps avoid reallocation if the maximum size of the heap is known in advance.
+
+#### Smallest Elements
+- **smallest(Heap storage heap, uint256 k)**: Returns an array of the `k` smallest items in the heap stored in contract storage, sorted in ascending order, without modifying the heap. If the heap has fewer than `k` items, all items in the heap are returned.
+- **smallest(MemHeap memory heap, uint256 k)**: Returns an array of the `k` smallest items in the heap stored in memory, sorted in ascending order, without modifying the heap. If the heap has fewer than `k` items, all items in the heap are returned.
+
+#### Length
+- **length(Heap storage heap)**: Returns the number of items in the heap stored in contract storage.
+- **length(MemHeap memory heap)**: Returns the number of items in the heap stored in memory.
+
+#### Push Operations
+- **push(Heap storage heap, uint256 value)**: Pushes the `value` onto the min-heap stored in contract storage.
+- **push(MemHeap memory heap, uint256 value)**: Pushes the `value` onto the min-heap stored in memory.
+
+#### Pop Operations
+- **pop(Heap storage heap)**: Pops the minimum value from the min-heap stored in contract storage. Reverts with `HeapIsEmpty` if the heap is empty.
+- **pop(MemHeap memory heap)**: Pops the minimum value from the min-heap stored in memory. Reverts with `HeapIsEmpty` if the heap is empty.
+
+#### Push-Pop Operations
+- **pushPop(Heap storage heap, uint256 value)**: Pushes the `value` onto the min-heap stored in contract storage and pops the minimum value.
+- **pushPop(MemHeap memory heap, uint256 value)**: Pushes the `value` onto the min-heap stored in memory and pops the minimum value.
+
+#### Replace Operations
+- **replace(Heap storage heap, uint256 value)**: Pops the minimum value and pushes the new `value` onto the min-heap stored in contract storage. Reverts with `HeapIsEmpty` if the heap is empty.
+- **replace(MemHeap memory heap, uint256 value)**: Pops the minimum value and pushes the new `value` onto the min-heap stored in memory. Reverts with `HeapIsEmpty` if the heap is empty.
+
+#### Enqueue Operations
+- **enqueue(Heap storage heap, uint256 value, uint256 maxLength)**: Pushes the `value` onto the min-heap stored in contract storage and pops the minimum value if the length of the heap exceeds `maxLength`. Reverts if `maxLength` is zero. Returns a tuple indicating whether the operation was successful, whether a value was popped, and the popped value.
+- **enqueue(MemHeap memory heap, uint256 value, uint256 maxLength)**: Pushes the `value` onto the min-heap stored in memory and pops the minimum value if the length of the heap exceeds `maxLength`. Reverts if `maxLength` is zero. Returns a tuple indicating whether the operation was successful, whether a value was popped, and the popped value.
+
+### Private Helpers
+- **_set(Heap storage heap, uint256 value, uint256 maxLength, uint256 mode)**: A private helper function for heap operations in contract storage. It handles various modes of operations such as enqueue, pop, replace, push, and pushPop.
+- **_set(MemHeap memory heap, uint256 value, uint256 maxLength, uint256 mode)**: A private helper function for heap operations in memory. It handles various modes of operations such as enqueue, pop, replace, push, and pushPop.
+
+### Usage Tips
+- To use the heap as a max-heap, bitwise negate the input and output values (e.g., `heap.push(~x)`).
+- To use the heap on tuples, pack the tuple values into a single integer.
+- To use the heap on signed integers, convert the signed integers into their ordered unsigned counterparts via `uint256(x) + (1 << 255)`.
+
+This library provides a comprehensive set of functionalities to manage a min-heap efficiently in Solidity, both in contract storage and in memory.

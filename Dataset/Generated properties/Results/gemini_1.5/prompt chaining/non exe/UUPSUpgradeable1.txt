@@ -1,0 +1,32 @@
+The provided smart contract is a mixin that adds upgradeability functionality to other smart contracts using the UUPS (Universal Upgradeable Proxy Standard) pattern. It's designed to work with ERC1967 proxies, which store the implementation contract address in a specific storage slot. Here's a breakdown of its functionalities:
+
+**1. Custom Errors:**
+
+- **UpgradeFailed:** This error is reverted if the upgrade process to a new implementation contract fails. This can happen if the new implementation doesn't meet certain requirements, like implementing the `proxiableUUID` function correctly.
+- **UnauthorizedCallContext:** This error is reverted if a function that requires a specific call context (like being called only through a proxy) is called in an unauthorized context.
+
+**2. Immutables:**
+
+- **__self:** This stores the contract's address, used to determine if a function is being called directly or through a proxy.
+
+**3. Events:**
+
+- **Upgraded(address indexed implementation):** This event is emitted whenever the proxy's implementation contract is successfully upgraded. It includes the address of the new implementation.
+
+**4. Storage:**
+
+- **_ERC1967_IMPLEMENTATION_SLOT:** This constant stores the storage slot where the address of the implementation contract is stored in ERC1967 proxies.
+
+**5. UUPS Operations:**
+
+- **_authorizeUpgrade(address newImplementation):** This internal virtual function is intended to be overridden by inheriting contracts to implement their own access control logic for upgrades. It should revert if the `msg.sender` is not authorized to upgrade the proxy.
+- **proxiableUUID() public view virtual notDelegated returns (bytes32):** This function returns the storage slot used by the implementation, adhering to the ERC1822 standard. It always returns `_ERC1967_IMPLEMENTATION_SLOT` to ensure compatibility with ERC1967 proxies. The `notDelegated` modifier ensures it's not accidentally called through a delegate call.
+- **upgradeToAndCall(address newImplementation, bytes calldata data) public payable virtual onlyProxy:** This function performs the actual upgrade of the proxy's implementation. It first authorizes the upgrade by calling `_authorizeUpgrade`, then performs several checks:
+    - Ensures the new implementation correctly implements `proxiableUUID`.
+    - Emits the `Upgraded` event.
+    - Updates the implementation address in storage.
+    - If `data` is provided, it performs a delegatecall to the new implementation with the provided data, allowing for initialization logic to be executed.
+- **onlyProxy Modifier:** This modifier ensures that the function it modifies can only be called through a proxy. It compares the current address with the stored `__self` address. If they don't match, it means the function is being called directly, and it reverts with `UnauthorizedCallContext`.
+- **notDelegated Modifier:** This modifier ensures that the function it modifies is not called through a delegate call. It's the opposite of `onlyProxy` and is used to prevent unintended behavior when a function should be called directly.
+
+**In summary, this contract provides a secure and flexible way to upgrade smart contracts using the UUPS pattern. By inheriting from this contract and implementing the `_authorizeUpgrade` function, developers can create upgradeable contracts with custom access control mechanisms.** 

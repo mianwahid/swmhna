@@ -1,0 +1,180 @@
+To ensure the robustness and correctness of the `LibString` library, we need to define test invariants for each functionality. These invariants will help us verify that the library behaves as expected under various edge cases. Below are the test invariants for each function:
+
+### Custom Errors
+1. **HexLengthInsufficient**:
+   - Ensure that `toHexStringNoPrefix` and `toHexString` revert with `HexLengthInsufficient` when the provided length is too small to contain all the hex digits of the value.
+
+2. **TooBigForSmallString**:
+   - Ensure that `toSmallString` reverts with `TooBigForSmallString` when the input string length exceeds 32 bytes.
+
+### Decimal Operations
+1. **toString(uint256 value)**:
+   - Verify that the function correctly converts `0` to `"0"`.
+   - Verify that the function correctly converts the maximum `uint256` value.
+   - Verify that the function correctly converts typical values like `1`, `10`, `1234567890`.
+
+2. **toString(int256 value)**:
+   - Verify that the function correctly converts `0` to `"0"`.
+   - Verify that the function correctly converts positive and negative values.
+   - Verify that the function correctly converts the minimum and maximum `int256` values.
+
+### Hexadecimal Operations
+1. **toHexString(uint256 value, uint256 length)**:
+   - Verify that the function correctly converts `0` to `"0x00"` when length is `1`.
+   - Verify that the function correctly converts the maximum `uint256` value with appropriate length.
+   - Verify that the function reverts with `HexLengthInsufficient` when length is too small.
+
+2. **toHexStringNoPrefix(uint256 value, uint256 length)**:
+   - Verify that the function correctly converts `0` to `"00"` when length is `1`.
+   - Verify that the function correctly converts the maximum `uint256` value with appropriate length.
+   - Verify that the function reverts with `HexLengthInsufficient` when length is too small.
+
+3. **toHexString(uint256 value)**:
+   - Verify that the function correctly converts `0` to `"0x0"`.
+   - Verify that the function correctly converts the maximum `uint256` value.
+
+4. **toMinimalHexString(uint256 value)**:
+   - Verify that the function correctly converts `0` to `"0x0"`.
+   - Verify that the function correctly converts values with leading zeros removed.
+
+5. **toMinimalHexStringNoPrefix(uint256 value)**:
+   - Verify that the function correctly converts `0` to `"0"`.
+   - Verify that the function correctly converts values with leading zeros removed.
+
+6. **toHexStringNoPrefix(uint256 value)**:
+   - Verify that the function correctly converts `0` to `"0"`.
+   - Verify that the function correctly converts the maximum `uint256` value.
+
+7. **toHexStringChecksummed(address value)**:
+   - Verify that the function correctly converts an address to its checksummed hexadecimal string representation.
+
+8. **toHexString(address value)**:
+   - Verify that the function correctly converts an address to its hexadecimal string representation.
+
+9. **toHexStringNoPrefix(address value)**:
+   - Verify that the function correctly converts an address to its hexadecimal string representation without the "0x" prefix.
+
+10. **toHexString(bytes memory raw)**:
+    - Verify that the function correctly converts a `bytes` array to its hexadecimal string representation.
+
+11. **toHexStringNoPrefix(bytes memory raw)**:
+    - Verify that the function correctly converts a `bytes` array to its hexadecimal string representation without the "0x" prefix.
+
+### Rune String Operations
+1. **runeCount(string memory s)**:
+   - Verify that the function correctly counts the number of UTF characters in a string.
+   - Verify that the function handles empty strings correctly.
+
+2. **is7BitASCII(string memory s)**:
+   - Verify that the function correctly identifies 7-bit ASCII strings.
+   - Verify that the function correctly identifies non-7-bit ASCII strings.
+
+### Byte String Operations
+1. **replace(string memory subject, string memory search, string memory replacement)**:
+   - Verify that the function correctly replaces all occurrences of `search` with `replacement`.
+   - Verify that the function handles cases where `search` is not found.
+   - Verify that the function handles empty `search` and `replacement`.
+
+2. **indexOf(string memory subject, string memory search, uint256 from)**:
+   - Verify that the function correctly finds the first occurrence of `search` starting from `from`.
+   - Verify that the function returns `NOT_FOUND` when `search` is not found.
+
+3. **indexOf(string memory subject, string memory search)**:
+   - Verify that the function correctly finds the first occurrence of `search`.
+   - Verify that the function returns `NOT_FOUND` when `search` is not found.
+
+4. **lastIndexOf(string memory subject, string memory search, uint256 from)**:
+   - Verify that the function correctly finds the last occurrence of `search` starting from `from`.
+   - Verify that the function returns `NOT_FOUND` when `search` is not found.
+
+5. **lastIndexOf(string memory subject, string memory search)**:
+   - Verify that the function correctly finds the last occurrence of `search`.
+   - Verify that the function returns `NOT_FOUND` when `search` is not found.
+
+6. **contains(string memory subject, string memory search)**:
+   - Verify that the function correctly identifies if `search` is found in `subject`.
+
+7. **startsWith(string memory subject, string memory search)**:
+   - Verify that the function correctly identifies if `subject` starts with `search`.
+
+8. **endsWith(string memory subject, string memory search)**:
+   - Verify that the function correctly identifies if `subject` ends with `search`.
+
+9. **repeat(string memory subject, uint256 times)**:
+   - Verify that the function correctly repeats `subject` the specified number of times.
+   - Verify that the function handles `times` equal to `0`.
+
+10. **slice(string memory subject, uint256 start, uint256 end)**:
+    - Verify that the function correctly slices `subject` from `start` to `end`.
+    - Verify that the function handles cases where `start` or `end` are out of bounds.
+
+11. **slice(string memory subject, uint256 start)**:
+    - Verify that the function correctly slices `subject` from `start` to the end.
+    - Verify that the function handles cases where `start` is out of bounds.
+
+12. **indicesOf(string memory subject, string memory search)**:
+    - Verify that the function correctly returns all indices of `search` in `subject`.
+    - Verify that the function handles cases where `search` is not found.
+
+13. **split(string memory subject, string memory delimiter)**:
+    - Verify that the function correctly splits `subject` based on `delimiter`.
+    - Verify that the function handles cases where `delimiter` is not found.
+
+14. **concat(string memory a, string memory b)**:
+    - Verify that the function correctly concatenates `a` and `b`.
+
+15. **toCase(string memory subject, bool toUpper)**:
+    - Verify that the function correctly converts `subject` to lowercase or uppercase based on `toUpper`.
+
+16. **fromSmallString(bytes32 s)**:
+    - Verify that the function correctly converts a null-terminated `bytes32` string to a `string`.
+
+17. **normalizeSmallString(bytes32 s)**:
+    - Verify that the function correctly normalizes a `bytes32` string by zeroizing all bytes after the first null byte.
+
+18. **toSmallString(string memory s)**:
+    - Verify that the function correctly converts a `string` to a null-terminated `bytes32` string.
+    - Verify that the function reverts with `TooBigForSmallString` when the input string length exceeds 32 bytes.
+
+19. **lower(string memory subject)**:
+    - Verify that the function correctly converts `subject` to lowercase.
+
+20. **upper(string memory subject)**:
+    - Verify that the function correctly converts `subject` to uppercase.
+
+21. **escapeHTML(string memory s)**:
+    - Verify that the function correctly escapes `s` for use within HTML tags.
+
+22. **escapeJSON(string memory s, bool addDoubleQuotes)**:
+    - Verify that the function correctly escapes `s` for use within double-quotes in a JSON.
+    - Verify that the function correctly adds double quotes around the result when `addDoubleQuotes` is true.
+
+23. **escapeJSON(string memory s)**:
+    - Verify that the function correctly escapes `s` for use within double-quotes in a JSON.
+
+24. **eq(string memory a, string memory b)**:
+    - Verify that the function correctly identifies if `a` equals `b`.
+
+25. **eqs(string memory a, bytes32 b)**:
+    - Verify that the function correctly identifies if `a` equals a null-terminated `bytes32` string `b`.
+
+26. **packOne(string memory a)**:
+    - Verify that the function correctly packs a single string with its length into a single word.
+    - Verify that the function returns `bytes32(0)` if the length is zero or greater than 31.
+
+27. **unpackOne(bytes32 packed)**:
+    - Verify that the function correctly unpacks a string packed using `packOne`.
+    - Verify that the function returns the empty string if `packed` is `bytes32(0)`.
+
+28. **packTwo(string memory a, string memory b)**:
+    - Verify that the function correctly packs two strings with their lengths into a single word.
+    - Verify that the function returns `bytes32(0)` if the combined length is zero or greater than 30.
+
+29. **unpackTwo(bytes32 packed)**:
+    - Verify that the function correctly unpacks two strings packed using `packTwo`.
+    - Verify that the function returns the empty strings if `packed` is `bytes32(0)`.
+
+30. **directReturn(string memory a)**:
+    - Verify that the function correctly returns the string `a` without copying.
+
+These test invariants cover a wide range of edge cases and ensure that the `LibString` library functions as expected under various conditions.

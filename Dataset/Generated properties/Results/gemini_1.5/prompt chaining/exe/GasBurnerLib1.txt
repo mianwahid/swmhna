@@ -1,0 +1,27 @@
+This smart contract provides a single functionality within the `GasBurnerLib` library:
+
+**Function:** `burn(uint256 x)`
+
+**Purpose:** This function aims to burn a specified amount of gas (`x`) without causing the transaction to revert. This is primarily intended for implementing Contract Secured Revenue (CSR) mechanisms.
+
+**Explanation:**
+
+1. **Input:** The function takes a single unsigned integer (`uint256`) as input, representing the target amount of gas to burn.
+
+2. **Gas Burning Mechanism:**
+   - It utilizes assembly code for efficient gas manipulation.
+   - It calculates a value `n` based on the input `x`. This calculation ensures a proportional relationship between the input gas and the number of iterations in the subsequent loop.
+   - A `for` loop is executed `n` times. Within each iteration:
+     - It performs a `keccak256` hash operation on a memory location (`0x10`). This operation consumes a significant amount of gas.
+   - Finally, it checks if the value at memory location `0x10` is zero. If it is, it triggers an `invalid` opcode, which would normally revert the transaction. However, this check is likely included as a safety measure and is unlikely to be triggered in practice.
+
+3. **Non-Reverting Nature:** The function is designed to burn gas without causing a transaction revert. Even if the gas burning operations consume all remaining gas, the contract execution will not revert.
+
+**Recommendation:**
+
+The contract recommends passing a dynamic value controlled by an admin rather than a hardcoded value for `x`. This allows for flexibility in adjusting the gas burning behavior based on factors like market conditions or changes in the underlying Layer 2 network.
+
+**Note:**
+
+- The use of `keccak256` instead of the `blake2f` precompile is for broader compatibility across different Ethereum Virtual Machine (EVM) implementations.
+- While this function aims to burn gas, the actual amount of gas consumed might vary depending on factors like the EVM implementation and network conditions. 

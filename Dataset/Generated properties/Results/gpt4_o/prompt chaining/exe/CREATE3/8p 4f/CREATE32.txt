@@ -1,0 +1,67 @@
+To ensure the robustness and correctness of the `CREATE3` library, we need to define test invariants that cover various edge cases for each functionality. Here are the test invariants for the `CREATE3` library:
+
+### Invariants for `deploy` Function
+
+1. **Successful Deployment**:
+   - **Invariant**: The function should successfully deploy a contract when provided with valid `salt`, `creationCode`, and `value`.
+   - **Edge Case**: Test with minimal `creationCode` and zero `value`.
+
+2. **Deployment Failure**:
+   - **Invariant**: The function should revert with `DeploymentFailed` if the proxy contract deployment fails.
+   - **Edge Case**: Test with a `salt` that causes `create2` to fail (e.g., insufficient gas).
+
+3. **Initialization Failure**:
+   - **Invariant**: The function should revert with `InitializationFailed` if the initialization of the deployed contract fails.
+   - **Edge Case**: Test with `creationCode` that reverts during initialization.
+
+4. **Zero Code Size**:
+   - **Invariant**: The function should revert with `InitializationFailed` if the deployed contract has zero code size.
+   - **Edge Case**: Test with `creationCode` that results in a contract with zero code size.
+
+5. **Deterministic Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for the deployed contract.
+   - **Edge Case**: Test with different `salt` values and ensure the address is as expected.
+
+6. **Funding the Deployed Contract**:
+   - **Invariant**: The deployed contract should be funded with the specified `value`.
+   - **Edge Case**: Test with non-zero `value` and verify the balance of the deployed contract.
+
+### Invariants for `getDeployed` Function (with deployer parameter)
+
+1. **Correct Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for the given `salt` and `deployer`.
+   - **Edge Case**: Test with different `salt` and `deployer` values and ensure the address is as expected.
+
+2. **Address Consistency**:
+   - **Invariant**: The function should consistently return the same address for the same `salt` and `deployer`.
+   - **Edge Case**: Call the function multiple times with the same parameters and verify the address remains the same.
+
+### Invariants for `getDeployed` Function (without deployer parameter)
+
+1. **Correct Address Calculation**:
+   - **Invariant**: The function should return the correct deterministic address for the given `salt` using the current contract's address as the deployer.
+   - **Edge Case**: Test with different `salt` values and ensure the address is as expected.
+
+2. **Address Consistency**:
+   - **Invariant**: The function should consistently return the same address for the same `salt`.
+   - **Edge Case**: Call the function multiple times with the same `salt` and verify the address remains the same.
+
+### Additional Edge Cases
+
+1. **Empty Creation Code**:
+   - **Invariant**: The `deploy` function should handle empty `creationCode` gracefully.
+   - **Edge Case**: Test with `creationCode` as an empty byte array.
+
+2. **Maximum Gas Limit**:
+   - **Invariant**: The `deploy` function should handle scenarios where the gas limit is at its maximum.
+   - **Edge Case**: Test with a very high gas limit to ensure the function does not run out of gas.
+
+3. **Reused Salt**:
+   - **Invariant**: The `deploy` function should handle the reuse of the same `salt` correctly.
+   - **Edge Case**: Deploy a contract with a specific `salt`, then attempt to deploy another contract with the same `salt` and verify the behavior.
+
+4. **Boundary Values for Salt**:
+   - **Invariant**: The `deploy` and `getDeployed` functions should handle boundary values for `salt`.
+   - **Edge Case**: Test with `salt` values like `0x0`, `0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF`, and other edge cases.
+
+By covering these invariants and edge cases, we can ensure that the `CREATE3` library functions correctly and handles various scenarios robustly.

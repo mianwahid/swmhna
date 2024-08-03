@@ -1,0 +1,41 @@
+The provided smart contract is an abstract contract named `Initializable` designed to manage the initialization process of upgradeable contracts. Below is a detailed explanation of its functionalities:
+
+### Custom Errors
+1. **`InvalidInitialization`**: This error is thrown when an invalid initialization attempt is made, such as trying to initialize an already initialized contract.
+2. **`NotInitializing`**: This error is thrown when a function that requires the contract to be in the initializing state is called, but the contract is not in that state.
+
+### Events
+1. **`Initialized(uint64 version)`**: This event is emitted when the contract has been successfully initialized. The `version` parameter indicates the version of the initialization.
+
+### Storage
+1. **`_INITIALIZABLE_SLOT`**: This is a constant that defines the storage slot used to store the initialization state. The slot is derived from a hash to ensure uniqueness and avoid collisions with other storage variables.
+   - **Bits Layout**:
+     - `[0]` - `initializing`: A flag indicating whether the contract is currently initializing.
+     - `[1..64]` - `initializedVersion`: The version of the initialization.
+
+### Operations
+1. **`_initializableSlot()`**: This internal function returns the storage slot used for initialization. It can be overridden to return a custom slot if needed.
+
+2. **`initializer` Modifier**: This modifier guards a function to ensure it can only be called once for initialization. It sets the `initializing` flag and the `initializedVersion` to 1. If the contract is already initialized, it reverts with `InvalidInitialization()`. After the function execution, it resets the `initializing` flag and emits the `Initialized` event.
+   - **Usage**: This is used to protect functions that should only be called once during the contract's lifecycle.
+
+3. **`reinitializer` Modifier**: This modifier guards a function to ensure it can only be called once for a specific version of initialization. It sets the `initializing` flag and the `initializedVersion` to the specified version. If the contract is already initialized to a version greater than or equal to the specified version, it reverts with `InvalidInitialization()`. After the function execution, it resets the `initializing` flag and emits the `Initialized` event.
+   - **Usage**: This is used to protect functions that should only be called once for a specific version of the contract's lifecycle.
+
+4. **`onlyInitializing` Modifier**: This modifier ensures that a function can only be called during the initialization process. It calls `_checkInitializing()` to verify the contract is in the initializing state.
+   - **Usage**: This is used to protect functions that should only be called during the initialization phase.
+
+5. **`_checkInitializing()`**: This internal function checks if the contract is currently initializing. If not, it reverts with `NotInitializing()`.
+   - **Usage**: This is used internally by the `onlyInitializing` modifier to ensure the contract is in the initializing state.
+
+6. **`_disableInitializers()`**: This internal function locks any future initializations by setting the `initializedVersion` to the maximum value (`2**64 - 1`). This is typically called in the constructor to prevent the contract from being initialized or reinitialized. It emits the `Initialized` event the first time it is successfully called.
+   - **Usage**: This is used to lock implementation contracts that are designed to be called through proxies.
+
+7. **`_getInitializedVersion()`**: This internal view function returns the highest version that has been initialized.
+   - **Usage**: This is used to query the current initialized version of the contract.
+
+8. **`_isInitializing()`**: This internal view function returns whether the contract is currently initializing.
+   - **Usage**: This is used to check if the contract is in the initializing state.
+
+### Summary
+The `Initializable` contract provides a robust framework for managing the initialization process of upgradeable contracts. It ensures that initialization functions can only be called once, supports versioned reinitialization, and provides mechanisms to lock the contract against future initializations. The use of custom errors, events, and storage slots ensures that the contract's state is managed efficiently and transparently.

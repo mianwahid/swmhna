@@ -1,0 +1,56 @@
+To ensure the `GasBurnerLib` library functions correctly and handles edge cases appropriately, we can derive several test invariants. These invariants will help verify the behavior of the `burn` function under various conditions. Here are the test invariants:
+
+### Test Invariants for `burn` Function
+
+1. **Invariant: Gas Consumption for Zero Input**
+   - **Description**: When `x` is zero, the function should not consume significant gas.
+   - **Edge Case**: `x = 0`
+   - **Expected Behavior**: Minimal gas consumption, no reversion.
+
+2. **Invariant: Gas Consumption for Small Input**
+   - **Description**: When `x` is a small positive number (e.g., less than 120), the function should not enter the loop and should consume minimal gas.
+   - **Edge Case**: `x = 1`, `x = 119`
+   - **Expected Behavior**: Minimal gas consumption, no reversion.
+
+3. **Invariant: Gas Consumption for Boundary Input**
+   - **Description**: When `x` is exactly 120, the function should not enter the loop and should consume minimal gas.
+   - **Edge Case**: `x = 120`
+   - **Expected Behavior**: Minimal gas consumption, no reversion.
+
+4. **Invariant: Gas Consumption for Input Just Above Boundary**
+   - **Description**: When `x` is just above 120, the function should enter the loop and consume more gas.
+   - **Edge Case**: `x = 121`
+   - **Expected Behavior**: Increased gas consumption, no reversion.
+
+5. **Invariant: Gas Consumption for Large Input**
+   - **Description**: When `x` is a large number, the function should consume a significant amount of gas.
+   - **Edge Case**: `x = 1000`, `x = 10000`
+   - **Expected Behavior**: Significant gas consumption, no reversion.
+
+6. **Invariant: Gas Consumption for Maximum Input**
+   - **Description**: When `x` is at its maximum possible value, the function should handle it without reverting.
+   - **Edge Case**: `x = type(uint256).max`
+   - **Expected Behavior**: Function handles the input without reversion, significant gas consumption.
+
+7. **Invariant: Memory Location Check**
+   - **Description**: The value at memory location `0x10` should not be zero after the loop unless `x` is zero.
+   - **Edge Case**: Various values of `x`
+   - **Expected Behavior**: Memory location `0x10` should not be zero unless `x` is zero.
+
+8. **Invariant: Invalid Opcode Trigger**
+   - **Description**: The function should trigger the `invalid` opcode if the value at memory location `0x10` is zero after the loop.
+   - **Edge Case**: Manipulate memory to force `mload(0x10)` to be zero.
+   - **Expected Behavior**: Function should revert with an invalid opcode.
+
+9. **Invariant: Gas Consumption Consistency**
+   - **Description**: For the same input `x`, the gas consumption should be consistent across multiple calls.
+   - **Edge Case**: Repeated calls with the same `x`
+   - **Expected Behavior**: Consistent gas consumption for the same input.
+
+10. **Invariant: No State Modification**
+    - **Description**: The function should not modify any state variables or storage.
+    - **Edge Case**: Any input `x`
+    - **Expected Behavior**: No state modification, as the function is marked `pure`.
+
+### Summary
+These test invariants cover a range of edge cases and expected behaviors for the `burn` function in the `GasBurnerLib` library. By testing these invariants, we can ensure that the function behaves correctly under various conditions and handles edge cases appropriately.

@@ -1,0 +1,67 @@
+To ensure the correctness and robustness of the `EnumerableSetLib` library, we need to define a set of test invariants that cover various edge cases for each functionality provided by the library. Here are the test invariants for the functionalities of the given smart contract:
+
+### Invariants for `length` Function
+1. **Empty Set**: The length of an empty set should be 0.
+   - `assert(length(set) == 0);`
+2. **Single Element**: After adding one element, the length should be 1.
+   - `add(set, value); assert(length(set) == 1);`
+3. **Multiple Elements**: After adding multiple unique elements, the length should match the number of elements added.
+   - `add(set, value1); add(set, value2); assert(length(set) == 2);`
+4. **Duplicate Elements**: Adding a duplicate element should not increase the length.
+   - `add(set, value); add(set, value); assert(length(set) == 1);`
+5. **Remove Elements**: After removing an element, the length should decrease accordingly.
+   - `add(set, value); remove(set, value); assert(length(set) == 0);`
+
+### Invariants for `contains` Function
+1. **Empty Set**: No element should be contained in an empty set.
+   - `assert(!contains(set, value));`
+2. **Single Element**: After adding an element, the set should contain that element.
+   - `add(set, value); assert(contains(set, value));`
+3. **Multiple Elements**: The set should contain all added elements.
+   - `add(set, value1); add(set, value2); assert(contains(set, value1)); assert(contains(set, value2));`
+4. **Non-Existent Element**: The set should not contain elements that were not added.
+   - `add(set, value1); assert(!contains(set, value2));`
+5. **Remove Element**: After removing an element, the set should no longer contain that element.
+   - `add(set, value); remove(set, value); assert(!contains(set, value));`
+
+### Invariants for `add` Function
+1. **Add Element**: Adding an element should return true if the element was not already in the set.
+   - `assert(add(set, value) == true);`
+2. **Add Duplicate**: Adding a duplicate element should return false.
+   - `add(set, value); assert(add(set, value) == false);`
+3. **Zero Sentinel**: Adding the zero sentinel value should revert.
+   - `try add(set, _ZERO_SENTINEL) { assert(false); } catch { assert(true); }`
+
+### Invariants for `remove` Function
+1. **Remove Element**: Removing an element should return true if the element was in the set.
+   - `add(set, value); assert(remove(set, value) == true);`
+2. **Remove Non-Existent Element**: Removing an element that is not in the set should return false.
+   - `assert(remove(set, value) == false);`
+3. **Zero Sentinel**: Removing the zero sentinel value should revert.
+   - `try remove(set, _ZERO_SENTINEL) { assert(false); } catch { assert(true); }`
+
+### Invariants for `values` Function
+1. **Empty Set**: The values array of an empty set should be empty.
+   - `assert(values(set).length == 0);`
+2. **Single Element**: The values array should contain the single added element.
+   - `add(set, value); assert(values(set).length == 1); assert(values(set)[0] == value);`
+3. **Multiple Elements**: The values array should contain all added elements.
+   - `add(set, value1); add(set, value2); assert(values(set).length == 2); assert(values(set)[0] == value1 || values(set)[1] == value1);`
+4. **Remove Element**: The values array should not contain removed elements.
+   - `add(set, value); remove(set, value); assert(values(set).length == 0);`
+
+### Invariants for `at` Function
+1. **Index Out of Bounds**: Accessing an index out of bounds should revert.
+   - `try at(set, 0) { assert(false); } catch { assert(true); }`
+2. **Valid Index**: Accessing a valid index should return the correct element.
+   - `add(set, value); assert(at(set, 0) == value);`
+3. **Multiple Elements**: Accessing indices should return the correct elements in the order they were added.
+   - `add(set, value1); add(set, value2); assert(at(set, 0) == value1 || at(set, 1) == value1);`
+
+### General Edge Cases
+1. **Zero Sentinel Handling**: Ensure that the zero sentinel value is never added to the set.
+   - `try add(set, _ZERO_SENTINEL) { assert(false); } catch { assert(true); }`
+2. **Large Sets**: Test the behavior with a large number of elements to ensure scalability.
+   - `for (uint256 i = 0; i < 1000; i++) { add(set, bytes32(i)); } assert(length(set) == 1000);`
+
+By covering these invariants, we can ensure that the `EnumerableSetLib` library functions correctly under various conditions and edge cases.

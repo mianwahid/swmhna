@@ -1,0 +1,6 @@
+langchain~=0.1.9
+langchain_openai
+langchain_google_genai
+streamlit
+solidity_parser
+langchain-chroma

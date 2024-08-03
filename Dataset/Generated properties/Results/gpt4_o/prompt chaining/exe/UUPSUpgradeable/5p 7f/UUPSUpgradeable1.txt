@@ -1,0 +1,58 @@
+The provided smart contract is an abstract contract named `UUPSUpgradeable`, which is designed to facilitate the upgradeability of smart contracts using the UUPS (Universal Upgradeable Proxy Standard) pattern. This contract is intended to be used with ERC1967 proxies. Below is a detailed explanation of each functionality within the contract:
+
+### Custom Errors
+1. **`error UpgradeFailed();`**
+   - This error is thrown when the upgrade process fails.
+
+2. **`error UnauthorizedCallContext();`**
+   - This error is thrown when a function is called from an unauthorized context, such as when a function that should only be called via a proxy is called directly.
+
+### Immutables
+3. **`uint256 private immutable __self = uint256(uint160(address(this)));`**
+   - This immutable variable stores the address of the contract itself. It is used to check the context of the call (whether it is a delegate call or not).
+
+### Events
+4. **`event Upgraded(address indexed implementation);`**
+   - This event is emitted when the proxy's implementation is upgraded.
+
+5. **`uint256 private constant _UPGRADED_EVENT_SIGNATURE = 0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b;`**
+   - This constant stores the keccak256 hash of the `Upgraded(address)` event signature. It is used in the assembly code to emit the event.
+
+### Storage
+6. **`bytes32 internal constant _ERC1967_IMPLEMENTATION_SLOT = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc;`**
+   - This constant represents the storage slot used by the ERC1967 standard to store the address of the current implementation. It is calculated as `uint256(keccak256("eip1967.proxy.implementation")) - 1`.
+
+### UUPS Operations
+7. **`function _authorizeUpgrade(address newImplementation) internal virtual;`**
+   - This is an abstract function that must be overridden in derived contracts to include logic for authorizing the upgrade. For example, it can be restricted to the contract owner.
+
+8. **`function proxiableUUID() public view virtual notDelegated returns (bytes32) { return _ERC1967_IMPLEMENTATION_SLOT; }`**
+   - This function returns the storage slot used by the implementation, complying with ERC1822. The `notDelegated` modifier ensures that this function is not called via a delegate call.
+
+9. **`function upgradeToAndCall(address newImplementation, bytes calldata data) public payable virtual onlyProxy`**
+   - This function upgrades the proxy's implementation to `newImplementation` and optionally calls a function on the new implementation with the provided `data`.
+   - It first calls `_authorizeUpgrade(newImplementation)` to ensure the caller is authorized.
+   - It then uses assembly to:
+     - Check if the new implementation correctly implements `proxiableUUID`.
+     - Emit the `Upgraded` event.
+     - Update the implementation address in the storage slot.
+     - If `data` is provided, it performs a delegate call to the new implementation with the provided `data`.
+
+### Modifiers
+10. **`modifier onlyProxy()`**
+    - This modifier ensures that the function is called through a proxy. It checks if the current context is a delegate call by comparing the stored address (`__self`) with the current address.
+    - If the check fails, it reverts with the `UnauthorizedCallContext` error.
+
+11. **`modifier notDelegated()`**
+    - This modifier ensures that the function is not called via a delegate call. It checks if the current context is not a delegate call by comparing the stored address (`__self`) with the current address.
+    - If the check fails, it reverts with the `UnauthorizedCallContext` error.
+
+### Summary
+The `UUPSUpgradeable` contract provides a framework for upgrading smart contracts using the UUPS pattern. It includes:
+- Custom errors for handling upgrade failures and unauthorized call contexts.
+- An event for logging upgrades.
+- Storage slot management for the implementation address.
+- Abstract functions and modifiers to enforce upgrade authorization and call context checks.
+- A function to perform the upgrade and optionally call a function on the new implementation.
+
+This contract is designed to be extended by other contracts that will implement the `_authorizeUpgrade` function to include specific authorization logic.

@@ -1,0 +1,79 @@
+To ensure the robustness of the `ReentrancyGuard` smart contract, we need to define test invariants that cover various edge cases for its functionalities. Here are the test invariants for the `ReentrancyGuard` contract:
+
+### Invariant 1: Initial State
+- **Description**: Ensure that the `_REENTRANCY_GUARD_SLOT` is not set to the contract's address initially.
+- **Test**:
+  - Deploy the contract.
+  - Check that `_REENTRANCY_GUARD_SLOT` is not equal to the contract's address.
+
+### Invariant 2: Single Entry for `nonReentrant`
+- **Description**: Ensure that a function protected by `nonReentrant` can be called once without reverting.
+- **Test**:
+  - Deploy the contract.
+  - Call a function protected by `nonReentrant`.
+  - Verify that the function executes successfully.
+
+### Invariant 3: Reentrancy Prevention for `nonReentrant`
+- **Description**: Ensure that a function protected by `nonReentrant` reverts on reentrant calls.
+- **Test**:
+  - Deploy the contract.
+  - Call a function protected by `nonReentrant` that attempts to call itself.
+  - Verify that the transaction reverts with the `Reentrancy()` error.
+
+### Invariant 4: Guard Reset for `nonReentrant`
+- **Description**: Ensure that the reentrancy guard is reset after the function execution.
+- **Test**:
+  - Deploy the contract.
+  - Call a function protected by `nonReentrant`.
+  - Verify that `_REENTRANCY_GUARD_SLOT` is reset to the contract's code size after execution.
+
+### Invariant 5: Single Entry for `nonReadReentrant`
+- **Description**: Ensure that a view function protected by `nonReadReentrant` can be called once without reverting.
+- **Test**:
+  - Deploy the contract.
+  - Call a view function protected by `nonReadReentrant`.
+  - Verify that the function executes successfully.
+
+### Invariant 6: Reentrancy Prevention for `nonReadReentrant`
+- **Description**: Ensure that a view function protected by `nonReadReentrant` reverts on reentrant calls.
+- **Test**:
+  - Deploy the contract.
+  - Call a view function protected by `nonReadReentrant` that attempts to call itself.
+  - Verify that the transaction reverts with the `Reentrancy()` error.
+
+### Invariant 7: No State Change for `nonReadReentrant`
+- **Description**: Ensure that the state is not modified by a view function protected by `nonReadReentrant`.
+- **Test**:
+  - Deploy the contract.
+  - Call a view function protected by `nonReadReentrant`.
+  - Verify that `_REENTRANCY_GUARD_SLOT` remains unchanged after execution.
+
+### Invariant 8: Nested Calls with `nonReentrant` and `nonReadReentrant`
+- **Description**: Ensure that nested calls between `nonReentrant` and `nonReadReentrant` functions are handled correctly.
+- **Test**:
+  - Deploy the contract.
+  - Call a function protected by `nonReentrant` that calls a view function protected by `nonReadReentrant`.
+  - Verify that both functions execute successfully without reverting.
+
+### Invariant 9: Multiple Calls to `nonReentrant`
+- **Description**: Ensure that multiple sequential calls to a function protected by `nonReentrant` do not cause reentrancy issues.
+- **Test**:
+  - Deploy the contract.
+  - Call a function protected by `nonReentrant` multiple times sequentially.
+  - Verify that each call executes successfully without reverting.
+
+### Invariant 10: Multiple Calls to `nonReadReentrant`
+- **Description**: Ensure that multiple sequential calls to a view function protected by `nonReadReentrant` do not cause reentrancy issues.
+- **Test**:
+  - Deploy the contract.
+  - Call a view function protected by `nonReadReentrant` multiple times sequentially.
+  - Verify that each call executes successfully without reverting.
+
+### Invariant 11: Cross-Contract Reentrancy
+- **Description**: Ensure that cross-contract calls do not bypass the reentrancy guard.
+- **Test**:
+  - Deploy the contract and another contract that calls the first contract.
+  - Call a function in the second contract that attempts to reenter the first contract's function protected by `nonReentrant`.
+  - Verify that the transaction reverts with the `Reentrancy()` error.
+
+These invariants cover various edge cases and ensure that the `ReentrancyGuard` contract functions as intended, preventing reentrant calls and maintaining the integrity of the contract's state.

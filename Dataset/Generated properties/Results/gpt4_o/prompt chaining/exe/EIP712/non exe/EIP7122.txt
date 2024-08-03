@@ -1,0 +1,77 @@
+To ensure the robustness and correctness of the provided EIP-712 smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for the functionalities of the given contract:
+
+### 1. Domain Separator Invariants
+
+#### Invariant 1: Cached Domain Separator Consistency
+- **Description**: The cached domain separator should remain consistent if the domain name and version do not change and the chain ID remains the same.
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainSeparator()` and store the result.
+  - Call `_domainSeparator()` again and ensure the result matches the stored value.
+
+#### Invariant 2: Domain Separator Recalculation on Chain ID Change
+- **Description**: The domain separator should be recalculated if the chain ID changes.
+- **Test**:
+  - Deploy the contract.
+  - Simulate a chain ID change (this might require a mock or a forked chain environment).
+  - Call `_domainSeparator()` and ensure it returns a new value different from the cached one.
+
+#### Invariant 3: Domain Separator Recalculation on Contract Address Change
+- **Description**: The domain separator should be recalculated if the contract address changes (e.g., in a proxy upgrade scenario).
+- **Test**:
+  - Deploy the contract.
+  - Simulate a contract address change (this might require a proxy pattern or a mock).
+  - Call `_domainSeparator()` and ensure it returns a new value different from the cached one.
+
+### 2. Hash Typed Data Invariants
+
+#### Invariant 4: Hash Typed Data Consistency
+- **Description**: The hash of the typed data should remain consistent for the same input struct hash.
+- **Test**:
+  - Deploy the contract.
+  - Call `_hashTypedData(structHash)` with a specific `structHash` and store the result.
+  - Call `_hashTypedData(structHash)` again with the same `structHash` and ensure the result matches the stored value.
+
+#### Invariant 5: Hash Typed Data with Domain Separator Recalculation
+- **Description**: The hash of the typed data should be recalculated correctly if the domain separator is invalidated.
+- **Test**:
+  - Deploy the contract.
+  - Simulate a chain ID or contract address change.
+  - Call `_hashTypedData(structHash)` with a specific `structHash` and ensure it returns a new value different from the previous one.
+
+### 3. EIP-5267 Domain Invariants
+
+#### Invariant 6: EIP-712 Domain Fields Consistency
+- **Description**: The fields returned by `eip712Domain()` should be consistent with the contract's state.
+- **Test**:
+  - Deploy the contract.
+  - Call `eip712Domain()` and verify that the returned fields match the expected values (e.g., name, version, chain ID, contract address).
+
+### 4. Domain Name and Version Invariants
+
+#### Invariant 7: Domain Name and Version Consistency
+- **Description**: The domain name and version should remain consistent if `_domainNameAndVersionMayChange()` returns `false`.
+- **Test**:
+  - Deploy the contract.
+  - Call `_domainNameAndVersion()` and store the result.
+  - Call `_domainNameAndVersion()` again and ensure the result matches the stored value.
+
+#### Invariant 8: Domain Name and Version Change Handling
+- **Description**: The contract should handle changes in domain name and version if `_domainNameAndVersionMayChange()` returns `true`.
+- **Test**:
+  - Deploy the contract with `_domainNameAndVersionMayChange()` returning `true`.
+  - Change the domain name and version (this might require a mock or a specific implementation).
+  - Call `_domainNameAndVersion()` and ensure the result reflects the new values.
+
+### 5. Private Helper Invariants
+
+#### Invariant 9: Cached Domain Separator Invalidated Check
+- **Description**: The `_cachedDomainSeparatorInvalidated()` function should correctly identify when the cached domain separator is invalidated.
+- **Test**:
+  - Deploy the contract.
+  - Simulate a chain ID or contract address change.
+  - Call `_cachedDomainSeparatorInvalidated()` and ensure it returns `true`.
+
+### Summary
+
+These test invariants cover the critical functionalities and edge cases of the provided EIP-712 smart contract. By implementing these tests, we can ensure that the contract behaves correctly under various conditions and maintains the integrity and authenticity of the data it processes.

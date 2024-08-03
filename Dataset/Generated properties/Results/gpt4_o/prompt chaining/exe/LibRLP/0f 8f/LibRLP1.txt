@@ -1,0 +1,89 @@
+The provided smart contract is a Solidity library named `LibRLP` that is designed to compute the address where a contract will be stored if deployed via a specific deployer address and nonce using the `CREATE` opcode. Below, I will break down and explain each functionality of the smart contract in detail:
+
+### 1. Library Declaration
+```solidity
+library LibRLP {
+```
+- **Library**: This keyword declares a library in Solidity. Libraries are similar to contracts but are intended to be stateless and reusable pieces of code. They cannot hold state variables and cannot inherit from other libraries or contracts.
+
+### 2. Function: `computeAddress`
+```solidity
+function computeAddress(address deployer, uint256 nonce)
+    internal
+    pure
+    returns (address deployed)
+```
+- **Function Name**: `computeAddress`
+- **Visibility**: `internal` - This function can only be called within the library or by contracts that use the library.
+- **State Mutability**: `pure` - This function does not read or modify the blockchain state.
+- **Parameters**:
+  - `address deployer`: The address of the deployer (the account or contract that is deploying the new contract).
+  - `uint256 nonce`: The nonce of the deployer at the time of deployment.
+- **Returns**: `address deployed` - The computed address where the contract will be stored.
+
+### 3. Assembly Block
+The function uses inline assembly to compute the address. Inline assembly is used for low-level operations and can be more efficient than high-level Solidity code.
+
+#### 3.1. Assembly Block Start
+```solidity
+/// @solidity memory-safe-assembly
+assembly {
+```
+- **Assembly**: This keyword starts an inline assembly block.
+- **Memory-safe-assembly**: This comment indicates that the assembly code is written to be memory-safe.
+
+#### 3.2. Loop and Conditional Check
+```solidity
+for {} 1 {} {
+    if iszero(gt(nonce, 0x7f)) {
+```
+- **Loop**: The `for` loop is used here as a control structure, but it only runs once due to the `1` condition.
+- **Conditional Check**: `if iszero(gt(nonce, 0x7f))` checks if the nonce is less than or equal to 127 (0x7f in hexadecimal).
+
+#### 3.3. Handling Nonce <= 127
+```solidity
+mstore(0x00, deployer)
+mstore8(0x0b, 0x94)
+mstore8(0x0a, 0xd6)
+mstore8(0x20, or(shl(7, iszero(nonce)), nonce))
+deployed := keccak256(0x0a, 0x17)
+break
+```
+- **mstore**: Stores the deployer address at memory location 0x00.
+- **mstore8**: Stores single bytes at specific memory locations.
+  - `0x94` and `0xd6` are constants used in the RLP encoding.
+- **shl**: Shifts bits to the left.
+- **or**: Bitwise OR operation.
+- **keccak256**: Computes the Keccak-256 hash of the data in memory from location 0x0a to 0x17.
+- **break**: Exits the loop.
+
+#### 3.4. Handling Nonce > 127
+```solidity
+let i := 8
+for {} shr(i, nonce) { i := add(i, 8) } {}
+i := shr(3, i)
+mstore(i, nonce)
+mstore(0x00, shl(8, deployer))
+mstore8(0x1f, add(0x80, i))
+mstore8(0x0a, 0x94)
+mstore8(0x09, add(0xd6, i))
+deployed := keccak256(0x09, add(0x17, i))
+break
+```
+- **let i := 8**: Initializes a variable `i` to 8.
+- **Loop**: Adjusts `i` based on the size of the nonce.
+- **shr**: Shifts bits to the right.
+- **mstore**: Stores the nonce and deployer address in memory.
+- **mstore8**: Stores single bytes at specific memory locations.
+- **keccak256**: Computes the Keccak-256 hash of the data in memory.
+- **break**: Exits the loop.
+
+### 4. End of Assembly Block and Function
+```solidity
+}
+```
+- **End of Assembly Block**: Closes the assembly block.
+- **End of Function**: Closes the function.
+
+### Summary
+The `LibRLP` library provides a single function `computeAddress` that calculates the address where a contract will be deployed based on the deployer's address and nonce. It uses the Recursive Length Prefix (RLP) encoding scheme and the Keccak-256 hash function to compute the address. The function handles both small nonces (<= 127) and larger nonces efficiently using inline assembly for performance optimization.

@@ -1,0 +1,73 @@
+The provided smart contract is a Solidity library named `LibBit` that offers various bit manipulation and boolean operations. Below is a detailed explanation of each function and its functionality:
+
+### Bit Twiddling Operations
+
+1. **`fls(uint256 x) -> uint256 r`**
+   - **Description**: Finds the index of the most significant bit (MSB) set to 1 in the given number `x`.
+   - **Returns**: The index of the MSB, counting from the least significant bit (LSB) position. If `x` is zero, it returns 256.
+   - **Implementation**: Uses bitwise operations and shifts to determine the position of the MSB.
+
+2. **`clz(uint256 x) -> uint256 r`**
+   - **Description**: Counts the number of leading zeros in the binary representation of `x`.
+   - **Returns**: The number of zeros preceding the most significant one bit. If `x` is zero, it returns 256.
+   - **Implementation**: Uses bitwise operations and shifts to count the leading zeros.
+
+3. **`ffs(uint256 x) -> uint256 r`**
+   - **Description**: Finds the index of the least significant bit (LSB) set to 1 in the given number `x`.
+   - **Returns**: The index of the LSB, counting from the LSB position. If `x` is zero, it returns 256.
+   - **Implementation**: Isolates the LSB and uses a De Bruijn-like lookup to determine its position.
+
+4. **`popCount(uint256 x) -> uint256 c`**
+   - **Description**: Counts the number of bits set to 1 in the given number `x`.
+   - **Returns**: The number of set bits in `x`.
+   - **Implementation**: Uses bitwise operations to count the set bits efficiently.
+
+5. **`isPo2(uint256 x) -> bool result`**
+   - **Description**: Checks if the given number `x` is a power of 2.
+   - **Returns**: `true` if `x` is a power of 2, otherwise `false`.
+   - **Implementation**: Uses the property that a number is a power of 2 if it has exactly one bit set to 1.
+
+6. **`reverseBits(uint256 x) -> uint256 r`**
+   - **Description**: Reverses the bits of the given number `x`.
+   - **Returns**: The number `x` with its bits reversed.
+   - **Implementation**: Uses masks and shifts to reverse the bits.
+
+7. **`reverseBytes(uint256 x) -> uint256 r`**
+   - **Description**: Reverses the bytes of the given number `x`.
+   - **Returns**: The number `x` with its bytes reversed.
+   - **Implementation**: Uses masks and shifts to reverse the bytes.
+
+### Boolean Operations
+
+1. **`rawAnd(bool x, bool y) -> bool z`**
+   - **Description**: Performs a bitwise AND operation on two boolean values `x` and `y`. Inputs must be clean (either 0 or 1).
+   - **Returns**: The result of `x & y`.
+   - **Implementation**: Uses the `and` assembly instruction.
+
+2. **`and(bool x, bool y) -> bool z`**
+   - **Description**: Performs a bitwise AND operation on two boolean values `x` and `y`.
+   - **Returns**: The result of `x & y`.
+   - **Implementation**: Ensures the inputs are clean and then uses the `and` assembly instruction.
+
+3. **`rawOr(bool x, bool y) -> bool z`**
+   - **Description**: Performs a bitwise OR operation on two boolean values `x` and `y`. Inputs must be clean (either 0 or 1).
+   - **Returns**: The result of `x | y`.
+   - **Implementation**: Uses the `or` assembly instruction.
+
+4. **`or(bool x, bool y) -> bool z`**
+   - **Description**: Performs a bitwise OR operation on two boolean values `x` and `y`.
+   - **Returns**: The result of `x | y`.
+   - **Implementation**: Ensures the inputs are clean and then uses the `or` assembly instruction.
+
+5. **`rawToUint(bool b) -> uint256 z`**
+   - **Description**: Converts a boolean value `b` to a uint256. Input must be clean (either 0 or 1).
+   - **Returns**: `1` if `b` is true, else `0`.
+   - **Implementation**: Directly assigns the boolean value to the uint256 variable.
+
+6. **`toUint(bool b) -> uint256 z`**
+   - **Description**: Converts a boolean value `b` to a uint256.
+   - **Returns**: `1` if `b` is true, else `0`.
+   - **Implementation**: Ensures the input is clean and then assigns the boolean value to the uint256 variable.
+
+### Summary
+The `LibBit` library provides a set of efficient bit manipulation and boolean operations using low-level assembly code. These functions are designed to be highly optimized for performance, making them suitable for use in scenarios where bit-level operations are critical.

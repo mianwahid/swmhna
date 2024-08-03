@@ -1,0 +1,231 @@
+To ensure the correctness and robustness of the `LibString` library, we need to define test invariants for each functionality. These invariants will help us verify that the library behaves as expected under various edge cases. Below is a list of test invariants for each function in the library:
+
+### Custom Errors
+1. **HexLengthInsufficient**
+   - Ensure the error is thrown when the length of the output is too small to contain all the hex digits.
+2. **TooBigForSmallString**
+   - Ensure the error is thrown when the length of the string is more than 32 bytes.
+
+### Decimal Operations
+1. **toString(uint256 value)**
+   - Invariant: The string representation of `0` should be "0".
+   - Invariant: The string representation of `uint256.max` should be correct.
+   - Invariant: The string representation of a random number should match its expected string form.
+
+2. **toString(int256 value)**
+   - Invariant: The string representation of `0` should be "0".
+   - Invariant: The string representation of `int256.min` should be correct.
+   - Invariant: The string representation of a negative number should include a '-' sign.
+   - Invariant: The string representation of a positive number should match its expected string form.
+
+### Hexadecimal Operations
+1. **toHexString(uint256 value, uint256 length)**
+   - Invariant: The hex representation of `0` with length `1` should be "0x0".
+   - Invariant: The hex representation of `uint256.max` with length `32` should be correct.
+   - Invariant: Ensure `HexLengthInsufficient` error is thrown for insufficient length.
+
+2. **toHexStringNoPrefix(uint256 value, uint256 length)**
+   - Invariant: The hex representation of `0` with length `1` should be "0".
+   - Invariant: The hex representation of `uint256.max` with length `32` should be correct.
+   - Invariant: Ensure `HexLengthInsufficient` error is thrown for insufficient length.
+
+3. **toHexString(uint256 value)**
+   - Invariant: The hex representation of `0` should be "0x0".
+   - Invariant: The hex representation of `uint256.max` should be correct.
+
+4. **toMinimalHexString(uint256 value)**
+   - Invariant: The minimal hex representation of `0` should be "0x0".
+   - Invariant: The minimal hex representation of `uint256.max` should be correct.
+
+5. **toMinimalHexStringNoPrefix(uint256 value)**
+   - Invariant: The minimal hex representation of `0` should be "0".
+   - Invariant: The minimal hex representation of `uint256.max` should be correct.
+
+6. **toHexStringNoPrefix(uint256 value)**
+   - Invariant: The hex representation of `0` should be "0".
+   - Invariant: The hex representation of `uint256.max` should be correct.
+
+7. **toHexStringChecksummed(address value)**
+   - Invariant: The checksummed hex representation of `0x0000000000000000000000000000000000000000` should be correct.
+   - Invariant: The checksummed hex representation of a random address should be correct.
+
+8. **toHexString(address value)**
+   - Invariant: The hex representation of `0x0000000000000000000000000000000000000000` should be "0x0000000000000000000000000000000000000000".
+   - Invariant: The hex representation of a random address should be correct.
+
+9. **toHexStringNoPrefix(address value)**
+   - Invariant: The hex representation of `0x0000000000000000000000000000000000000000` should be "0000000000000000000000000000000000000000".
+   - Invariant: The hex representation of a random address should be correct.
+
+10. **toHexString(bytes memory raw)**
+    - Invariant: The hex representation of an empty byte array should be "0x".
+    - Invariant: The hex representation of a random byte array should be correct.
+
+11. **toHexStringNoPrefix(bytes memory raw)**
+    - Invariant: The hex representation of an empty byte array should be "".
+    - Invariant: The hex representation of a random byte array should be correct.
+
+### Rune String Operations
+1. **runeCount(string memory s)**
+   - Invariant: The rune count of an empty string should be `0`.
+   - Invariant: The rune count of a string with only ASCII characters should be correct.
+   - Invariant: The rune count of a string with multi-byte UTF characters should be correct.
+
+2. **is7BitASCII(string memory s)**
+   - Invariant: An empty string should return `true`.
+   - Invariant: A string with only ASCII characters should return `true`.
+   - Invariant: A string with non-ASCII characters should return `false`.
+
+### Byte String Operations
+1. **replace(string memory subject, string memory search, string memory replacement)**
+   - Invariant: Replacing a substring in an empty string should return an empty string.
+   - Invariant: Replacing a non-existent substring should return the original string.
+   - Invariant: Replacing a substring with an empty string should remove the substring.
+   - Invariant: Replacing a substring with another substring should be correct.
+
+2. **indexOf(string memory subject, string memory search, uint256 from)**
+   - Invariant: Searching in an empty string should return `NOT_FOUND`.
+   - Invariant: Searching for an empty string should return `from`.
+   - Invariant: Searching for a non-existent substring should return `NOT_FOUND`.
+   - Invariant: Searching for a substring should return the correct index.
+
+3. **indexOf(string memory subject, string memory search)**
+   - Invariant: Searching in an empty string should return `NOT_FOUND`.
+   - Invariant: Searching for an empty string should return `0`.
+   - Invariant: Searching for a non-existent substring should return `NOT_FOUND`.
+   - Invariant: Searching for a substring should return the correct index.
+
+4. **lastIndexOf(string memory subject, string memory search, uint256 from)**
+   - Invariant: Searching in an empty string should return `NOT_FOUND`.
+   - Invariant: Searching for an empty string should return `from`.
+   - Invariant: Searching for a non-existent substring should return `NOT_FOUND`.
+   - Invariant: Searching for a substring should return the correct index.
+
+5. **lastIndexOf(string memory subject, string memory search)**
+   - Invariant: Searching in an empty string should return `NOT_FOUND`.
+   - Invariant: Searching for an empty string should return the length of the subject.
+   - Invariant: Searching for a non-existent substring should return `NOT_FOUND`.
+   - Invariant: Searching for a substring should return the correct index.
+
+6. **contains(string memory subject, string memory search)**
+   - Invariant: An empty string should not contain any substring.
+   - Invariant: A string should contain itself.
+   - Invariant: A string should contain a substring if it exists.
+
+7. **startsWith(string memory subject, string memory search)**
+   - Invariant: An empty string should start with an empty string.
+   - Invariant: A string should start with itself.
+   - Invariant: A string should start with a substring if it is a prefix.
+
+8. **endsWith(string memory subject, string memory search)**
+   - Invariant: An empty string should end with an empty string.
+   - Invariant: A string should end with itself.
+   - Invariant: A string should end with a substring if it is a suffix.
+
+9. **repeat(string memory subject, uint256 times)**
+   - Invariant: Repeating an empty string any number of times should return an empty string.
+   - Invariant: Repeating a string `0` times should return an empty string.
+   - Invariant: Repeating a string `n` times should return the correct concatenated string.
+
+10. **slice(string memory subject, uint256 start, uint256 end)**
+    - Invariant: Slicing an empty string should return an empty string.
+    - Invariant: Slicing with `start` >= `end` should return an empty string.
+    - Invariant: Slicing with `start` or `end` out of bounds should be handled correctly.
+    - Invariant: Slicing a string should return the correct substring.
+
+11. **slice(string memory subject, uint256 start)**
+    - Invariant: Slicing an empty string should return an empty string.
+    - Invariant: Slicing with `start` out of bounds should return an empty string.
+    - Invariant: Slicing a string should return the correct substring from `start` to the end.
+
+12. **indicesOf(string memory subject, string memory search)**
+    - Invariant: Searching in an empty string should return an empty array.
+    - Invariant: Searching for an empty string should return all indices.
+    - Invariant: Searching for a non-existent substring should return an empty array.
+    - Invariant: Searching for a substring should return all correct indices.
+
+13. **split(string memory subject, string memory delimiter)**
+    - Invariant: Splitting an empty string should return an array with one empty string.
+    - Invariant: Splitting by an empty delimiter should return an array of single characters.
+    - Invariant: Splitting by a non-existent delimiter should return an array with the original string.
+    - Invariant: Splitting by a delimiter should return the correct array of substrings.
+
+14. **concat(string memory a, string memory b)**
+    - Invariant: Concatenating two empty strings should return an empty string.
+    - Invariant: Concatenating a string with an empty string should return the original string.
+    - Invariant: Concatenating two strings should return the correct concatenated string.
+
+15. **toCase(string memory subject, bool toUpper)**
+    - Invariant: Converting an empty string should return an empty string.
+    - Invariant: Converting a string to lowercase should be correct.
+    - Invariant: Converting a string to uppercase should be correct.
+
+16. **fromSmallString(bytes32 s)**
+    - Invariant: Converting an empty `bytes32` should return an empty string.
+    - Invariant: Converting a `bytes32` with a null-terminated string should be correct.
+
+17. **normalizeSmallString(bytes32 s)**
+    - Invariant: Normalizing an empty `bytes32` should return an empty `bytes32`.
+    - Invariant: Normalizing a `bytes32` with a null-terminated string should be correct.
+
+18. **toSmallString(string memory s)**
+    - Invariant: Converting an empty string should return an empty `bytes32`.
+    - Invariant: Converting a string longer than 32 bytes should throw `TooBigForSmallString`.
+    - Invariant: Converting a string shorter than 32 bytes should be correct.
+
+19. **lower(string memory subject)**
+    - Invariant: Converting an empty string should return an empty string.
+    - Invariant: Converting a string to lowercase should be correct.
+
+20. **upper(string memory subject)**
+    - Invariant: Converting an empty string should return an empty string.
+    - Invariant: Converting a string to uppercase should be correct.
+
+21. **escapeHTML(string memory s)**
+    - Invariant: Escaping an empty string should return an empty string.
+    - Invariant: Escaping a string with no special characters should return the original string.
+    - Invariant: Escaping a string with special characters should be correct.
+
+22. **escapeJSON(string memory s, bool addDoubleQuotes)**
+    - Invariant: Escaping an empty string should return an empty string or `""` based on `addDoubleQuotes`.
+    - Invariant: Escaping a string with no special characters should return the original string or the string with double quotes based on `addDoubleQuotes`.
+    - Invariant: Escaping a string with special characters should be correct.
+
+23. **escapeJSON(string memory s)**
+    - Invariant: Escaping an empty string should return an empty string.
+    - Invariant: Escaping a string with no special characters should return the original string.
+    - Invariant: Escaping a string with special characters should be correct.
+
+24. **eq(string memory a, string memory b)**
+    - Invariant: Comparing two empty strings should return `true`.
+    - Invariant: Comparing a string with itself should return `true`.
+    - Invariant: Comparing two different strings should return `false`.
+
+25. **eqs(string memory a, bytes32 b)**
+    - Invariant: Comparing an empty string with an empty `bytes32` should return `true`.
+    - Invariant: Comparing a string with a matching `bytes32` should return `true`.
+    - Invariant: Comparing a string with a non-matching `bytes32` should return `false`.
+
+26. **packOne(string memory a)**
+    - Invariant: Packing an empty string should return `bytes32(0)`.
+    - Invariant: Packing a string longer than 31 bytes should return `bytes32(0)`.
+    - Invariant: Packing a string shorter than 32 bytes should be correct.
+
+27. **unpackOne(bytes32 packed)**
+    - Invariant: Unpacking `bytes32(0)` should return an empty string.
+    - Invariant: Unpacking a valid packed string should be correct.
+
+28. **packTwo(string memory a, string memory b)**
+    - Invariant: Packing two empty strings should return `bytes32(0)`.
+    - Invariant: Packing two strings with a combined length longer than 30 bytes should return `bytes32(0)`.
+    - Invariant: Packing two strings with a combined length shorter than 31 bytes should be correct.
+
+29. **unpackTwo(bytes32 packed)**
+    - Invariant: Unpacking `bytes32(0)` should return two empty strings.
+    - Invariant: Unpacking a valid packed string should be correct.
+
+30. **directReturn(string memory a)**
+    - Invariant: Directly returning an empty string should be correct.
+    - Invariant: Directly returning a non-empty string should be correct.
+
+These invariants cover a wide range of edge cases and ensure that the `LibString` library functions as expected.

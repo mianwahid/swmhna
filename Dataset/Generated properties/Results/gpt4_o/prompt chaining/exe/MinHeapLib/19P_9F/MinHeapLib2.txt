@@ -1,0 +1,93 @@
+To ensure the correctness and robustness of the `MinHeapLib` smart contract, we need to define a set of test invariants. These invariants will help us verify that the contract behaves as expected under various conditions, including edge cases. Below are the test invariants for each functionality of the contract:
+
+### Custom Errors
+1. **HeapIsEmpty()**
+   - **Invariant:** Any operation that requires the heap to be non-empty should revert with `HeapIsEmpty()` if the heap is empty.
+
+### Structs
+2. **Heap**
+   - **Invariant:** The `data` array should always represent a valid min-heap structure.
+
+3. **MemHeap**
+   - **Invariant:** The `data` array should always represent a valid min-heap structure.
+
+### Operations
+4. **root(Heap storage heap)**
+   - **Invariant:** Should return the minimum value of the heap.
+   - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+5. **root(MemHeap memory heap)**
+   - **Invariant:** Should return the minimum value of the heap.
+   - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+6. **reserve(MemHeap memory heap, uint256 minimum)**
+   - **Invariant:** Should reserve at least `minimum` slots of memory for the heap.
+   - **Edge Case:** Should handle cases where `minimum` is zero or very large.
+
+7. **smallest(Heap storage heap, uint256 k)**
+   - **Invariant:** Should return an array of the `k` smallest items in the heap, sorted in ascending order.
+   - **Edge Case:** If the heap has less than `k` items, all items in the heap should be returned.
+
+8. **smallest(MemHeap memory heap, uint256 k)**
+   - **Invariant:** Should return an array of the `k` smallest items in the heap, sorted in ascending order.
+   - **Edge Case:** If the heap has less than `k` items, all items in the heap should be returned.
+
+9. **length(Heap storage heap)**
+   - **Invariant:** Should return the number of items in the heap.
+
+10. **length(MemHeap memory heap)**
+    - **Invariant:** Should return the number of items in the heap.
+
+11. **push(Heap storage heap, uint256 value)**
+    - **Invariant:** Should push the `value` onto the min-heap.
+    - **Edge Case:** Should handle pushing the maximum and minimum possible `uint256` values.
+
+12. **push(MemHeap memory heap, uint256 value)**
+    - **Invariant:** Should push the `value` onto the min-heap.
+    - **Edge Case:** Should handle pushing the maximum and minimum possible `uint256` values.
+
+13. **pop(Heap storage heap)**
+    - **Invariant:** Should pop the minimum value from the min-heap.
+    - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+14. **pop(MemHeap memory heap)**
+    - **Invariant:** Should pop the minimum value from the min-heap.
+    - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+15. **pushPop(Heap storage heap, uint256 value)**
+    - **Invariant:** Should push the `value` onto the min-heap and pop the minimum value.
+    - **Edge Case:** Should handle pushing and popping the maximum and minimum possible `uint256` values.
+
+16. **pushPop(MemHeap memory heap, uint256 value)**
+    - **Invariant:** Should push the `value` onto the min-heap and pop the minimum value.
+    - **Edge Case:** Should handle pushing and popping the maximum and minimum possible `uint256` values.
+
+17. **replace(Heap storage heap, uint256 value)**
+    - **Invariant:** Should pop the minimum value and push the new `value` onto the min-heap.
+    - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+18. **replace(MemHeap memory heap, uint256 value)**
+    - **Invariant:** Should pop the minimum value and push the new `value` onto the min-heap.
+    - **Edge Case:** Should revert with `HeapIsEmpty()` if the heap is empty.
+
+19. **enqueue(Heap storage heap, uint256 value, uint256 maxLength)**
+    - **Invariant:** Should push the `value` onto the min-heap and pop the minimum value if the length of the heap exceeds `maxLength`.
+    - **Edge Case:** Should revert if `maxLength` is zero.
+    - **Edge Case:** Should handle cases where `value` is less than, equal to, or greater than the current minimum value.
+
+20. **enqueue(MemHeap memory heap, uint256 value, uint256 maxLength)**
+    - **Invariant:** Should push the `value` onto the min-heap and pop the minimum value if the length of the heap exceeds `maxLength`.
+    - **Edge Case:** Should revert if `maxLength` is zero.
+    - **Edge Case:** Should handle cases where `value` is less than, equal to, or greater than the current minimum value.
+
+### Private Helpers
+21. **_set(Heap storage heap, uint256 value, uint256 maxLength, uint256 mode)**
+    - **Invariant:** Should correctly handle various modes of operation such as push, pop, replace, pushPop, and enqueue.
+    - **Edge Case:** Should handle edge cases for each mode, including empty heap, full heap, and boundary values for `value`.
+
+22. **_set(MemHeap memory heap, uint256 value, uint256 maxLength, uint256 mode)**
+    - **Invariant:** Should correctly handle various modes of operation such as push, pop, replace, pushPop, and enqueue.
+    - **Edge Case:** Should handle edge cases for each mode, including empty heap, full heap, and boundary values for `value`.
+
+### Summary
+These test invariants cover the expected behavior and edge cases for each functionality provided by the `MinHeapLib` smart contract. By implementing these invariants in your test suite, you can ensure that the contract behaves correctly under various conditions and edge cases.

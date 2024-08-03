@@ -1,0 +1,19 @@
+    [
+        { "UnSound_Properties_of_Solidity_code": "assert(z == 0);\n        return;",
+          "Sound_Properties_of_Solidity_code": "if (x == 0 || y == 0) {\n            assert(z == 0);\n            return;\n        }"},
+
+      {"UnSound_Properties_of_Solidity_code": "uint256 z = FullMath.mulDiv(x, y, d);\n        if (x == 0 || y == 0) {\n            assert(z == 0);\n            return;\n        }",
+          "Sound_Properties_of_Solidity_code": " require(d > 0);\n        uint256 z = FullMath.mulDiv(x, y, d);\n        if (x == 0 || y == 0) {\n            assert(z == 0);\n            return;\n        }"},
+
+      {"UnSound_Properties_of_Solidity_code": "        assert(ceiled - floored == 1);\n        assert(ceiled == floored);",
+        "Sound_Properties_of_Solidity_code": " if (mulmod(x, y, d) > 0) {\n            assert(ceiled - floored == 1);\n        } else {\n            assert(ceiled == floored);\n        }"},
+
+      {"UnSound_Properties_of_Solidity_code": "  assert(sqrtQ <= sqrtP);\n        assert(amountIn >= SqrtPriceMath.getAmount0Delta(sqrtQ, sqrtP, liquidity, true));\n        assert(sqrtQ >= sqrtP);",
+        "Sound_Properties_of_Solidity_code": " if (zeroForOne) {\n            assert(sqrtQ <= sqrtP);\n            assert(amountIn >= SqrtPriceMath.getAmount0Delta(sqrtQ, sqrtP, liquidity, true));\n        } else {\n            assert(sqrtQ >= sqrtP);\n            assert(amountIn >= SqrtPriceMath.getAmount1Delta(sqrtP, sqrtQ, liquidity, true));\n        }"},
+
+      {"UnSound_Properties_of_Solidity_code": "assert(sqrtPX96 == sqrtQX96);",
+        "Sound_Properties_of_Solidity_code": " if (amount == 0) {\n            assert(sqrtPX96 == sqrtQX96);\n        }"},
+
+      {"UnSound_Properties_of_Solidity_code": "  // type(int24).min + 256\n            require(tick >= -8388352);\n            assert(next <= tick);\n            assert(tick - next < 256);\n            // all the ticks between the input tick and the next tick should be uninitialized\n            for (int24 i = tick; i > next; i--) {\n                assert(!isInitialized(i));\n            }\n            // type(int24).max - 256\n            require(tick < 8388351);\n            assert(next > tick);\n            assert(next - tick <= 256);\n            // all the ticks between the input tick and the next tick should be uninitialized\n            for (int24 i = tick + 1; i < next; i++) {\n                assert(!isInitialized(i));\n            }\n            assert(isInitialized(next) == initialized);",
+        "Sound_Properties_of_Solidity_code": " if (lte) {\n            // type(int24).min + 256\n            require(tick >= -8388352);\n            assert(next <= tick);\n            assert(tick - next < 256);\n            // all the ticks between the input tick and the next tick should be uninitialized\n            for (int24 i = tick; i > next; i--) {\n                assert(!isInitialized(i));\n            }\n            assert(isInitialized(next) == initialized);\n        } else {\n            // type(int24).max - 256\n            require(tick < 8388351);\n            assert(next > tick);\n            assert(next - tick <= 256);\n            // all the ticks between the input tick and the next tick should be uninitialized\n            for (int24 i = tick + 1; i < next; i++) {\n                assert(!isInitialized(i));\n            }\n            assert(isInitialized(next) == initialized);\n        }"}
+    ]

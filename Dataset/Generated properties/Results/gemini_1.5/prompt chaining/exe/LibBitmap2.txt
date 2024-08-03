@@ -1,0 +1,93 @@
+## Test Invariants for LibBitmap
+
+Here are the test invariants for the `LibBitmap` contract, focusing on edge cases:
+
+**1. `get(Bitmap storage bitmap, uint256 index)`**
+
+- **Invariant:** `get` should always return the correct boolean value for any valid index within the bitmap.
+    - **Edge Cases:**
+        - **Index 0:** Test with index 0 to ensure the first bit is handled correctly.
+        - **Last index in a bucket:** Test with indices like 255, 511, etc., to cover the last bit in each storage bucket.
+        - **Index out of bounds:** Test with indices beyond the current size of the bitmap (e.g., if no bits are set yet). Should revert or return false depending on your desired behavior.
+
+**2. `set(Bitmap storage bitmap, uint256 index)`**
+
+- **Invariant:** `set` should correctly set the bit at the given index to `true`.
+    - **Edge Cases:**
+        - **Index 0:** Test setting the first bit.
+        - **Last index in a bucket:** Test setting the last bit in a storage bucket.
+        - **Setting an already set bit:** Ensure there are no unintended side effects.
+        - **Index out of bounds:**  Test with indices beyond the current size. Should expand the bitmap correctly.
+
+**3. `unset(Bitmap storage bitmap, uint256 index)`**
+
+- **Invariant:** `unset` should correctly set the bit at the given index to `false`.
+    - **Edge Cases:**
+        - **Index 0:** Test unsetting the first bit.
+        - **Last index in a bucket:** Test unsetting the last bit in a storage bucket.
+        - **Unsetting an already unset bit:** Ensure there are no unintended side effects.
+        - **Index out of bounds:** Test with indices beyond the current size. Should not have any effect.
+
+**4. `toggle(Bitmap storage bitmap, uint256 index)`**
+
+- **Invariant:** `toggle` should flip the bit at the given index and return the new state.
+    - **Edge Cases:**
+        - **Index 0:** Test toggling the first bit.
+        - **Last index in a bucket:** Test toggling the last bit in a storage bucket.
+        - **Toggling multiple times:** Ensure the bit flips correctly on consecutive calls.
+        - **Index out of bounds:** Test with indices beyond the current size. Should expand the bitmap and set the new bit to `true`.
+
+**5. `setTo(Bitmap storage bitmap, uint256 index, bool shouldSet)`**
+
+- **Invariant:** `setTo` should correctly set the bit at the given index to the value of `shouldSet`.
+    - **Edge Cases:**
+        - **All combinations of index and `shouldSet` values:** Test with `index` at various positions (including 0 and last in a bucket) and `shouldSet` as both `true` and `false`.
+        - **Index out of bounds:** Test with indices beyond the current size. Should expand the bitmap if `shouldSet` is `true`.
+
+**6. `setBatch(Bitmap storage bitmap, uint256 start, uint256 amount)`**
+
+- **Invariant:** `setBatch` should correctly set `amount` bits to `true` starting from the `start` index.
+    - **Edge Cases:**
+        - **Start at 0:** Test setting a batch from the beginning.
+        - **Amount 1:** Test setting a single bit using `setBatch`.
+        - **Amount spanning multiple buckets:** Test setting a batch that crosses over bucket boundaries.
+        - **Amount exceeding the bitmap size:** Ensure correct expansion of the bitmap.
+        - **Start + amount exceeding uint256 max:** Test for potential overflow issues.
+
+**7. `unsetBatch(Bitmap storage bitmap, uint256 start, uint256 amount)`**
+
+- **Invariant:** `unsetBatch` should correctly set `amount` bits to `false` starting from the `start` index.
+    - **Edge Cases:**
+        - **Start at 0:** Test unsetting a batch from the beginning.
+        - **Amount 1:** Test unsetting a single bit using `unsetBatch`.
+        - **Amount spanning multiple buckets:** Test unsetting a batch that crosses over bucket boundaries.
+        - **Amount exceeding the bitmap size:** Ensure no unintended side effects.
+        - **Start + amount exceeding uint256 max:** Test for potential overflow issues.
+
+**8. `popCount(Bitmap storage bitmap, uint256 start, uint256 amount)`**
+
+- **Invariant:** `popCount` should return the correct count of set bits within the specified range.
+    - **Edge Cases:**
+        - **Empty bitmap:** Test with an empty bitmap. Should return 0.
+        - **Start at 0:** Test counting from the beginning.
+        - **Amount 1:** Test counting a single bit using `popCount`.
+        - **Amount spanning multiple buckets:** Test counting across bucket boundaries.
+        - **Amount exceeding the bitmap size:** Ensure only bits within the bitmap are counted.
+        - **Start + amount exceeding uint256 max:** Test for potential overflow issues.
+
+**9. `findLastSet(Bitmap storage bitmap, uint256 upTo)`**
+
+- **Invariant:** `findLastSet` should return the index of the most significant set bit within the range `[0, upTo]`.
+    - **Edge Cases:**
+        - **Empty bitmap:** Test with an empty bitmap. Should return `NOT_FOUND`.
+        - **UpTo 0:** Test searching only the first bit.
+        - **Single bit set:** Test with only one bit set at various positions.
+        - **Multiple bits set:** Test with various patterns of set bits.
+        - **UpTo exceeding the bitmap size:** Ensure the search is limited to the actual bitmap size.
+        - **No set bit found within the range:** Should return `NOT_FOUND`.
+
+**General Testing Considerations:**
+
+- **Gas usage:** Measure and optimize the gas costs of each function, especially for batch operations.
+- **Data fuzzing:** Use fuzzing techniques to generate random inputs and test for unexpected behavior.
+- **Property-based testing:** Define properties that should hold true for the bitmap (e.g., the number of set bits after a series of operations) and use a property-based testing framework to verify them. 

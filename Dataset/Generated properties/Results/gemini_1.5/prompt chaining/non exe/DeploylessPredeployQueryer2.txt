@@ -1,0 +1,84 @@
+## Test Invariants for DeploylessPredeployQueryer
+
+This document outlines test invariants for the `DeploylessPredeployQueryer` contract, focusing on edge cases and ensuring comprehensive coverage of its functionalities.
+
+**1. Constructor Invariants:**
+
+* **Invariant 1: Target Contract Deployment Success:**
+    * **Condition:** `target` contract does not exist prior to contract construction.
+    * **Input:** Valid `factory`, `factoryCalldata`, and `target` address.
+    * **Expected Behavior:**
+        * `target` contract is successfully deployed at the provided `target` address.
+        * Constructor executes successfully without reverting.
+    * **Edge Cases:**
+        * Insufficient balance to cover deployment costs.
+        * `factoryCalldata` targets a different contract address.
+        * `factory` has a faulty deployment mechanism.
+
+* **Invariant 2: Target Contract Deployment Failure:**
+    * **Condition:** `target` contract does not exist prior to contract construction.
+    * **Input:** Invalid `factory`, `factoryCalldata`, or `target` address.
+    * **Expected Behavior:**
+        * Constructor reverts with an error.
+    * **Edge Cases:**
+        * `factory` throws an error during deployment.
+        * `factory` deploys to an incorrect address.
+        * `factoryCalldata` is malformed.
+
+* **Invariant 3: Target Contract Pre-Exists:**
+    * **Condition:** `target` contract already exists prior to contract construction.
+    * **Input:** Any valid input parameters.
+    * **Expected Behavior:**
+        * Constructor does not attempt to deploy the `target` contract.
+        * Constructor executes successfully without reverting.
+
+* **Invariant 4: Target Query Execution Success:**
+    * **Condition:** `target` contract exists (pre-existing or deployed).
+    * **Input:** Valid `targetQueryCalldata` for the `target` contract.
+    * **Expected Behavior:**
+        * All queries in `targetQueryCalldata` are executed successfully.
+        * Constructor returns a byte array containing the return data of each query.
+    * **Edge Cases:**
+        * One or more queries in `targetQueryCalldata` revert.
+        * `targetQueryCalldata` contains invalid function signatures.
+        * `targetQueryCalldata` contains incorrect argument encoding.
+
+* **Invariant 5: Target Query Execution Failure:**
+    * **Condition:** `target` contract exists (pre-existing or deployed).
+    * **Input:** Invalid `targetQueryCalldata` for the `target` contract.
+    * **Expected Behavior:**
+        * Constructor reverts with an error.
+    * **Edge Cases:**
+        * One or more queries in `targetQueryCalldata` revert due to contract logic.
+        * `targetQueryCalldata` contains calls to non-existent functions.
+
+**2. General Invariants:**
+
+* **Invariant 6: Gas Efficiency:**
+    * **Condition:** Any function call to the deployed contract.
+    * **Expected Behavior:**
+        * Gas consumption should be optimized and comparable to direct interaction with the `target` contract.
+    * **Testing:**
+        * Compare gas costs of using the `DeploylessPredeployQueryer` versus direct interaction.
+
+* **Invariant 7: Revert Data Propagation:**
+    * **Condition:** A query in `targetQueryCalldata` or the deployment process reverts.
+    * **Expected Behavior:**
+        * The constructor should revert with the exact revert data from the failing call.
+    * **Testing:**
+        * Trigger reverts in the `target` contract or `factory` and verify the returned revert data.
+
+**3. Edge Case Considerations:**
+
+* **Empty `targetQueryCalldata`:** Test behavior with an empty array.
+* **Large `targetQueryCalldata`:** Test with a large number of queries to assess gas limits and potential errors.
+* **Zero address as `target`:** Test behavior and error handling.
+* **Different Solidity versions:** Test compatibility with different Solidity compiler versions.
+
+**Testing Methodology:**
+
+* Utilize Foundry's testing framework for comprehensive unit testing.
+* Employ fuzzing techniques to test with a wide range of inputs and identify unexpected behavior.
+* Simulate different blockchain environments and network conditions.
+
+By thoroughly testing these invariants and edge cases, we can ensure the robustness and reliability of the `DeploylessPredeployQueryer` contract. 
