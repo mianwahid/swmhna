@@ -13,7 +13,7 @@ from zipfile import ZipFile
 
 
 
-os.environ["GOOGLE_API_KEY"] = "Your GEMINI API Key"
+os.environ["GOOGLE_API_KEY"] = "Your GOOGLE API key"
 os.environ["OPENAI_API_KEY"] = "Your OPENAI API Key"
 
 
@@ -156,14 +156,16 @@ class InvariantGenerator:
         return '\n'.join(pre_contract_lines)
 
 
-    def process_contracts(self, custom_invariants):
+    def process_contracts(self, custom_invariants,prompt_technique,selected_files):
         chain_prompts = []
         tempcontracts = []
         encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
         input_token_count=0
         output_token_count=0
-        for contract in [self.contracts[33]]:
-        # for contract in [contract for contract in self.contracts if contract["filename"] in ["ERC1967FactoryConstants.sol"]]:
+
+
+        # for contract in [self.contracts[33]]:
+        for contract in [contract for contract in self.contracts if contract["filename"] in selected_files]:
             tempcontracts.append(contract)
             pragma = ""
             custom_invariant=""
@@ -201,81 +203,134 @@ class InvariantGenerator:
 
         self.contracts = tempcontracts
 
-        prompt1=[]
-        for i,t in enumerate(tempcontracts):
-            prompttext = prompts.promptchain_1(t["code"],t["referencecontracts"])
-            prompt1.append({"fewshot": prompttext})
+        if prompt_technique=="Prompt chaining":
+            prompt1=[]
+            for i,t in enumerate(tempcontracts):
+                prompttext = prompts.promptchain_1(t["code"],t["referencecontracts"])
+                prompt1.append({"fewshot": prompttext})
 
-        res1 = (self.chain.batch(prompt1))
-        if not (type(res1[0]) == type("a")):
+            res1 = (self.chain.batch(prompt1))
+            if not (type(res1[0]) == type("a")):
+                for i in range(len(res1)):
+                    res1[i] = res1[i].content
+
+            print("Contract functionalities generated.")
+
+            output_contracts=[]
+
+            # saving first resonse in the files
             for i in range(len(res1)):
-                res1[i] = res1[i].content
+                extractedcode=res1[i]
+                name = self.contracts[i]["filename"].replace(".sol", "1.txt")
+                output_contracts.append({"filename": name, "code": extractedcode})
+                # output_token_count+=len(encoding.encode(extractedcode))
 
-        print("Contract functionalities generated.")
+            self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
 
-        output_contracts=[]
+            prompt2=[]
+            for i, t in enumerate(tempcontracts):
+                prompttext = prompts.promptchain_2(t["code"], t["referencecontracts"],res1[i])
+                prompt2.append({"fewshot": prompttext})
 
-        # saving first resonse in the files
-        for i in range(len(res1)):
-            extractedcode=res1[i]
-            name = self.contracts[i]["filename"].replace(".sol", "1.txt")
-            output_contracts.append({"filename": name, "code": extractedcode})
-            # output_token_count+=len(encoding.encode(extractedcode))
+            res2 = (self.chain.batch(prompt2))
+            if not (type(res2[0]) == type("a")):
+                for i in range(len(res2)):
+                    res2[i] = res2[i].content
 
-        self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
+            print("Test invariants lists generated..")
 
-        prompt2=[]
-        for i, t in enumerate(tempcontracts):
-            prompttext = prompts.promptchain_2(t["code"], t["referencecontracts"],res1[i])
-            prompt2.append({"fewshot": prompttext})
+            output_contracts = []
 
-        res2 = (self.chain.batch(prompt2))
-        if not (type(res2[0]) == type("a")):
+            # saving first resonse in the files
             for i in range(len(res2)):
-                res2[i] = res2[i].content
-
-        print("Test invariants lists generated..")
-
-        output_contracts = []
-
-        # saving first resonse in the files
-        for i in range(len(res2)):
-            extractedcode = res2[i]
-            name = self.contracts[i]["filename"].replace(".sol", "2.txt")
-            output_contracts.append({"filename": name, "code": extractedcode})
-            # output_token_count+=len(encoding.encode(extractedcode))
-
-        self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
-
-        prompt3=[]
-        for i,t in enumerate(tempcontracts):
-            prompttext = prompts.promptchain_3(t["code"],t["pragma"], t["contract_name"] ,self.contracts_file_name,t["referencecontracts"],t["custom_invariant"],self.modelname,res2[i])
-            prompt3.append({"fewshot": prompttext})
-            input_token_count+=len(encoding.encode(prompttext))
+                extractedcode = res2[i]
+                name = self.contracts[i]["filename"].replace(".sol", "2.txt")
+                output_contracts.append({"filename": name, "code": extractedcode})
+                # output_token_count+=len(encoding.encode(extractedcode))
 
 
+            self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
 
+            prompt3=[]
+            for i,t in enumerate(tempcontracts):
+                prompttext = prompts.promptchain_3(t["code"],t["pragma"], t["contract_name"] ,self.contracts_file_name,t["referencecontracts"],t["custom_invariant"],self.modelname,res2[i])
+                prompt3.append({"fewshot": prompttext})
+                input_token_count+=len(encoding.encode(prompttext))
 
-        output_contracts = []
-        ans = (self.chain.batch(prompt3))
-        print(ans)
-        if not (type(ans[0]) == type("a")):
+            output_contracts = []
+            ans = (self.chain.batch(prompt3))
+            if not (type(ans[0]) == type("a")):
+                for i in range(len(ans)):
+                    ans[i] = ans[i].content
+
             for i in range(len(ans)):
-                ans[i] = ans[i].content
+                extractedcode=self.extract_code(ans[i])
+                name = self.contracts[i]["filename"].replace(".sol", ".t.sol")
+                output_contracts.append({"filename": name, "code": extractedcode})
+                output_token_count+=len(encoding.encode(extractedcode))
+
+            self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
+            print("--------------------------------------------")
+            print("Total Input token: ",input_token_count)
+            print("Total Output token: ",output_token_count)
+            print("--------------------------------------------")
+        elif prompt_technique=="zero-shot":
+            prompt1 = []
+            for i, t in enumerate(tempcontracts):
+                p1,p2,prompttext = prompts.zeroShot(t["code"], t["pragma"], t["contract_name"], self.contracts_file_name,
+                                                   t["referencecontracts"], t["custom_invariant"], self.modelname)
+                prompt1.append({"fewshot": prompttext})
+                input_token_count += len(encoding.encode(prompttext))
+
+            res1 = (self.chain.batch(prompt1))
+            if not (type(res1[0]) == type("a")):
+                for i in range(len(res1)):
+                    res1[i] = res1[i].content
+
+            output_contracts = []
+
+            # saving first resonse in the files
+            for i in range(len(res1)):
+                extractedcode = self.extract_code(res1[i])
+                name = self.contracts[i]["filename"].replace(".sol", ".t.sol")
+                output_contracts.append({"filename": name, "code": extractedcode})
+                output_token_count += len(encoding.encode(extractedcode))
 
 
+            self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
+            print("--------------------------------------------")
+            print("Total Input token: ",input_token_count)
+            print("Total Output token: ",output_token_count)
+            print("--------------------------------------------")
+        elif prompt_technique=="few-shot":
+            prompt1 = []
+            for i, t in enumerate(tempcontracts):
+                prompttext = prompts.solady_fewShot(t["code"], t["pragma"], t["contract_name"], self.contracts_file_name,
+                                              t["referencecontracts"], t["custom_invariant"], self.modelname)
+                prompt1.append({"fewshot": prompttext})
+                input_token_count += len(encoding.encode(prompttext))
 
-        for i in range(len(ans)):
-            extractedcode=self.extract_code(ans[i])
-            name = self.contracts[i]["filename"].replace(".sol", ".t.sol")
-            output_contracts.append({"filename": name, "code": extractedcode})
-            output_token_count+=len(encoding.encode(extractedcode))
+            res1 = (self.chain.batch(prompt1))
+            if not (type(res1[0]) == type("a")):
+                for i in range(len(res1)):
+                    res1[i] = res1[i].content
 
-        self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
-        print("--------------------------------------------")
-        print("Total Input token: ",input_token_count)
-        print("Total Output token: ",output_token_count)
-        print("--------------------------------------------")
+            output_contracts = []
+
+            # saving first resonse in the files
+            for i in range(len(res1)):
+                extractedcode = self.extract_code(res1[i])
+                name = self.contracts[i]["filename"].replace(".sol", ".t.sol")
+                output_contracts.append({"filename": name, "code": extractedcode})
+                output_token_count += len(encoding.encode(extractedcode))
+
+            self.write_smart_contracts(os.path.join(self.absolute_path, 'test'), output_contracts)
+            print("--------------------------------------------")
+            print("Total Input token: ", input_token_count)
+            print("Total Output token: ", output_token_count)
+            print("--------------------------------------------")
+
+
         return True
 
 # inv=InvariantGenerator("/home/wahid/PycharmProjects/pythonProject/FYPEvaluation/FYP/FoundryProject","src/").process_contracts()

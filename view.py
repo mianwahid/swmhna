@@ -12,6 +12,7 @@ def sideBar():
         st.title("🔍🔒 Smart Auditor Pro")
 
         llmModel = st.selectbox("Select a model:", ["gemini-1.0-pro","gemini-1.5-advanced","gpt-4","gpt-3.5"])
+        prompt_technique = st.selectbox("Select Prompt :", ["zero-shot","few-shot","Prompt chaining"])
 
         st.markdown("---")
         st.markdown(
@@ -19,7 +20,7 @@ def sideBar():
             "1. Upload Smart contract file 📄\n"
             "2. Provide description to customize invariants 💬\n"
         )
-        return llmModel
+        return llmModel,prompt_technique
 
 
 def remappinginput():
@@ -120,7 +121,7 @@ def input_files():
         st.session_state.generated=False
         st.session_state.custom_invariants = {}
 
-def generate_invariants(llmmodel):
+def generate_invariants(llmmodel,prompt_technique):
     foundry_path = f'{current_dir}/FoundryProject/'
 
     try:
@@ -149,18 +150,30 @@ def generate_invariants(llmmodel):
         # Text area for custom invariants
         custom_invariants_text = st.text_area(f"Enter custom invariants for {selected_contract}:", key=selected_contract, value=value)
 
+
         if st.button("Add Custom Invariants"):
             # Update custom invariants for the selected contract
             if custom_invariants_text.strip():
                 st.session_state.custom_invariants[selected_contract] =  custom_invariants_text.strip()
                 st.success("Custom invariants added successfully.")
                 print(st.session_state.custom_invariants)
+        checked_files = {}
+
+        # Display checkboxes and store their state
+        st.text("Select files to create test invariants:")
+        for file in contract_files:
+            checked_files[file] = st.checkbox(file)
+
+        # Filter the selected files
+        selected_files = [file for file, checked in checked_files.items() if checked]
 
         if st.button("Generate Invariants"):
             with st.spinner("Generating invariants..."):
                 # Pass custom invariants dictionary to InvariantGenerator
-                IG=InvariantGenerator(foundry_path, contracts_file_name,llmmodel)
-                IG.process_contracts(st.session_state.custom_invariants if "custom_invariants" in st.session_state else {})
+                IG = InvariantGenerator(foundry_path, contracts_file_name, llmmodel)
+                IG.process_contracts(
+                    st.session_state.custom_invariants if "custom_invariants" in st.session_state else {},
+                    prompt_technique,selected_files)
                 print(st.session_state.custom_invariants)
                 st.success("Invariants generated successfully.")
                 st.session_state.generated = True
@@ -168,9 +181,12 @@ def generate_invariants(llmmodel):
 
 
 
+
+
     except Exception as e:
         st.session_state.generated = False
         st.error(f"Error: {e}")
+
 def compile_invariants():
     foundry_path = f'{current_dir}/FoundryProject/'
     try:
@@ -193,11 +209,11 @@ if __name__ == '__main__':
     if 'generated' not in st.session_state:
         st.session_state.generated = False
 
-    llmmodel=sideBar()
+    llmmodel,prompt_technique=sideBar()
     #  Main page
     st.title("🔍🔒 Smart Auditor Pro")
     input_files()
     if st.session_state.compilable:
-        generate_invariants(llmmodel)
+        generate_invariants(llmmodel,prompt_technique)
     # if st.session_state.generated:
         # compile_invariants()
