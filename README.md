@@ -10,7 +10,7 @@ git clone https://github.com/mianwahid/swmhna
 Change into the cloned repository directory:
 
 ```bash
-cd swmhna
+cd swmhna/Code
 ```
 ## 3. Install Dependencies
 Install all the necessary dependencies by running:
